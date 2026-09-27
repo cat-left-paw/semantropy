@@ -39,7 +39,7 @@ Set the destination under **Settings → Semantropy → Collection file** and se
 - Manual verb and i-adjective changes use supported forms observed in the vocabulary; unsupported forms stay unchanged. A very large note, especially at MAX, can take several seconds to prepare. A single parser or tokenizer step may delay cancellation.
 - A narrow pane with high zoom can leave little room for the body below the fixed toolbar. Vertical writing, a dedicated Collection view, folder-wide vocabulary and user-editable templates are not included.
 
-The bundled `main.js` is over 5 MB (recent builds have been about 14–16 MB) because it embeds WebAssembly and the dictionary. Check the published GitHub Release for the exact asset size. This exceeds [Obsidian Sync Standard's 5 MB per-file limit](https://obsidian.md/help/sync/plans). Standard users should install or update the plugin on each device rather than rely on the plugin file to sync. Sync Plus allows files up to 200 MB.
+The macOS 0.0.1 release candidate `main.js` measures 14,184,815 bytes (about 14.2 MB) because it embeds WebAssembly and the dictionary. Builds on other operating systems can differ; check the published GitHub Release for the size of the asset you install. This exceeds [Obsidian Sync Standard's 5 MB per-file limit](https://obsidian.md/help/sync/plans). Standard users should install or update the plugin on each device rather than rely on the plugin file to sync. Sync Plus allows files up to 200 MB.
 
 ## Installation
 

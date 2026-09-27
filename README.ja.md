@@ -39,7 +39,7 @@ Collectする前に **設定 → Semantropy → Collection file** で保存先�
 - 動詞とイ形容詞の手動変更は、語彙で観測した対応形に限ります。対応外の形は維持します。非常に大きなノート、特にMAXでは準備に数秒かかる場合があります。分割できないparser／tokenizer処理中はCancelが遅れる場合があります。
 - 狭いpaneと高倍率zoomでは、固定Toolbarの下の本文領域が小さくなる場合があります。縦書き、Collection専用View、フォルダ全体の語彙、ユーザー編集templateはありません。
 
-配布用 `main.js` はWebAssemblyと辞書を内包するため5 MBを超えます（最近のbuildでは約14〜16 MB）。正確なサイズは公開されたGitHub Releaseのassetで確認してください。[Obsidian Sync Standardの1ファイル5 MB上限](https://obsidian.md/help/sync/plans)を超えるので、Standardを使う場合はplugin fileの同期に頼らず、端末ごとにインストール／更新してください。Sync Plusの1ファイル上限は200 MBです。
+macOS版0.0.1 release candidateの `main.js` はWebAssemblyと辞書を内包し、実測14,184,815 bytes（約14.2 MB）です。他のOSでbuildした場合は異なることがあるため、インストールするassetのサイズは公開後のGitHub Releaseで確認してください。[Obsidian Sync Standardの1ファイル5 MB上限](https://obsidian.md/help/sync/plans)を超えるので、Standardを使う場合はplugin fileの同期に頼らず、端末ごとにインストール／更新してください。Sync Plusの1ファイル上限は200 MBです。
 
 ## インストール
 
