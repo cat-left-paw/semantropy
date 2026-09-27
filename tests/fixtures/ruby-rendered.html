@@ -1,0 +1,29 @@
+<div class="markdown-preview-view">
+	<h1>Ruby analysis fixture</h1>
+	<p data-case="short"><ruby class="ruby" data-ruby-raw="漢字《かんじ》"><rb>漢字</rb><rt>かんじ</rt></ruby>と<ruby class="ruby" data-ruby-raw="歩《ある》"><rb>歩</rb><rt>ある</rt></ruby>く。</p>
+	<p data-case="explicit"><ruby class="ruby" data-ruby-raw="｜親文字《よみ》"><rb>親文字</rb><rt>よみ</rt></ruby>と<ruby class="ruby" data-ruby-raw="｜Alice in Wonderland《ありす》"><rb>Alice in Wonderland</rb><rt>ありす</rt></ruby>。</p>
+	<p data-case="html">前<ruby>歩<rp>（</rp><rt>ある</rt><rp>）</rp></ruby>く後</p>
+	<p data-case="multi-token"><ruby>東京都<rt>とうきょうと</rt></ruby>へ行く。</p>
+	<p data-case="inline">歩<strong>く</strong></p>
+	<p data-case="emoji-repeat">😀猫と猫、<ruby class="ruby" data-ruby-raw="漢字《かんじ》"><rb>漢字</rb><rt>かんじ</rt></ruby>の周辺🐈。</p>
+	<p data-case="protected">
+		前<code>code漢字《かんじ》</code>後
+		<a href="note.md">link漢字《かんじ》</a>末
+		<span class="math math-inline">math漢字《かんじ》</span>外
+		<a class="tag" href="#tag">tag漢字《かんじ》</a>端
+		<span class="internal-embed">embed漢字《かんじ》</span>完
+	</p>
+	<pre>pre漢字《かんじ》</pre>
+	<div class="metadata-container">metadata漢字《かんじ》</div>
+	<textarea>control漢字《かんじ》</textarea>
+	<p data-case="ascii"><ruby class="ruby" data-ruby-raw="|親文字《よみ》"><rb>親文字</rb><rt>よみ</rt></ruby></p>
+	<p data-case="empty-reading">漢字《》</p>
+	<p data-case="nested-text"><ruby class="ruby" data-ruby-raw="漢字《かん《じ》》"><rb>漢字</rb><rt>かん《じ》</rt></ruby></p>
+	<p data-case="escaped-visible">漢字\《かんじ》</p>
+	<p data-case="escaped-explicit">\<ruby class="ruby" data-ruby-raw="｜親文字《よみ》"><rb>親文字</rb><rt>よみ</rt></ruby></p>
+	<p data-case="escaped-mixed">漢字\《かんじ》と<ruby class="ruby" data-ruby-raw="歩《ある》"><rb>歩</rb><rt>ある</rt></ruby>く</p>
+	<p data-case="line-break">漢字《かん<br>じ》</p>
+	<p data-case="nested-html"><ruby>外<ruby>内<rt>うち</rt></ruby><rt>そと</rt></ruby></p>
+	<p data-case="multiple-rt"><ruby>漢字<rt>かん</rt><rt>じ</rt></ruby></p>
+	<p data-case="raw-mismatch"><ruby class="ruby" data-ruby-raw="猫《ねこ》"><rb>犬</rb><rt>いぬ</rt></ruby></p>
+</div>

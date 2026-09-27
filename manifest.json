@@ -1,0 +1,10 @@
+{
+	"id": "semantropy",
+	"name": "Semantropy",
+	"version": "0.0.1",
+	"minAppVersion": "1.13.7",
+	"description": "Transform Japanese Markdown into meaning-disrupting variations without changing the source note.",
+	"author": "Cat Left Paw / 猫乃 左手",
+	"authorUrl": "https://github.com/cat-left-paw",
+	"isDesktopOnly": true
+}

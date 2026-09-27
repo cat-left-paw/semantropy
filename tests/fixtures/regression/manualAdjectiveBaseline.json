@@ -1,0 +1,3763 @@
+{
+  "format": 1,
+  "origin": "f5f1d1c62ed49e4c3246521dbe3758a21e523c4a",
+  "source": "書いて描いて歩いて泳いで脱いで急いだ。待って持って買って。読んだ飲んだ飛んで遊んで。書かない描かない分からない帰らないあらず。書きます描きます食べない見ない。書かせられなかった。書くこと。書くか。書け。来る。する。",
+  "verbs": [
+    {
+      "index": 0,
+      "target": {
+        "surface": "書い",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カイ"
+      },
+      "next": {
+        "surface": "て",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"描い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"描く\",\"エガイ\",false]",
+          "displayFormId": "[\"[\\\"描い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"描く\\\",\\\"エガイ\\\",false]\",\"描い\"]",
+          "surface": "描い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        },
+        {
+          "candidateId": "[\"歩い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"歩く\",\"アルイ\",false]",
+          "displayFormId": "[\"[\\\"歩い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"歩く\\\",\\\"アルイ\\\",false]\",\"歩い\"]",
+          "surface": "歩い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "target": {
+        "surface": "描い",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "描く",
+        "isUnknown": false,
+        "reading": "エガイ"
+      },
+      "next": {
+        "surface": "て",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"書い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"書く\",\"カイ\",false]",
+          "displayFormId": "[\"[\\\"書い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"書く\\\",\\\"カイ\\\",false]\",\"書い\"]",
+          "surface": "書い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        },
+        {
+          "candidateId": "[\"歩い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"歩く\",\"アルイ\",false]",
+          "displayFormId": "[\"[\\\"歩い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"歩く\\\",\\\"アルイ\\\",false]\",\"歩い\"]",
+          "surface": "歩い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "target": {
+        "surface": "歩い",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "歩く",
+        "isUnknown": false,
+        "reading": "アルイ"
+      },
+      "next": {
+        "surface": "て",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"描い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"描く\",\"エガイ\",false]",
+          "displayFormId": "[\"[\\\"描い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"描く\\\",\\\"エガイ\\\",false]\",\"描い\"]",
+          "surface": "描い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        },
+        {
+          "candidateId": "[\"書い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"書く\",\"カイ\",false]",
+          "displayFormId": "[\"[\\\"書い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"書く\\\",\\\"カイ\\\",false]\",\"書い\"]",
+          "surface": "書い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "target": {
+        "surface": "泳い",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ガ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "泳ぐ",
+        "isUnknown": false,
+        "reading": "オヨイ"
+      },
+      "next": {
+        "surface": "で",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"脱い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・ガ行\",\"連用タ接続\",\"脱ぐ\",\"ヌイ\",false]",
+          "displayFormId": "[\"[\\\"脱い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・ガ行\\\",\\\"連用タ接続\\\",\\\"脱ぐ\\\",\\\"ヌイ\\\",false]\",\"脱い\"]",
+          "surface": "脱い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "target": {
+        "surface": "脱い",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ガ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "脱ぐ",
+        "isUnknown": false,
+        "reading": "ヌイ"
+      },
+      "next": {
+        "surface": "で",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"泳い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・ガ行\",\"連用タ接続\",\"泳ぐ\",\"オヨイ\",false]",
+          "displayFormId": "[\"[\\\"泳い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・ガ行\\\",\\\"連用タ接続\\\",\\\"泳ぐ\\\",\\\"オヨイ\\\",false]\",\"泳い\"]",
+          "surface": "泳い",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "target": {
+        "surface": "急い",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ガ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "急ぐ",
+        "isUnknown": false,
+        "reading": "イソイ"
+      },
+      "next": {
+        "surface": "だ",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "only-current-surface"
+    },
+    {
+      "index": 13,
+      "target": {
+        "surface": "待っ",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・タ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "待つ",
+        "isUnknown": false,
+        "reading": "マッ"
+      },
+      "next": {
+        "surface": "て",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"持っ\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・タ行\",\"連用タ接続\",\"持つ\",\"モッ\",false]",
+          "displayFormId": "[\"[\\\"持っ\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・タ行\\\",\\\"連用タ接続\\\",\\\"持つ\\\",\\\"モッ\\\",false]\",\"持っ\"]",
+          "surface": "持っ",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 15,
+      "target": {
+        "surface": "持っ",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・タ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "持つ",
+        "isUnknown": false,
+        "reading": "モッ"
+      },
+      "next": {
+        "surface": "て",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"待っ\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・タ行\",\"連用タ接続\",\"待つ\",\"マッ\",false]",
+          "displayFormId": "[\"[\\\"待っ\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・タ行\\\",\\\"連用タ接続\\\",\\\"待つ\\\",\\\"マッ\\\",false]\",\"待っ\"]",
+          "surface": "待っ",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "target": {
+        "surface": "買っ",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ワ行促音便",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "買う",
+        "isUnknown": false,
+        "reading": "カッ"
+      },
+      "next": {
+        "surface": "て",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "only-current-surface"
+    },
+    {
+      "index": 20,
+      "target": {
+        "surface": "読ん",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・マ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "読む",
+        "isUnknown": false,
+        "reading": "ヨン"
+      },
+      "next": {
+        "surface": "だ",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"飲ん\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・マ行\",\"連用タ接続\",\"飲む\",\"ノン\",false]",
+          "displayFormId": "[\"[\\\"飲ん\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・マ行\\\",\\\"連用タ接続\\\",\\\"飲む\\\",\\\"ノン\\\",false]\",\"飲ん\"]",
+          "surface": "飲ん",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 22,
+      "target": {
+        "surface": "飲ん",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・マ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "飲む",
+        "isUnknown": false,
+        "reading": "ノン"
+      },
+      "next": {
+        "surface": "だ",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"読ん\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・マ行\",\"連用タ接続\",\"読む\",\"ヨン\",false]",
+          "displayFormId": "[\"[\\\"読ん\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・マ行\\\",\\\"連用タ接続\\\",\\\"読む\\\",\\\"ヨン\\\",false]\",\"読ん\"]",
+          "surface": "読ん",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 24,
+      "target": {
+        "surface": "飛ん",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・バ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "飛ぶ",
+        "isUnknown": false,
+        "reading": "トン"
+      },
+      "next": {
+        "surface": "で",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"遊ん\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・バ行\",\"連用タ接続\",\"遊ぶ\",\"アソン\",false]",
+          "displayFormId": "[\"[\\\"遊ん\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・バ行\\\",\\\"連用タ接続\\\",\\\"遊ぶ\\\",\\\"アソン\\\",false]\",\"遊ん\"]",
+          "surface": "遊ん",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 26,
+      "target": {
+        "surface": "遊ん",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・バ行",
+        "conjugationForm": "連用タ接続",
+        "baseForm": "遊ぶ",
+        "isUnknown": false,
+        "reading": "アソン"
+      },
+      "next": {
+        "surface": "で",
+        "pos": "助詞",
+        "detail1": "接続助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"飛ん\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・バ行\",\"連用タ接続\",\"飛ぶ\",\"トン\",false]",
+          "displayFormId": "[\"[\\\"飛ん\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・バ行\\\",\\\"連用タ接続\\\",\\\"飛ぶ\\\",\\\"トン\\\",false]\",\"飛ん\"]",
+          "surface": "飛ん",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 29,
+      "target": {
+        "surface": "書か",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "未然形",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カカ"
+      },
+      "next": {
+        "surface": "ない",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"描か\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"未然形\",\"描く\",\"エガカ\",false]",
+          "displayFormId": "[\"[\\\"描か\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"未然形\\\",\\\"描く\\\",\\\"エガカ\\\",false]\",\"描か\"]",
+          "surface": "描か",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 31,
+      "target": {
+        "surface": "描か",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "未然形",
+        "baseForm": "描く",
+        "isUnknown": false,
+        "reading": "エガカ"
+      },
+      "next": {
+        "surface": "ない",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"書か\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"未然形\",\"書く\",\"カカ\",false]",
+          "displayFormId": "[\"[\\\"書か\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"未然形\\\",\\\"書く\\\",\\\"カカ\\\",false]\",\"書か\"]",
+          "surface": "書か",
+          "frequency": 2,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 2
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 33,
+      "target": {
+        "surface": "分から",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ラ行",
+        "conjugationForm": "未然形",
+        "baseForm": "分かる",
+        "isUnknown": false,
+        "reading": "ワカラ"
+      },
+      "next": {
+        "surface": "ない",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"帰ら\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・ラ行\",\"未然形\",\"帰る\",\"カエラ\",false]",
+          "displayFormId": "[\"[\\\"帰ら\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・ラ行\\\",\\\"未然形\\\",\\\"帰る\\\",\\\"カエラ\\\",false]\",\"帰ら\"]",
+          "surface": "帰ら",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 35,
+      "target": {
+        "surface": "帰ら",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ラ行",
+        "conjugationForm": "未然形",
+        "baseForm": "帰る",
+        "isUnknown": false,
+        "reading": "カエラ"
+      },
+      "next": {
+        "surface": "ない",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"分から\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・ラ行\",\"未然形\",\"分かる\",\"ワカラ\",false]",
+          "displayFormId": "[\"[\\\"分から\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・ラ行\\\",\\\"未然形\\\",\\\"分かる\\\",\\\"ワカラ\\\",false]\",\"分から\"]",
+          "surface": "分から",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 37,
+      "target": {
+        "surface": "あら",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・ラ行",
+        "conjugationForm": "未然形",
+        "baseForm": "ある",
+        "isUnknown": false,
+        "reading": "アラ"
+      },
+      "next": {
+        "surface": "ず",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "only-current-surface"
+    },
+    {
+      "index": 40,
+      "target": {
+        "surface": "書き",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "連用形",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カキ"
+      },
+      "next": {
+        "surface": "ます",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"描き\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用形\",\"描く\",\"エガキ\",false]",
+          "displayFormId": "[\"[\\\"描き\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用形\\\",\\\"描く\\\",\\\"エガキ\\\",false]\",\"描き\"]",
+          "surface": "描き",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 42,
+      "target": {
+        "surface": "描き",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "連用形",
+        "baseForm": "描く",
+        "isUnknown": false,
+        "reading": "エガキ"
+      },
+      "next": {
+        "surface": "ます",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"書き\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用形\",\"書く\",\"カキ\",false]",
+          "displayFormId": "[\"[\\\"書き\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用形\\\",\\\"書く\\\",\\\"カキ\\\",false]\",\"書き\"]",
+          "surface": "書き",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 44,
+      "target": {
+        "surface": "食べ",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "一段",
+        "conjugationForm": "未然形",
+        "baseForm": "食べる",
+        "isUnknown": false,
+        "reading": "タベ"
+      },
+      "next": {
+        "surface": "ない",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"見\",\"動詞\",\"自立\",\"*\",\"*\",\"一段\",\"未然形\",\"見る\",\"ミ\",false]",
+          "displayFormId": "[\"[\\\"見\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"一段\\\",\\\"未然形\\\",\\\"見る\\\",\\\"ミ\\\",false]\",\"見\"]",
+          "surface": "見",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 46,
+      "target": {
+        "surface": "見",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "一段",
+        "conjugationForm": "未然形",
+        "baseForm": "見る",
+        "isUnknown": false,
+        "reading": "ミ"
+      },
+      "next": {
+        "surface": "ない",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": true,
+      "candidates": [
+        {
+          "candidateId": "[\"食べ\",\"動詞\",\"自立\",\"*\",\"*\",\"一段\",\"未然形\",\"食べる\",\"タベ\",false]",
+          "displayFormId": "[\"[\\\"食べ\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"一段\\\",\\\"未然形\\\",\\\"食べる\\\",\\\"タベ\\\",false]\",\"食べ\"]",
+          "surface": "食べ",
+          "frequency": 1,
+          "origins": [
+            {
+              "path": "source.md",
+              "contentHash": "7ecce25694708294bc72de6e21cb457ee3ef7d4869ba565345528455e5e972c1",
+              "count": 1
+            }
+          ],
+          "verifiedRubyVariants": []
+        }
+      ]
+    },
+    {
+      "index": 49,
+      "target": {
+        "surface": "書か",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "未然形",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カカ"
+      },
+      "next": {
+        "surface": "せ",
+        "pos": "動詞",
+        "detail1": "接尾",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "only-current-surface"
+    },
+    {
+      "index": 50,
+      "target": {
+        "surface": "せ",
+        "pos": "動詞",
+        "detail1": "接尾",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "next": {
+        "surface": "られ",
+        "pos": "動詞",
+        "detail1": "接尾",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "unsupported-part-of-speech"
+    },
+    {
+      "index": 51,
+      "target": {
+        "surface": "られ",
+        "pos": "動詞",
+        "detail1": "接尾",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "next": {
+        "surface": "なかっ",
+        "pos": "助動詞",
+        "detail1": "*",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "unsupported-part-of-speech"
+    },
+    {
+      "index": 55,
+      "target": {
+        "surface": "書く",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "基本形",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カク"
+      },
+      "next": {
+        "surface": "こと",
+        "pos": "名詞",
+        "detail1": "非自立",
+        "detail2": "一般",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "only-current-surface"
+    },
+    {
+      "index": 58,
+      "target": {
+        "surface": "書く",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "基本形",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カク"
+      },
+      "next": {
+        "surface": "か",
+        "pos": "助詞",
+        "detail1": "副助詞／並立助詞／終助詞",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "unsupported-connection"
+    },
+    {
+      "index": 61,
+      "target": {
+        "surface": "書け",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "五段・カ行イ音便",
+        "conjugationForm": "命令ｅ",
+        "baseForm": "書く",
+        "isUnknown": false,
+        "reading": "カケ"
+      },
+      "next": {
+        "surface": "。",
+        "pos": "記号",
+        "detail1": "句点",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "unsupported-conjugation-form"
+    },
+    {
+      "index": 63,
+      "target": {
+        "surface": "来る",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "カ変・来ル",
+        "conjugationForm": "基本形",
+        "baseForm": "来る",
+        "isUnknown": false,
+        "reading": "クル"
+      },
+      "next": {
+        "surface": "。",
+        "pos": "記号",
+        "detail1": "句点",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "unsupported-conjugation-type"
+    },
+    {
+      "index": 65,
+      "target": {
+        "surface": "する",
+        "pos": "動詞",
+        "detail1": "自立",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "サ変・スル",
+        "conjugationForm": "基本形",
+        "baseForm": "する",
+        "isUnknown": false,
+        "reading": "スル"
+      },
+      "next": {
+        "surface": "。",
+        "pos": "記号",
+        "detail1": "句点",
+        "detail2": "*",
+        "detail3": "*",
+        "conjugationType": "*",
+        "conjugationForm": "*",
+        "baseForm": "*",
+        "isUnknown": false
+      },
+      "available": false,
+      "candidates": [],
+      "reason": "unsupported-conjugation-type"
+    }
+  ],
+  "adjectiveSource": "高い山。美しい景色。赤い",
+  "targets": [
+    {
+      "text": "暑い。",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "。",
+          "pos": "記号",
+          "detail1": "句点",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": true,
+      "result": {
+        "available": false,
+        "reason": "no-candidate",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いか",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "か",
+          "pos": "助詞",
+          "detail1": "副助詞／並立助詞／終助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いかも",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "かも",
+          "pos": "助詞",
+          "detail1": "副助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いとは",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "と",
+          "pos": "助詞",
+          "detail1": "格助詞",
+          "detail2": "引用",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        {
+          "surface": "は",
+          "pos": "助詞",
+          "detail1": "係助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いって",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "って",
+          "pos": "助詞",
+          "detail1": "格助詞",
+          "detail2": "連語",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いとも",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "とも",
+          "pos": "助詞",
+          "detail1": "接続助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いも",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "も",
+          "pos": "助詞",
+          "detail1": "係助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いな",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "な",
+          "pos": "助詞",
+          "detail1": "終助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いね",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "ね",
+          "pos": "助詞",
+          "detail1": "終助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いの",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "の",
+          "pos": "助詞",
+          "detail1": "終助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いのか",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "の",
+          "pos": "名詞",
+          "detail1": "非自立",
+          "detail2": "一般",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        {
+          "surface": "か",
+          "pos": "助詞",
+          "detail1": "副助詞／並立助詞／終助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いのも",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "の",
+          "pos": "名詞",
+          "detail1": "非自立",
+          "detail2": "一般",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        {
+          "surface": "も",
+          "pos": "助詞",
+          "detail1": "係助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いけど",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "けど",
+          "pos": "助詞",
+          "detail1": "接続助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いしか",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "しか",
+          "pos": "助詞",
+          "detail1": "係助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いと思う",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "と",
+          "pos": "助詞",
+          "detail1": "格助詞",
+          "detail2": "引用",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        {
+          "surface": "思う",
+          "pos": "動詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "五段・ワ行促音便",
+          "conjugationForm": "基本形",
+          "baseForm": "思う",
+          "isUnknown": false,
+          "reading": "オモウ"
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いところ",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "ところ",
+          "pos": "名詞",
+          "detail1": "非自立",
+          "detail2": "副詞可能",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑いです",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        },
+        {
+          "surface": "です",
+          "pos": "助動詞",
+          "detail1": "*",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        }
+      ],
+      "targetSupported": true,
+      "result": {
+        "available": false,
+        "reason": "no-candidate",
+        "candidates": []
+      }
+    },
+    {
+      "text": "暑い",
+      "tokens": [
+        {
+          "surface": "暑い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "暑い",
+          "isUnknown": false,
+          "reading": "アツイ"
+        }
+      ],
+      "targetSupported": false,
+      "result": {
+        "available": false,
+        "reason": "unsupported-connection",
+        "candidates": []
+      }
+    }
+  ],
+  "nounSource": "｜猫《ねこ》と｜犬《いぬ》。高い山。美しい景色。書いて描いて。",
+  "nounTarget": "猫と犬。暑い山。",
+  "snapshot": {
+    "policyVersion": "vocabulary-snapshot-1",
+    "drawMode": "uniform",
+    "sources": [
+      {
+        "path": "source.md",
+        "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+        "projectionPolicy": "source-projection-1"
+      }
+    ],
+    "candidates": [
+      {
+        "candidateId": "[\"。\",\"記号\",\"句点\",\"*\",\"*\",\"*\",\"*\",\"*\",null,false]",
+        "displayFormId": "[\"[\\\"。\\\",\\\"記号\\\",\\\"句点\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",null,false]\",\"。\"]",
+        "surface": "。",
+        "token": {
+          "surface": "。",
+          "pos": "記号",
+          "detail1": "句点",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        "frequency": 4,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 4
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"て\",\"助詞\",\"接続助詞\",\"*\",\"*\",\"*\",\"*\",\"*\",null,false]",
+        "displayFormId": "[\"[\\\"て\\\",\\\"助詞\\\",\\\"接続助詞\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",null,false]\",\"て\"]",
+        "surface": "て",
+        "token": {
+          "surface": "て",
+          "pos": "助詞",
+          "detail1": "接続助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        "frequency": 2,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 2
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"と\",\"助詞\",\"並立助詞\",\"*\",\"*\",\"*\",\"*\",\"*\",null,false]",
+        "displayFormId": "[\"[\\\"と\\\",\\\"助詞\\\",\\\"並立助詞\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",null,false]\",\"と\"]",
+        "surface": "と",
+        "token": {
+          "surface": "と",
+          "pos": "助詞",
+          "detail1": "並立助詞",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "*",
+          "isUnknown": false
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+        "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]",
+        "surface": "山",
+        "token": {
+          "surface": "山",
+          "pos": "名詞",
+          "detail1": "一般",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "山",
+          "isUnknown": false,
+          "reading": "ヤマ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"描い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"描く\",\"エガイ\",false]",
+        "displayFormId": "[\"[\\\"描い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"描く\\\",\\\"エガイ\\\",false]\",\"描い\"]",
+        "surface": "描い",
+        "token": {
+          "surface": "描い",
+          "pos": "動詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "五段・カ行イ音便",
+          "conjugationForm": "連用タ接続",
+          "baseForm": "描く",
+          "isUnknown": false,
+          "reading": "エガイ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+        "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+        "surface": "景色",
+        "token": {
+          "surface": "景色",
+          "pos": "名詞",
+          "detail1": "一般",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "景色",
+          "isUnknown": false,
+          "reading": "ケシキ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"書い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"書く\",\"カイ\",false]",
+        "displayFormId": "[\"[\\\"書い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"書く\\\",\\\"カイ\\\",false]\",\"書い\"]",
+        "surface": "書い",
+        "token": {
+          "surface": "書い",
+          "pos": "動詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "五段・カ行イ音便",
+          "conjugationForm": "連用タ接続",
+          "baseForm": "書く",
+          "isUnknown": false,
+          "reading": "カイ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+        "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+        "surface": "犬",
+        "token": {
+          "surface": "犬",
+          "pos": "名詞",
+          "detail1": "一般",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "犬",
+          "isUnknown": false,
+          "reading": "イヌ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": [
+          {
+            "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+            "baseRangeInSurface": {
+              "start": 0,
+              "end": 1
+            },
+            "reading": "いぬ",
+            "sourceNotations": [
+              "aozora-explicit"
+            ],
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+        "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+        "surface": "猫",
+        "token": {
+          "surface": "猫",
+          "pos": "名詞",
+          "detail1": "一般",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "*",
+          "conjugationForm": "*",
+          "baseForm": "猫",
+          "isUnknown": false,
+          "reading": "ネコ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": [
+          {
+            "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+            "baseRangeInSurface": {
+              "start": 0,
+              "end": 1
+            },
+            "reading": "ねこ",
+            "sourceNotations": [
+              "aozora-explicit"
+            ],
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "candidateId": "[\"美しい\",\"形容詞\",\"自立\",\"*\",\"*\",\"形容詞・イ段\",\"基本形\",\"美しい\",\"ウツクシイ\",false]",
+        "displayFormId": "[\"[\\\"美しい\\\",\\\"形容詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"形容詞・イ段\\\",\\\"基本形\\\",\\\"美しい\\\",\\\"ウツクシイ\\\",false]\",\"美しい\"]",
+        "surface": "美しい",
+        "token": {
+          "surface": "美しい",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・イ段",
+          "conjugationForm": "基本形",
+          "baseForm": "美しい",
+          "isUnknown": false,
+          "reading": "ウツクシイ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      },
+      {
+        "candidateId": "[\"高い\",\"形容詞\",\"自立\",\"*\",\"*\",\"形容詞・アウオ段\",\"基本形\",\"高い\",\"タカイ\",false]",
+        "displayFormId": "[\"[\\\"高い\\\",\\\"形容詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"形容詞・アウオ段\\\",\\\"基本形\\\",\\\"高い\\\",\\\"タカイ\\\",false]\",\"高い\"]",
+        "surface": "高い",
+        "token": {
+          "surface": "高い",
+          "pos": "形容詞",
+          "detail1": "自立",
+          "detail2": "*",
+          "detail3": "*",
+          "conjugationType": "形容詞・アウオ段",
+          "conjugationForm": "基本形",
+          "baseForm": "高い",
+          "isUnknown": false,
+          "reading": "タカイ"
+        },
+        "frequency": 1,
+        "origins": [
+          {
+            "path": "source.md",
+            "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+            "count": 1
+          }
+        ],
+        "verifiedRubyVariants": []
+      }
+    ],
+    "fingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+    "projections": {
+      "automaticBody": {
+        "policyVersion": "automatic-body-projection-1",
+        "buckets": [
+          {
+            "key": "名詞\u001f一般",
+            "surfaces": [
+              {
+                "surface": "猫",
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ],
+                "candidates": [
+                  {
+                    "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                    "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]"
+                  }
+                ]
+              },
+              {
+                "surface": "犬",
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ],
+                "candidates": [
+                  {
+                    "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                    "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]"
+                  }
+                ]
+              },
+              {
+                "surface": "山",
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ],
+                "candidates": [
+                  {
+                    "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+                    "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]"
+                  }
+                ]
+              },
+              {
+                "surface": "景色",
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ],
+                "candidates": [
+                  {
+                    "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                    "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "manual": {
+        "policyVersion": "manual-projection-1",
+        "candidates": [
+          {
+            "candidateId": "[\"。\",\"記号\",\"句点\",\"*\",\"*\",\"*\",\"*\",\"*\",null,false]",
+            "displayFormId": "[\"[\\\"。\\\",\\\"記号\\\",\\\"句点\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",null,false]\",\"。\"]",
+            "surface": "。",
+            "morphology": {
+              "surface": "。",
+              "pos": "記号",
+              "detail1": "句点",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "*",
+              "isUnknown": false
+            },
+            "frequency": 4,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 4
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          },
+          {
+            "candidateId": "[\"て\",\"助詞\",\"接続助詞\",\"*\",\"*\",\"*\",\"*\",\"*\",null,false]",
+            "displayFormId": "[\"[\\\"て\\\",\\\"助詞\\\",\\\"接続助詞\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",null,false]\",\"て\"]",
+            "surface": "て",
+            "morphology": {
+              "surface": "て",
+              "pos": "助詞",
+              "detail1": "接続助詞",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "*",
+              "isUnknown": false
+            },
+            "frequency": 2,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 2
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          },
+          {
+            "candidateId": "[\"と\",\"助詞\",\"並立助詞\",\"*\",\"*\",\"*\",\"*\",\"*\",null,false]",
+            "displayFormId": "[\"[\\\"と\\\",\\\"助詞\\\",\\\"並立助詞\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",null,false]\",\"と\"]",
+            "surface": "と",
+            "morphology": {
+              "surface": "と",
+              "pos": "助詞",
+              "detail1": "並立助詞",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "*",
+              "isUnknown": false
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          },
+          {
+            "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+            "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]",
+            "surface": "山",
+            "morphology": {
+              "surface": "山",
+              "pos": "名詞",
+              "detail1": "一般",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "山",
+              "isUnknown": false,
+              "reading": "ヤマ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": "名詞\u001f一般",
+            "dictionaryPlaceholder": "noun",
+            "collisionRole": "noun"
+          },
+          {
+            "candidateId": "[\"描い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"描く\",\"エガイ\",false]",
+            "displayFormId": "[\"[\\\"描い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"描く\\\",\\\"エガイ\\\",false]\",\"描い\"]",
+            "surface": "描い",
+            "morphology": {
+              "surface": "描い",
+              "pos": "動詞",
+              "detail1": "自立",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "五段・カ行イ音便",
+              "conjugationForm": "連用タ接続",
+              "baseForm": "描く",
+              "isUnknown": false,
+              "reading": "エガイ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          },
+          {
+            "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+            "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+            "surface": "景色",
+            "morphology": {
+              "surface": "景色",
+              "pos": "名詞",
+              "detail1": "一般",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "景色",
+              "isUnknown": false,
+              "reading": "ケシキ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": "名詞\u001f一般",
+            "dictionaryPlaceholder": "noun",
+            "collisionRole": "noun"
+          },
+          {
+            "candidateId": "[\"書い\",\"動詞\",\"自立\",\"*\",\"*\",\"五段・カ行イ音便\",\"連用タ接続\",\"書く\",\"カイ\",false]",
+            "displayFormId": "[\"[\\\"書い\\\",\\\"動詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"五段・カ行イ音便\\\",\\\"連用タ接続\\\",\\\"書く\\\",\\\"カイ\\\",false]\",\"書い\"]",
+            "surface": "書い",
+            "morphology": {
+              "surface": "書い",
+              "pos": "動詞",
+              "detail1": "自立",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "五段・カ行イ音便",
+              "conjugationForm": "連用タ接続",
+              "baseForm": "書く",
+              "isUnknown": false,
+              "reading": "カイ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          },
+          {
+            "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+            "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+            "surface": "犬",
+            "morphology": {
+              "surface": "犬",
+              "pos": "名詞",
+              "detail1": "一般",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "犬",
+              "isUnknown": false,
+              "reading": "イヌ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [
+              {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            ],
+            "automaticBodyKey": "名詞\u001f一般",
+            "dictionaryPlaceholder": "noun",
+            "collisionRole": "noun"
+          },
+          {
+            "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+            "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+            "surface": "猫",
+            "morphology": {
+              "surface": "猫",
+              "pos": "名詞",
+              "detail1": "一般",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "*",
+              "conjugationForm": "*",
+              "baseForm": "猫",
+              "isUnknown": false,
+              "reading": "ネコ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [
+              {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            ],
+            "automaticBodyKey": "名詞\u001f一般",
+            "dictionaryPlaceholder": "noun",
+            "collisionRole": "noun"
+          },
+          {
+            "candidateId": "[\"美しい\",\"形容詞\",\"自立\",\"*\",\"*\",\"形容詞・イ段\",\"基本形\",\"美しい\",\"ウツクシイ\",false]",
+            "displayFormId": "[\"[\\\"美しい\\\",\\\"形容詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"形容詞・イ段\\\",\\\"基本形\\\",\\\"美しい\\\",\\\"ウツクシイ\\\",false]\",\"美しい\"]",
+            "surface": "美しい",
+            "morphology": {
+              "surface": "美しい",
+              "pos": "形容詞",
+              "detail1": "自立",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "形容詞・イ段",
+              "conjugationForm": "基本形",
+              "baseForm": "美しい",
+              "isUnknown": false,
+              "reading": "ウツクシイ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          },
+          {
+            "candidateId": "[\"高い\",\"形容詞\",\"自立\",\"*\",\"*\",\"形容詞・アウオ段\",\"基本形\",\"高い\",\"タカイ\",false]",
+            "displayFormId": "[\"[\\\"高い\\\",\\\"形容詞\\\",\\\"自立\\\",\\\"*\\\",\\\"*\\\",\\\"形容詞・アウオ段\\\",\\\"基本形\\\",\\\"高い\\\",\\\"タカイ\\\",false]\",\"高い\"]",
+            "surface": "高い",
+            "morphology": {
+              "surface": "高い",
+              "pos": "形容詞",
+              "detail1": "自立",
+              "detail2": "*",
+              "detail3": "*",
+              "conjugationType": "形容詞・アウオ段",
+              "conjugationForm": "基本形",
+              "baseForm": "高い",
+              "isUnknown": false,
+              "reading": "タカイ"
+            },
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "verifiedRubyVariants": [],
+            "automaticBodyKey": null,
+            "dictionaryPlaceholder": null,
+            "collisionRole": null
+          }
+        ]
+      },
+      "dictionary": {
+        "policyVersion": "dictionary-projection-1",
+        "byPlaceholder": {
+          "noun": [
+            {
+              "surface": "山",
+              "frequency": 1,
+              "origins": [
+                {
+                  "path": "source.md",
+                  "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                  "count": 1
+                }
+              ],
+              "candidates": [
+                {
+                  "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+                  "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]"
+                }
+              ]
+            },
+            {
+              "surface": "景色",
+              "frequency": 1,
+              "origins": [
+                {
+                  "path": "source.md",
+                  "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                  "count": 1
+                }
+              ],
+              "candidates": [
+                {
+                  "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                  "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]"
+                }
+              ]
+            },
+            {
+              "surface": "犬",
+              "frequency": 1,
+              "origins": [
+                {
+                  "path": "source.md",
+                  "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                  "count": 1
+                }
+              ],
+              "candidates": [
+                {
+                  "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                  "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]"
+                }
+              ]
+            },
+            {
+              "surface": "猫",
+              "frequency": 1,
+              "origins": [
+                {
+                  "path": "source.md",
+                  "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                  "count": 1
+                }
+              ],
+              "candidates": [
+                {
+                  "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                  "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]"
+                }
+              ]
+            }
+          ],
+          "proper": [],
+          "person": [],
+          "place": [],
+          "organization": [],
+          "sahen": [],
+          "adverbialNoun": [],
+          "number": []
+        }
+      },
+      "collision": {
+        "policyVersion": "collision-projection-1",
+        "nouns": [
+          {
+            "surface": "山",
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "candidates": [
+              {
+                "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+                "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]"
+              }
+            ]
+          },
+          {
+            "surface": "景色",
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "candidates": [
+              {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]"
+              }
+            ]
+          },
+          {
+            "surface": "犬",
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "candidates": [
+              {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]"
+              }
+            ]
+          },
+          {
+            "surface": "猫",
+            "frequency": 1,
+            "origins": [
+              {
+                "path": "source.md",
+                "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                "count": 1
+              }
+            ],
+            "candidates": [
+              {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]"
+              }
+            ]
+          }
+        ],
+        "sahenNouns": []
+      }
+    }
+  },
+  "draws": [
+    {
+      "bodySeed": 0,
+      "level": 0,
+      "result": {
+        "texts": [
+          "猫と犬。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "猫",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 0,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 0,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 0,
+      "level": 25,
+      "result": {
+        "texts": [
+          "犬と猫。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "猫",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 2,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 25,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 0,
+      "level": 50,
+      "result": {
+        "texts": [
+          "犬と猫。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "猫",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 2,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 50,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 0,
+      "level": 75,
+      "result": {
+        "texts": [
+          "犬と猫。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "猫",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 2,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 75,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 0,
+      "level": 100,
+      "result": {
+        "texts": [
+          "犬と猫。暑い猫。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "猫",
+            "。",
+            "暑い",
+            "猫",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null
+          ]
+        ],
+        "replacementCount": 3,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 100,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 7,
+      "level": 0,
+      "result": {
+        "texts": [
+          "猫と犬。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "猫",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 0,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 0,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 7,
+      "level": 25,
+      "result": {
+        "texts": [
+          "犬と犬。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 1,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 25,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 7,
+      "level": 50,
+      "result": {
+        "texts": [
+          "犬と犬。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 1,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 50,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 7,
+      "level": 75,
+      "result": {
+        "texts": [
+          "犬と猫。暑い景色。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "猫",
+            "。",
+            "暑い",
+            "景色",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null
+          ]
+        ],
+        "replacementCount": 3,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 75,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 7,
+      "level": 100,
+      "result": {
+        "texts": [
+          "犬と猫。暑い景色。"
+        ],
+        "tokenSurfaces": [
+          [
+            "犬",
+            "と",
+            "猫",
+            "。",
+            "暑い",
+            "景色",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"犬\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"犬\",\"イヌ\",false]",
+                "displayFormId": "[\"[\\\"犬\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"犬\\\",\\\"イヌ\\\",false]\",\"犬\"]",
+                "surface": "犬"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"犬\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"犬\\\\\\\",\\\\\\\"イヌ\\\\\\\",false]\\\",\\\"犬\\\"]\",\"犬\",\"いぬ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "いぬ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"猫\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"猫\",\"ネコ\",false]",
+                "displayFormId": "[\"[\\\"猫\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"猫\\\",\\\"ネコ\\\",false]\",\"猫\"]",
+                "surface": "猫"
+              },
+              "rubyVariant": {
+                "variantId": "[\"[\\\"[\\\\\\\"猫\\\\\\\",\\\\\\\"名詞\\\\\\\",\\\\\\\"一般\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"*\\\\\\\",\\\\\\\"猫\\\\\\\",\\\\\\\"ネコ\\\\\\\",false]\\\",\\\"猫\\\"]\",\"猫\",\"ねこ\",0,1]",
+                "baseRangeInSurface": {
+                  "start": 0,
+                  "end": 1
+                },
+                "reading": "ねこ",
+                "sourceNotations": [
+                  "aozora-explicit"
+                ],
+                "frequency": 1,
+                "origins": [
+                  {
+                    "path": "source.md",
+                    "contentHash": "fef0d5076f260e6213b1eaa0e17d27b91bd5289339270c41d65fcc3f8c73455d",
+                    "count": 1
+                  }
+                ]
+              }
+            },
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null
+          ]
+        ],
+        "replacementCount": 3,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 100,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 123456,
+      "level": 0,
+      "result": {
+        "texts": [
+          "猫と犬。暑い山。"
+        ],
+        "tokenSurfaces": [
+          [
+            "猫",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "山",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ],
+        "replacementCount": 0,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 0,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 123456,
+      "level": 25,
+      "result": {
+        "texts": [
+          "猫と犬。暑い景色。"
+        ],
+        "tokenSurfaces": [
+          [
+            "猫",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "景色",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null
+          ]
+        ],
+        "replacementCount": 1,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 25,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 123456,
+      "level": 50,
+      "result": {
+        "texts": [
+          "猫と犬。暑い景色。"
+        ],
+        "tokenSurfaces": [
+          [
+            "猫",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "景色",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null
+          ]
+        ],
+        "replacementCount": 1,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 50,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 123456,
+      "level": 75,
+      "result": {
+        "texts": [
+          "山と犬。暑い景色。"
+        ],
+        "tokenSurfaces": [
+          [
+            "山",
+            "と",
+            "犬",
+            "。",
+            "暑い",
+            "景色",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+                "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]",
+                "surface": "山"
+              },
+              "rubyVariant": null
+            },
+            null,
+            null,
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null
+          ]
+        ],
+        "replacementCount": 2,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 75,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    },
+    {
+      "bodySeed": 123456,
+      "level": 100,
+      "result": {
+        "texts": [
+          "山と景色。暑い景色。"
+        ],
+        "tokenSurfaces": [
+          [
+            "山",
+            "と",
+            "景色",
+            "。",
+            "暑い",
+            "景色",
+            "。"
+          ]
+        ],
+        "selections": [
+          [
+            {
+              "candidate": {
+                "candidateId": "[\"山\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"山\",\"ヤマ\",false]",
+                "displayFormId": "[\"[\\\"山\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"山\\\",\\\"ヤマ\\\",false]\",\"山\"]",
+                "surface": "山"
+              },
+              "rubyVariant": null
+            },
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null,
+            null,
+            {
+              "candidate": {
+                "candidateId": "[\"景色\",\"名詞\",\"一般\",\"*\",\"*\",\"*\",\"*\",\"景色\",\"ケシキ\",false]",
+                "displayFormId": "[\"[\\\"景色\\\",\\\"名詞\\\",\\\"一般\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"*\\\",\\\"景色\\\",\\\"ケシキ\\\",false]\",\"景色\"]",
+                "surface": "景色"
+              },
+              "rubyVariant": null
+            },
+            null
+          ]
+        ],
+        "replacementCount": 3,
+        "replaceableSlotCount": 3,
+        "bodySemantropy": 100,
+        "drawMode": "uniform",
+        "vocabularyFingerprint": "vocabulary-fingerprint-sha256-1:5b6f450b7197721c840d56125f8baba58396cc4c7f79f9c08ad25b5fc902be19",
+        "algorithmVersion": 1
+      }
+    }
+  ]
+}

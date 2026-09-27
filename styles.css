@@ -1,0 +1,926 @@
+/*
+ * Three owners: a non-scrolling Toolbar, a non-scrolling status line, and one
+ * scrolling box for the body. The root itself never scrolls, so reaching the
+ * end of a long Target cannot take the Toolbar off screen. This does not
+ * depend on `position: sticky`, and every rule stays under the Semantropy
+ * view's own classes.
+ */
+.semantropy-root {
+	/* The containing block the Manual menu is placed in, beside its word. */
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
+	padding: 0.75rem 1rem 0;
+	box-sizing: border-box;
+	/* The chrome keeps the interface font whatever the body is set to. */
+	font-family: var(--font-interface);
+	font-size: var(--font-ui-small);
+	color: var(--text-normal);
+}
+
+/*
+ * The body takes the space left over, from a zero basis. With `auto` its basis
+ * was the whole Target's height, and flex shrink is weighted by basis, so every
+ * other shrinkable row (Dictionary availability) was squeezed by the same large
+ * ratio and cut to a sliver.
+ */
+.semantropy-scroll {
+	flex: 1 1 0;
+	min-height: 0;
+	overflow: auto;
+	overscroll-behavior: contain;
+	padding-bottom: 1.5rem;
+}
+
+.semantropy-toolbar,
+.semantropy-status {
+	flex: 0 0 auto;
+}
+
+/*
+ * EXPERIENCE-CONTROLS1: one row of icon-only controls that never wraps. When
+ * the pane is too narrow the View moves the lowest-priority items into the More
+ * menu (planToolbarOverflow), so nothing is clipped or scrolled sideways. The
+ * row is the containing block of its popups, which open below it.
+ */
+.semantropy-toolbar {
+	position: relative;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: flex-end;
+	gap: 0.6rem;
+	min-width: 0;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/*
+ * A category: its small fixed label above its row of icons. The label is also
+ * the group's accessible name (aria-labelledby), so no chip names the group.
+ */
+.semantropy-toolbar-group {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.15rem;
+	flex: 0 0 auto;
+}
+
+/* A quiet separator between categories keeps the row from looking crowded. */
+.semantropy-toolbar-group + .semantropy-toolbar-group {
+	padding-left: 0.6rem;
+	border-left: 1px solid var(--background-modifier-border);
+}
+
+.semantropy-toolbar-items {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.semantropy-toolbar-group-label {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	line-height: 1.2;
+	white-space: nowrap;
+	user-select: none;
+}
+
+/* A group whose items all moved to the More menu takes no room. */
+.semantropy-toolbar-group[hidden],
+.semantropy-toolbar-item[hidden],
+.semantropy-toolbar-more[hidden],
+.semantropy-more-section[hidden] {
+	display: none;
+}
+
+.semantropy-toolbar-item,
+.semantropy-toolbar-more {
+	display: flex;
+	flex: 0 0 auto;
+}
+
+/*
+ * TOOLBAR-FINISH1: the left side is text actions, vocabulary and phrase
+ * generation. Generation settings starts the right cluster, beside Settings.
+ * When that group has moved entirely into More, Settings keeps the end. When
+ * Settings has moved too, More keeps it. One auto margin, so the two groups
+ * stay adjacent.
+ */
+.semantropy-toolbar-group.is-text {
+	margin-left: auto;
+}
+
+.semantropy-toolbar-group.is-text[hidden] + .semantropy-toolbar-group.is-settings,
+.semantropy-toolbar-group.is-text[hidden] + .semantropy-toolbar-group.is-settings[hidden] + .semantropy-toolbar-more {
+	margin-left: auto;
+}
+
+.semantropy-toolbar .semantropy-action.is-toolbar-icon {
+	width: 2rem;
+	min-width: 2rem;
+	padding: 0;
+}
+
+.semantropy-toolbar .is-toolbar-icon .semantropy-action-label {
+	display: none;
+}
+
+.semantropy-toolbar-popup {
+	position: absolute;
+	z-index: 2;
+	top: 100%;
+	left: 0;
+	box-sizing: border-box;
+	width: min(20rem, 100%);
+	max-width: 100%;
+	max-height: min(28rem, 70vh);
+	overflow: auto;
+	overscroll-behavior: contain;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: 0.6rem;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m, 6px);
+	box-shadow: var(--shadow-s);
+}
+
+.semantropy-toolbar-popup[hidden] {
+	display: none;
+}
+
+.semantropy-toolbar .semantropy-more-menu {
+	left: auto;
+	right: 0;
+	width: min(18rem, 100%);
+}
+
+/* In the More menu each category keeps its name as a heading. */
+.semantropy-more-heading {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	margin: 0.2rem 0 0.1rem;
+}
+
+.semantropy-more-items {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+}
+
+/* In the More menu an item shows its name, and its own popup opens in place. */
+.semantropy-more-menu .semantropy-toolbar-item {
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.semantropy-toolbar .semantropy-more-menu .semantropy-action.is-toolbar-icon {
+	width: 100%;
+	justify-content: flex-start;
+	padding-inline: var(--size-4-2);
+}
+
+.semantropy-toolbar .semantropy-more-menu .is-toolbar-icon .semantropy-action-label {
+	display: inline;
+}
+
+.semantropy-more-menu .semantropy-toolbar-popup {
+	position: static;
+	width: auto;
+	max-height: none;
+	/* No side margin: a stretched popup would overflow the More menu by it. */
+	margin: 0.25rem 0;
+	box-shadow: none;
+}
+
+.semantropy-more-menu .semantropy-automatic-pos-toolbar {
+	flex-direction: column;
+}
+
+/* Descriptions for aria-describedby: read by assistive technology, never shown. */
+.semantropy-visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.semantropy-level-popup .semantropy-level-label {
+	flex-wrap: nowrap;
+}
+
+.semantropy-level-popup .semantropy-level-select {
+	width: auto;
+}
+
+/*
+ * The level popup is as wide as its label and select. A percentage max-width
+ * would follow the icon button, which is only the popup's anchor. The
+ * Automatic menu stays a fixed narrower width. Display settings keeps the
+ * shared popup width. Inside More these still stretch to that menu.
+ */
+.semantropy-toolbar-item > .semantropy-level-popup {
+	width: fit-content;
+	max-width: 16rem;
+}
+
+.semantropy-automatic-pos-toolbar > .semantropy-automatic-pos-menu.semantropy-toolbar-popup {
+	width: min(14rem, 100%);
+	max-width: min(14rem, 100%);
+}
+
+.semantropy-more-menu .semantropy-level-popup,
+.semantropy-more-menu .semantropy-automatic-pos-toolbar > .semantropy-automatic-pos-menu.semantropy-toolbar-popup {
+	width: auto;
+	max-width: 100%;
+}
+
+.semantropy-display-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	color: var(--text-muted);
+	min-width: 0;
+}
+
+/* Collapsed means removed from the Tab order, not merely invisible. */
+.semantropy-display-menu[hidden],
+.semantropy-status > [hidden],
+button.semantropy-action[hidden] {
+	display: none;
+}
+
+.semantropy-display-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.3rem 0.5rem;
+}
+
+.semantropy-color-input {
+	min-width: 6rem;
+	max-width: 100%;
+}
+
+.semantropy-display-toggle[aria-pressed="true"] {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.semantropy-contrast-warning:not(:empty),
+.semantropy-display-message:not(:empty) {
+	color: var(--text-warning, var(--text-accent));
+	overflow-wrap: anywhere;
+}
+
+/*
+ * The Manual diagnostic for the selected word. It takes its own status line
+ * row so a long sentence wraps downwards in a narrow pane instead of widening
+ * the Toolbar, and it states availability in words: the attribute below only
+ * lets a theme reinforce what the sentence already says.
+ */
+.semantropy-manual-diagnostic {
+	flex-basis: 100%;
+	min-width: 0;
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+
+.semantropy-manual-diagnostic[data-manual="unavailable"] {
+	color: var(--text-faint, var(--text-muted));
+}
+
+/*
+ * Durable display state, stated in words in the status line so it is readable
+ * with the overflow menu closed. The button's outline only reinforces it.
+ */
+.semantropy-display-alert {
+	flex-basis: 100%;
+	color: var(--text-warning, var(--text-accent));
+	overflow-wrap: anywhere;
+}
+
+.semantropy-display-menu-button.is-error {
+	border-color: var(--text-warning, var(--text-accent));
+}
+
+.semantropy-status {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.15rem 0.75rem;
+	padding: 0.35rem 0 0.5rem;
+}
+
+.semantropy-status-detail,
+.semantropy-toolbar-feedback {
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+
+.semantropy-meta {
+	color: var(--text-muted);
+	margin-bottom: 0.25rem;
+}
+
+.semantropy-message {
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+
+/*
+ * The Target body is built from a fixed set of tags with no attributes, so it
+ * is styled here only, from theme variables (light and dark alike).
+ */
+.semantropy-body {
+	margin-top: 0.5rem;
+	padding: 0.25rem 0.35rem;
+	border-radius: var(--radius-s, 4px);
+	user-select: text;
+	font-family: var(--font-text);
+	font-size: var(--font-text-size);
+	line-height: var(--line-height-normal, 1.6);
+}
+
+/*
+ * Ruby Off hides the reading only. The base text, the token identity and the
+ * logical text Copy and Collect read are untouched, because a reading was
+ * never part of them.
+ */
+.semantropy-body.is-ruby-hidden rt,
+.semantropy-body.is-ruby-hidden rp {
+	display: none;
+}
+
+.semantropy-body p,
+.semantropy-body pre,
+.semantropy-body h1,
+.semantropy-body h2,
+.semantropy-body h3,
+.semantropy-body h4,
+.semantropy-body h5,
+.semantropy-body h6 {
+	margin: 0 0 0.9em;
+}
+
+.semantropy-body pre {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font-family: var(--font-monospace);
+	color: var(--text-normal);
+	background-color: var(--code-background, var(--background-secondary));
+	border-radius: var(--radius-s, 4px);
+	padding: 0.5em 0.75em;
+}
+
+.semantropy-body code {
+	font-family: var(--font-monospace);
+	background-color: var(--code-background, var(--background-secondary));
+	border-radius: var(--radius-s, 4px);
+	padding: 0 0.2em;
+}
+
+.semantropy-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 1rem;
+	margin-bottom: 0.25rem;
+}
+
+.semantropy-controls .semantropy-meta {
+	margin-bottom: 0;
+}
+
+.semantropy-level {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.semantropy-level-label {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	color: var(--text-muted);
+}
+
+.semantropy-level-select {
+	color: var(--text-normal);
+	background-color: var(--interactive-normal);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s, 4px);
+	padding: 0.1rem 0.3rem;
+}
+
+.semantropy-level-select:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+.semantropy-action {
+	font-family: var(--font-interface);
+	font-size: var(--font-ui-small);
+	padding: 0.35rem 0.8rem;
+	color: var(--text-normal);
+	background-color: var(--interactive-normal);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s, 4px);
+	cursor: pointer;
+}
+
+.semantropy-action:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	color: var(--text-muted);
+}
+
+/*
+ * EXPERIENCE-CONTROLS1: an Obsidian icon beside the short label. The glyph is
+ * decorative (aria-hidden); the control's aria-label is its name. Every control
+ * keeps at least a 2rem-wide target at Obsidian's own input height, including
+ * when a narrow pane leaves only the icon. The inline padding is trimmed so the
+ * icon does not widen the Toolbar into an extra row.
+ */
+.semantropy-action.has-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.35em;
+	min-width: 2rem;
+	min-height: var(--input-height, 2rem);
+	padding-inline: var(--size-4-2);
+}
+.semantropy-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	line-height: 0;
+}
+.semantropy-icon svg {
+	width: 1.15em;
+	height: 1.15em;
+}
+
+/* Stale is stated in words; the colour only reinforces it. */
+.semantropy-stale {
+	color: var(--text-muted);
+	overflow-wrap: anywhere;
+}
+
+.semantropy-stale.is-stale {
+	padding: 0.4rem 0.6rem;
+	color: var(--text-normal);
+	background-color: var(--background-modifier-border);
+	border-left: 3px solid var(--text-accent, var(--text-normal));
+	border-radius: var(--radius-s, 4px);
+}
+
+/*
+ * The Fake Dictionary (Modal and Popover share it): the headword large at the
+ * top left, the actions at the top right, the definition below at the reader's
+ * note text size, the Dictionary level last. The heading is as wide as its
+ * content, so a short headword keeps the tool group (the three icon-only
+ * actions and the level select) beside it, and a long one or a narrow pane moves
+ * the whole group to its own line, still right-aligned, instead of hiding any of it.
+ */
+.semantropy-definition-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 0.35rem 0.75rem;
+}
+
+.semantropy-definition-heading {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.semantropy-definition-headword {
+	font-size: calc(var(--font-text-size, 16px) * 1.3);
+	font-weight: var(--font-semibold, 600);
+	line-height: 1.3;
+	overflow-wrap: anywhere;
+}
+
+.semantropy-definition-reading,
+.semantropy-definition-pos {
+	color: var(--text-muted);
+	margin-top: 0.1rem;
+	overflow-wrap: anywhere;
+}
+
+.semantropy-definition-tools {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 0.25rem;
+	flex: 0 1 auto;
+	max-width: 100%;
+	margin-left: auto;
+}
+
+.semantropy-definition-actions {
+	display: flex;
+	gap: 0.25rem;
+}
+
+.semantropy-definition-actions .semantropy-action.is-icon-only {
+	width: 2rem;
+	min-width: 2rem;
+	padding: 0;
+}
+
+.semantropy-definition-actions .is-icon-only .semantropy-action-label {
+	display: none;
+}
+
+.semantropy-dictionary-level-select {
+	max-width: 100%;
+}
+
+.semantropy-definition-body {
+	margin-top: 0.6rem;
+	font-size: var(--font-text-size, 16px);
+	line-height: 1.65;
+	user-select: text;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.semantropy-definition-message {
+	color: var(--text-muted);
+}
+
+.semantropy-settings-status,
+.semantropy-language-status {
+	margin-top: 0.5rem;
+	color: var(--text-muted);
+	min-height: 1.25em;
+}
+/* Parser-certified paragraph continuation: no added margin at a Chunk seam. */
+.semantropy-body .semantropy-continued-block {
+	margin-bottom: 0;
+}
+
+/* Obsidian's button display rule overrides the browser's hidden default. */
+button.semantropy-load-next[hidden] {
+	display: none;
+}
+
+button.semantropy-load-next {
+	margin-top: 0.75rem;
+}
+
+.semantropy-vocabulary-status { overflow-wrap: anywhere; }
+
+/*
+ * The Vocabulary picker. Apply and Cancel stay in the first screen: the dialog
+ * is at most 90vh, and only the selected list and the folder tree shrink and
+ * scroll. The selected list keeps its content height up to 22vh, so a short
+ * selection is not squeezed by the tree; a longer one scrolls inside that cap.
+ * When the controls and the buttons themselves exceed the window, the dialog
+ * content scrolls just far enough to reach both buttons.
+ */
+.semantropy-vocabulary-modal {
+	--dialog-width: min(34rem, 95vw);
+	--dialog-max-width: min(34rem, 95vw);
+	--dialog-min-width: 0px;
+	width: min(34rem, 95vw);
+	max-width: min(34rem, 95vw);
+	min-width: 0;
+	max-height: 90vh;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	overflow: auto;
+}
+/* Obsidian's control display rules can override the browser's hidden default. */
+.semantropy-vocabulary-modal [hidden] {
+	display: none !important;
+}
+.semantropy-vocabulary-modal > .modal-title,
+.semantropy-vocabulary-modal > .modal-header {
+	flex: 0 0 auto;
+}
+.semantropy-vocabulary-modal .modal-content {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	gap: 0.5rem;
+	min-height: 0;
+	overflow: auto;
+	overflow-wrap: anywhere;
+}
+.semantropy-vocabulary-controls,
+.semantropy-vocabulary-actions {
+	display: flex;
+	flex: 0 0 auto;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+.semantropy-vocabulary-picker-status,
+.semantropy-vocabulary-current-note {
+	flex: 0 0 auto;
+}
+.semantropy-vocabulary-scroll {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-height: 0;
+	overflow: hidden;
+}
+.semantropy-vocabulary-selected,
+.semantropy-vocabulary-browse {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow: hidden;
+}
+/*
+ * Flex shrink is weighted by each item's content height. The file tree's
+ * content is tall, so a short selected-note list was squeezed to about one
+ * line. The list keeps its own height up to a share of the window — not a
+ * fixed row count — and does not give that height back to the tree. The tree
+ * takes the remaining space. On a short window the cap shrinks with the
+ * viewport and both lists scroll inside themselves.
+ */
+.semantropy-vocabulary-selected {
+	flex: 0 0 auto;
+	max-height: 22vh;
+}
+.semantropy-vocabulary-browse {
+	flex: 1 1 auto;
+}
+.semantropy-vocabulary-browse > label,
+.semantropy-vocabulary-tree-note {
+	flex: 0 0 auto;
+}
+.semantropy-vocabulary-modal label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.semantropy-vocabulary-modal select,
+.semantropy-vocabulary-modal input[type="search"] { max-width: 100%; min-width: 0; }
+/*
+ * A focused native select paints its border and focus ring outside the border
+ * box. This dialog and the Collision dialog scroll their content
+ * (overflow: auto), so a select sitting on that edge loses its top while it
+ * is focused. The keyboard outline is 2px with a 1px offset, so it extends
+ * 3px past the border. A 4px block margin keeps that paint inside the
+ * scrollport. The dialog's width, max-height and which region scrolls stay
+ * as they are.
+ */
+.semantropy-vocabulary-modal select,
+.semantropy-collision-modal select {
+	margin-block: 4px;
+	scroll-margin-block: 4px;
+}
+.semantropy-vocabulary-modal select:focus-visible,
+.semantropy-collision-modal select:focus-visible {
+	outline: 2px solid var(--background-modifier-border-focus, Highlight);
+	outline-offset: 1px;
+}
+.semantropy-vocabulary-modal button { white-space: normal; height: auto; min-height: 2em; }
+.semantropy-vocabulary-selected h3 { flex: 0 0 auto; margin: 0 0 0.25rem; font-size: var(--font-ui-medium, 1em); }
+.semantropy-vocabulary-selected ul,
+.semantropy-vocabulary-tree,
+.semantropy-vocabulary-tree ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.semantropy-vocabulary-selected ul {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+}
+.semantropy-vocabulary-selected li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; }
+.semantropy-vocabulary-selected-issue { color: var(--text-warning, var(--text-accent)); }
+.semantropy-vocabulary-tree {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s, 4px);
+	padding: 0.25rem;
+}
+.semantropy-vocabulary-tree ul { padding-inline-start: 1.25rem; }
+.semantropy-vocabulary-folder-toggle { text-align: start; }
+.semantropy-vocabulary-folder-toggle[aria-expanded="true"]::before { content: "▾ " / ""; }
+.semantropy-vocabulary-folder-toggle[aria-expanded="false"]::before { content: "▸ " / ""; }
+.semantropy-vocabulary-count,
+.semantropy-vocabulary-tree-note,
+.semantropy-vocabulary-current-note { color: var(--text-muted); }
+.semantropy-vocabulary-current-note { margin: 0; }
+
+/*
+ * Independent cues; no generated characters, focus stops or accessibility hiding.
+ * They are kept quiet: the text itself keeps its full colour and opacity, and
+ * only the background and lines are softened (color-mix toward transparent,
+ * with the plain theme colour as the fallback). Each kind keeps its own shape —
+ * background, dashed line, dotted underline, outline — so none relies on colour.
+ */
+.semantropy-body .semantropy-replaced {
+ background-color: var(--text-highlight-bg);
+ background-color: color-mix(in srgb, var(--text-highlight-bg) 50%, transparent);
+ border-radius: 0.15em;
+}
+.semantropy-body .semantropy-manual-available {
+ border-bottom: 1px dashed var(--text-muted);
+ border-bottom-color: color-mix(in srgb, var(--text-muted) 60%, transparent);
+}
+.semantropy-body .semantropy-manual-changed { outline: 1px solid var(--interactive-accent); outline-offset: 1px; }
+.semantropy-manual-menu {
+	position: absolute; z-index: var(--layer-popover); display: flex; flex-direction: column;
+	gap: 0.25rem; padding: 0.5rem; border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s); background: var(--background-primary); box-shadow: var(--shadow-s);
+	box-sizing: border-box; overflow: auto;
+}
+.semantropy-manual-menu button { text-align: left; white-space: normal; height: auto; min-height: 2em; }
+.semantropy-body .semantropy-dictionary-available {
+ text-decoration-line: underline;
+ text-decoration-style: dotted;
+ text-decoration-color: var(--text-accent);
+ text-decoration-color: color-mix(in srgb, var(--text-accent) 60%, transparent);
+ text-decoration-thickness: 1px;
+ text-underline-offset: 0.3em;
+ text-decoration-skip-ink: auto;
+}
+/*
+ * Pointer affordance only where the View would act now: a click opens the
+ * Manual menu, and the Fake Dictionary opens with the configured modifier
+ * (the cursor only says there is something to look up; hover rules are unchanged).
+ */
+.semantropy-body.is-manual-live .semantropy-manual-operable { cursor: pointer; }
+.semantropy-body.is-dictionary-live .semantropy-dictionary-operable:not(.semantropy-manual-operable) { cursor: help; }
+
+/*
+ * Narrow panes: the row itself never wraps (lower-priority items move to the
+ * More menu), and a popup takes the row's whole width instead of a fixed one.
+ */
+@container semantropy-view (max-width: 30rem) {
+	.semantropy-toolbar .semantropy-toolbar-popup {
+		width: 100%;
+	}
+}
+
+/* Narrow panes drop the category labels; More still heads its sections by category. */
+@container semantropy-view (max-width: 32rem) {
+	.semantropy-toolbar-group-label {
+		display: none;
+	}
+}
+
+/*
+ * The breakpoint follows the view's own width, not the window's, so a narrow
+ * Semantropy pane beside a wide editor is treated as narrow.
+ */
+.workspace-leaf-content[data-type="semantropy-view"] .semantropy-root {
+	container: semantropy-view / inline-size;
+}
+
+/*
+ * View-owned interactive dictionary; interface font, never Target font/colours.
+ * The Modal sizes to its definition up to a reading width. The Popover keeps
+ * its own fixed width; the Modal rule does not apply to it.
+ */
+.semantropy-dictionary-modal {
+	--dialog-width: fit-content;
+	--dialog-max-width: min(32rem, 95vw);
+	--dialog-min-width: min(16rem, 95vw);
+	width: fit-content;
+	min-width: min(16rem, 95vw);
+	max-width: min(32rem, 95vw);
+	box-sizing: border-box;
+}
+.semantropy-dictionary-popover {
+ position: fixed;
+ z-index: var(--layer-popover, 30);
+ width: 24rem;
+ box-sizing: border-box;
+ overflow: auto;
+ overscroll-behavior: contain;
+ padding: var(--size-4-2) var(--size-4-3);
+ border: 1px solid var(--background-modifier-border);
+ border-radius: var(--radius-m);
+ background: var(--background-primary);
+ color: var(--text-normal);
+ box-shadow: var(--shadow-s);
+ font-family: var(--font-interface);
+ font-size: var(--font-ui-small);
+ overflow-wrap: anywhere;
+}
+/* A small label that says the definition is invented; the headword below is the heading. */
+.semantropy-definition-title { color: var(--text-muted); font-size: var(--font-ui-smaller); margin-bottom: 0.15rem; }
+.semantropy-dictionary-popover button { height: auto; min-height: 2rem; }
+/*
+ * A sibling of the body scroll box in the root's flex column. It may give up
+ * height when the pane is short, but never below its summary line, and the
+ * open panel scrolls inside a bounded box so the body keeps most of the pane.
+ */
+.semantropy-dictionary-diagnostics {
+	flex: 0 1 auto;
+	min-height: 1.5em;
+	max-height: min(35vh, 12em);
+	overflow-y: auto;
+	overflow-wrap: anywhere;
+	font-size: var(--font-ui-small);
+}
+.semantropy-dictionary-diagnostics > summary { cursor: pointer; }
+.semantropy-dictionary-diagnostics label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+.semantropy-dictionary-diagnostics > div { white-space: pre-wrap; overflow-wrap: anywhere; }
+.semantropy-collision-modal {
+	/* Obsidian sizes .modal from these variables; width covers a single-class rule. */
+	--dialog-width: min(38rem, 95vw);
+	--dialog-max-width: min(38rem, 95vw);
+	--dialog-min-width: 0px;
+	width: min(38rem, 95vw);
+	max-width: min(38rem, 95vw);
+	min-width: 0;
+	max-height: 90vh;
+	box-sizing: border-box;
+}
+.semantropy-collision-modal .modal-content {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow: auto;
+}
+.semantropy-collision-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+/*
+ * The select's block margin keeps its focus outline inside the scrollport.
+ * Center the name with that select so it shares the line of the buttons,
+ * which the controls row already centers against the label.
+ */
+.semantropy-collision-controls label {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem;
+}
+.semantropy-collision-controls select { max-width: 100%; }
+.semantropy-collision-rows { margin: 0; padding-inline-start: 1.75rem; overflow: auto; min-height: 5rem; }
+.semantropy-collision-row { padding: 0.75rem 0; border-bottom: 1px solid var(--background-modifier-border); }
+.semantropy-collision-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 1.1em; }
+.semantropy-fake-proverb-modal {
+	--dialog-width: min(36rem, 95vw);
+	--dialog-max-width: min(36rem, 95vw);
+	--dialog-min-width: 0px;
+	width: min(36rem, 95vw);
+	max-width: min(36rem, 95vw);
+	min-width: 0;
+	max-height: 90vh;
+	box-sizing: border-box;
+}
+.semantropy-fake-proverb-modal .modal-content {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow: auto;
+}
+.semantropy-fake-proverb-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+.semantropy-fake-proverb-controls button { white-space: normal; height: auto; min-height: 2em; }
+.semantropy-fake-proverb-controls button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+.semantropy-fake-proverb-rows { margin: 0; padding-inline-start: 1.75rem; min-height: 5rem; }
+.semantropy-fake-proverb-row { padding: 0.75rem 0; border-bottom: 1px solid var(--background-modifier-border); }
+.semantropy-fake-proverb-row.is-empty { color: var(--text-muted); }
+/* Plugin-owned emphasis and quotation: the generated text is plain text, not Markdown. */
+.semantropy-fake-proverb-proverb {
+	margin: 0 0 0.5rem;
+	font-weight: var(--font-bold);
+	font-size: 1.1em;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.semantropy-fake-proverb-gloss {
+	margin: 0 0 0.5rem;
+	padding: 0.25rem 0 0.25rem 0.75rem;
+	border-inline-start: 3px solid var(--blockquote-border-color, var(--interactive-accent));
+	color: var(--text-normal);
+	font-style: normal;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}

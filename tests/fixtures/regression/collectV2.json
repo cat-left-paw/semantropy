@@ -1,0 +1,116 @@
+{
+  "identity": {
+    "id": "11111111-2222-4333-8444-555555555555",
+    "created": "2026-09-05T12:34:56.000Z"
+  },
+  "entries": [
+    {
+      "input": {
+        "type": "body",
+        "text": "おかき的な自殺",
+        "target": {
+          "path": "桜桃.md",
+          "contentHash": "abababababababababababababababababababababababababababababababab"
+        },
+        "vocabulary": {
+          "sources": [
+            {
+              "path": "桜桃.md",
+              "contentHash": "abababababababababababababababababababababababababababababababab"
+            }
+          ],
+          "fingerprint": "vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab",
+          "drawMode": "uniform"
+        },
+        "bodySemantropy": 50,
+        "algorithmVersion": 9,
+        "hasManualEdits": false
+      },
+      "bytes": "- おかき的な自殺\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"body\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":9,\"target\":{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"},\"vocabulary\":{\"sources\":[{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"bodySemantropy\":50,\"hasManualEdits\":false} -->\n"
+    },
+    {
+      "input": {
+        "type": "body",
+        "text": "おかき的な自殺",
+        "target": {
+          "path": "桜桃.md",
+          "contentHash": "abababababababababababababababababababababababababababababababab"
+        },
+        "vocabulary": {
+          "sources": [
+            {
+              "path": "桜桃.md",
+              "contentHash": "abababababababababababababababababababababababababababababababab"
+            }
+          ],
+          "fingerprint": "vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab",
+          "drawMode": "uniform"
+        },
+        "bodySemantropy": 50,
+        "algorithmVersion": 9,
+        "hasManualEdits": true,
+        "manualAlgorithmVersion": 1,
+        "manualOverrides": [
+          {
+            "tokenId": "t",
+            "kind": "replacement",
+            "localRevision": 2
+          }
+        ]
+      },
+      "bytes": "- おかき的な自殺\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"body\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":9,\"target\":{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"},\"vocabulary\":{\"sources\":[{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"bodySemantropy\":50,\"hasManualEdits\":true,\"manualAlgorithmVersion\":1,\"manualOverrides\":[{\"tokenId\":\"t\",\"kind\":\"replacement\",\"localRevision\":2}]} -->\n"
+    },
+    {
+      "input": {
+        "type": "fake-dictionary",
+        "text": "幸福：通常三人以上では行わない移動方法。",
+        "target": {
+          "path": "folder/note.md",
+          "contentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        "vocabulary": {
+          "sources": [
+            {
+              "path": "folder/note.md",
+              "contentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            }
+          ],
+          "fingerprint": "vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab",
+          "drawMode": "uniform"
+        },
+        "dictionarySemantropy": 75,
+        "algorithmVersion": 1,
+        "templateId": "core-noun-1",
+        "templateSetVersion": 1
+      },
+      "bytes": "- 幸福：通常三人以上では行わない移動方法。\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"fake-dictionary\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":1,\"target\":{\"path\":\"folder/note.md\",\"contentHash\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"vocabulary\":{\"sources\":[{\"path\":\"folder/note.md\",\"contentHash\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"dictionarySemantropy\":75,\"templateId\":\"core-noun-1\",\"templateSetVersion\":1} -->\n"
+    },
+    {
+      "input": {
+        "type": "collision",
+        "text": "夜光階段を観測する",
+        "vocabulary": {
+          "sources": [
+            {
+              "path": "vocab-a.md",
+              "contentHash": "abababababababababababababababababababababababababababababababab"
+            },
+            {
+              "path": "vocab-b.md",
+              "contentHash": "abababababababababababababababababababababababababababababababab"
+            }
+          ],
+          "fingerprint": "vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab",
+          "drawMode": "uniform"
+        },
+        "algorithmVersion": 1,
+        "patternId": "noun-sahen-1",
+        "patternSetVersion": 1,
+        "batchId": "batch-1",
+        "rowId": "row-1"
+      },
+      "bytes": "- 夜光階段を観測する\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"collision\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":1,\"vocabulary\":{\"sources\":[{\"path\":\"vocab-a.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"},{\"path\":\"vocab-b.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"patternId\":\"noun-sahen-1\",\"patternSetVersion\":1,\"batchId\":\"batch-1\",\"rowId\":\"row-1\"} -->\n"
+    }
+  ],
+  "collection": "---\r\nsemantropy-collection-version: 1\r\n---\r\n\r\n# Semantropy Fragments\r\n\r\n- おかき的な自殺\r\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"body\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":9,\"target\":{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"},\"vocabulary\":{\"sources\":[{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"bodySemantropy\":50,\"hasManualEdits\":false} -->\r\n\r\n- おかき的な自殺\r\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"body\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":9,\"target\":{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"},\"vocabulary\":{\"sources\":[{\"path\":\"桜桃.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"bodySemantropy\":50,\"hasManualEdits\":true,\"manualAlgorithmVersion\":1,\"manualOverrides\":[{\"tokenId\":\"t\",\"kind\":\"replacement\",\"localRevision\":2}]} -->\r\n\r\n- 幸福：通常三人以上では行わない移動方法。\r\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"fake-dictionary\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":1,\"target\":{\"path\":\"folder/note.md\",\"contentHash\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"},\"vocabulary\":{\"sources\":[{\"path\":\"folder/note.md\",\"contentHash\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"dictionarySemantropy\":75,\"templateId\":\"core-noun-1\",\"templateSetVersion\":1} -->\r\n\r\n- 夜光階段を観測する\r\n  <!-- semantropy: {\"id\":\"11111111-2222-4333-8444-555555555555\",\"metadataVersion\":2,\"type\":\"collision\",\"created\":\"2026-09-05T12:34:56.000Z\",\"algorithmVersion\":1,\"vocabulary\":{\"sources\":[{\"path\":\"vocab-a.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"},{\"path\":\"vocab-b.md\",\"contentHash\":\"abababababababababababababababababababababababababababababababab\"}],\"fingerprint\":\"vocabulary-fingerprint-sha256-1:abababababababababababababababababababababababababababababababab\",\"drawMode\":\"uniform\"},\"patternId\":\"noun-sahen-1\",\"patternSetVersion\":1,\"batchId\":\"batch-1\",\"rowId\":\"row-1\"} -->\r\n\r\n<!-- future: {\"unknown\":true} -->\r\n*  ユーザー編集\t行  "
+}

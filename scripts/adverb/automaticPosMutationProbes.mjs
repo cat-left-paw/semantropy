@@ -1,0 +1,41 @@
+/** AUTO-POS-CORE1: run only in verifyAdverbMutations' private temporary tree. */
+const P = "src/transform/automaticPosProjection.ts", C = "src/transform/automaticPosCore.ts";
+const M = "src/transform/manualMorphology.ts", A = "src/transform/manualAdverbAuthority.ts";
+const CAP = "src/adverb/adverbCapability.ts", FAMILY = "src/adverb/adverbFamily.ts";
+const PT = "tests/automaticPosProjection.test.ts", CT = "tests/automaticPosCore.test.ts";
+export const probes = [
+	[P, PT, "owner-authentication-bypassed", 'if (!isManualMorphVocabulary(value as ManualMorphVocabulary)) refuse("invalid-owner");',
+		'if (false) refuse("invalid-owner");', "authenticates the owner before any downstream structural seam"],
+	[P, PT, "raw-snapshot-accepted", 'if (!isManualMorphVocabulary(value as ManualMorphVocabulary)) refuse("invalid-owner");',
+		'if (!isManualMorphVocabulary(value as ManualMorphVocabulary) && !(value as ManualMorphVocabulary["snapshot"])?.projections) refuse("invalid-owner");', "never accepts raw Snapshot as origin proof"],
+	[A, PT, "public-provenance-used-as-owner-binding", 'if (AUTHORITIES.get(handle)!.vocabulary !== vocabulary) refuse("invalid-vocabulary");',
+		'if (handle.provenance.fingerprint !== vocabulary.snapshot.fingerprint) refuse("invalid-vocabulary");', "rejects clone owners raw snapshots and foreign adverb authorities"],
+	[M, CT, "verb-compatibility-bypassed", 'const compatible = state.byCompatibility.get(connectionResult.compatibility.candidateCompatibilityKey) ?? [];',
+		'const compatible = [...state.byCompatibility.values()].flat();', "uses Manual authority for verb type"],
+	[M, CT, "adjective-form-bypassed", 'token.conjugationForm, adjective ? null : targetConnection,',
+		'adjective ? "基本形" : token.conjugationForm, adjective ? null : targetConnection,', "uses Manual authority for adjective form"],
+	[M, CT, "adjective-follower-bypassed", 'const requiresConnection = !adjective || (role === "target" && token.conjugationForm !== "基本形");',
+		'const requiresConnection = !adjective;', "uses Manual authority for adjective follower"],
+	[FAMILY, CT, "adverb-family-bypassed", 'if (token.pos !== ADVERB_POS) {\n\t\treturn { supported: false, reason: "unsupported-part-of-speech" };\n\t}\n\tif (!isAdverbClass(token.detail1)) {',
+		'if (false) {\n\t\treturn { supported: false, reason: "unsupported-part-of-speech" };\n\t}\n\tif (false) {', "uses the adverb authority for family"],
+	[CAP, CT, "adverb-head-bypassed", '(profile) => profile.headClass === targetProfile.headClass,', '(profile) => true,', "uses the adverb authority for head"],
+	[CAP, CT, "adverb-polarity-bypassed", '(profile) => profile.polarity === targetProfile.polarity,', '(profile) => true,', "uses the adverb authority for polarity"],
+	[CAP, CT, "adverb-bridge-bypassed", 'if (!capabilities[targetProfile.bridge]) {', 'if (false) {', "uses the adverb authority for bridge"],
+	[CAP, CT, "duplicate-to-guard-bypassed", 'targetProfile.bridge === "to" &&\n\t\tadverbSurfaceEndsWithTo(candidate.surface)', 'false', "uses the adverb authority for duplicate to"],
+	[M, CT, "morph-current-surface-not-excluded", '(record) => record.surface !== input.currentSurface,', '(record) => true,', "excludes the current surface and refuses slots with no distinct alternative"],
+	[A, CT, "adverb-current-surface-not-excluded", 'if (candidate.record.surface === current) continue;', '', "excludes the current surface and refuses slots with no distinct alternative"],
+	[C, CT, "private-pos-streams-shared", 'const random = { verb: createSeededRandom(domainNonce(nonce, "verb", "surface")),\n\t\t\tiAdjective: createSeededRandom(domainNonce(nonce, "iAdjective", "surface")), adverb: createSeededRandom(domainNonce(nonce, "adverb", "surface")) };',
+		'const shared = createSeededRandom(nonce); const random = { verb: shared, iAdjective: shared, adverb: shared };', "all sixteen option combinations isolate every part"],
+	[C, CT, "legacy-noun-nonce-changed", 'bodySeed: nonce, bodySemantropy: level as BodySemantropy, algorithmVersion: 1',
+		'bodySeed: (nonce ^ 1) >>> 0, bodySemantropy: level as BodySemantropy, algorithmVersion: 1', "matches legacy noun draws including exact Ruby"],
+	[P, PT, "profile-version-fingerprint-binding-removed", 'verb, iAdjective, authority.policyVersion, authority.bridgeProfile, authority.observations.entries,',
+		'verb, iAdjective, authority.policyVersion, authority.observations.entries,', "binds the profile version and meaning into the new fingerprint"],
+	[C, CT, "ruby-pair-invented", 'return record.verifiedRubyVariants.length ? draw(record.verifiedRubyVariants, variant => variant.frequency, random) : null;',
+		'return record.verifiedRubyVariants.length ? draw(record.verifiedRubyVariants, variant => variant.frequency, random) : { reading: record.surface } as VerifiedRubyVariant;', "uses only verified Source Ruby and never candidate reading as a Ruby pair"],
+	[P, CT, "released-and-stale-owner-check-removed", 'const revoked = REVOKED.get(owner); if (revoked) refuse(revoked);', '', "rejects source-changed owners on generation and delayed inspection"],
+	[C, CT, "delayed-result-check-removed", 'if (state.latest !== result) refuse("stale");', '', "refuses delayed results after supersession"],
+	[P, PT, "source-origin-check-removed", 'if (!vocabulary.snapshot.sources.some(source => source.path === origin.path && source.contentHash === origin.contentHash)) refuse("provenance-mismatch");',
+		'', "rejects structurally consistent outside origins after test-only authentication bypass"],
+	[P, PT, "projection-freeze-removed", 'const projection: AutomaticPosProjection = frozen({', 'const projection: AutomaticPosProjection = ({', "publishes all or nothing and permits a clean retry after missing evidence"],
+	[C, CT, "current-baseline-ignored", 'current?.tokenSurfaces[sequenceIndex]?.[tokenIndex] ?? token.surface', 'token.surface', "excludes an authenticated displayed baseline on a repeated shuffle"],
+];

@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "origin": "f0a381e45283c3aaef05a731bb3d366fddede836",
+  "count": 4018,
+  "inputSha256": "2720d8c3fe5483e6a2309adc9fdcddfe810ecfb099d200b90669d137c60c5546",
+  "outputs": {
+    "source": "643c9437a9186ceb41e9ffcd2698a3c7af23a2140a2a2862458676ba0e316e91",
+    "target-prototype": "05a8b722507b09be88cffd464c2550294f605f1ff15e48e2e45fcea444a26020"
+  },
+  "display1": {
+    "origin": "PRE-RELEASE-EXPERIENCE-DISPLAY1",
+    "outputs": {
+      "source": "643c9437a9186ceb41e9ffcd2698a3c7af23a2140a2a2862458676ba0e316e91",
+      "target-prototype": "79d8d5d3f37f7b952ea695a3fae310c3877edd5f032ea00c81d61f02445bbc34"
+    },
+    "hiddenFrontmatter": {
+      "source": 0,
+      "target-prototype": 167
+    }
+  }
+}

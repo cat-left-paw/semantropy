@@ -1,0 +1,17 @@
+# The build compares the generated template module with what the document
+# implies. Both are checked out with LF everywhere, so a Windows checkout with
+# core.autocrlf=true cannot turn a correct file into a "stale" one.
+resources/fake-dictionary/standard-templates.md text eol=lf
+src/dictionary/generated/*.ts                   text eol=lf
+resources/collision/standard-patterns.md        text eol=lf
+resources/collision/standard-patterns.lock.json text eol=lf
+src/collision/generated/*.ts                    text eol=lf
+resources/fake-proverb/standard-recipes.md        text eol=lf
+resources/fake-proverb/standard-recipes.lock.json text eol=lf
+src/fakeProverb/generated/*.ts                    text eol=lf
+
+# Recorded regression oracles are compared by SHA-256 of their exact bytes.
+tests/fixtures/regression/*.json                text eol=lf
+
+# The own MIT permission notice is embedded verbatim in the shipped banner.
+LICENSE                                       text eol=lf

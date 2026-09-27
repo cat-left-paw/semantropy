@@ -1,0 +1,20 @@
+Semantropy
+
+Copyright (C) 2026 Cat Left Paw / 猫乃 左手.
+
+Semantropy's original source code is licensed under the MIT License.
+See LICENSE for the copyright and permission notice.
+
+Official public repository:
+https://github.com/cat-left-paw/semantropy
+
+Semantropy's distribution build includes third-party software and Japanese
+dictionary data under their respective licenses. See THIRD_PARTY_NOTICES.md
+for the inventory. The generated distribution main.js also contains the
+required license and notice texts so that they remain available in the
+three-file Obsidian Community Plugin distribution.
+
+The build embeds lindera-wasm 6.0.0 (MIT), its WebAssembly module, and a
+Semantropy-compact build of the Lindera IPADIC 6.0.0 release archive, which
+derives from mecab-ipadic-2.7.0-20070801. No dictionary is downloaded at
+runtime.

@@ -1,0 +1,254 @@
+{
+	"schemaVersion": 1,
+	"dataVersion": 1,
+	"recipes": [
+		{
+			"id": "noun-pair",
+			"shape": "modifier-noun-connector-modifier-noun",
+			"weight": 100
+		},
+		{
+			"id": "sahen-noun",
+			"shape": "sahen-noun",
+			"weight": 12
+		}
+	],
+	"profiles": [
+		{
+			"id": "placement-none",
+			"placement": "none",
+			"weight": 45
+		},
+		{
+			"id": "placement-left",
+			"placement": "left",
+			"weight": 20
+		},
+		{
+			"id": "placement-right",
+			"placement": "right",
+			"weight": 27
+		},
+		{
+			"id": "placement-both",
+			"placement": "both",
+			"weight": 8
+		}
+	],
+	"connectors": [
+		{
+			"id": "empty",
+			"form": "empty",
+			"weight": 14,
+			"literal": null
+		},
+		{
+			"id": "no",
+			"form": "literal",
+			"weight": 28,
+			"literal": "の"
+		},
+		{
+			"id": "to",
+			"form": "literal",
+			"weight": 12,
+			"literal": "と"
+		},
+		{
+			"id": "ya",
+			"form": "literal",
+			"weight": 8,
+			"literal": "や"
+		},
+		{
+			"id": "teki",
+			"form": "literal",
+			"weight": 5,
+			"literal": "的"
+		},
+		{
+			"id": "teki-na",
+			"form": "literal",
+			"weight": 6,
+			"literal": "的な"
+		},
+		{
+			"id": "to-no",
+			"form": "literal",
+			"weight": 5,
+			"literal": "との"
+		},
+		{
+			"id": "e-no",
+			"form": "literal",
+			"weight": 4,
+			"literal": "への"
+		},
+		{
+			"id": "kara-no",
+			"form": "literal",
+			"weight": 3,
+			"literal": "からの"
+		},
+		{
+			"id": "to-shite-no",
+			"form": "literal",
+			"weight": 3,
+			"literal": "としての"
+		},
+		{
+			"id": "no-yo-na",
+			"form": "literal",
+			"weight": 4,
+			"literal": "のような"
+		},
+		{
+			"id": "to-iu",
+			"form": "literal",
+			"weight": 3,
+			"literal": "という"
+		},
+		{
+			"id": "to-iu-na-no",
+			"form": "literal",
+			"weight": 1,
+			"literal": "という名の"
+		},
+		{
+			"id": "no-hate-no",
+			"form": "literal",
+			"weight": 1,
+			"literal": "の果ての"
+		},
+		{
+			"id": "no-tame-no",
+			"form": "literal",
+			"weight": 2,
+			"literal": "のための"
+		},
+		{
+			"id": "ni-yoru",
+			"form": "literal",
+			"weight": 3,
+			"literal": "による"
+		},
+		{
+			"id": "ni-okeru",
+			"form": "literal",
+			"weight": 1,
+			"literal": "における"
+		},
+		{
+			"id": "ni-taisuru",
+			"form": "literal",
+			"weight": 2,
+			"literal": "に対する"
+		},
+		{
+			"id": "o-meguru",
+			"form": "literal",
+			"weight": 2,
+			"literal": "をめぐる"
+		},
+		{
+			"id": "ppoi",
+			"form": "literal",
+			"weight": 2,
+			"literal": "っぽい"
+		}
+	],
+	"modifierForms": [
+		{
+			"id": "i-adjective-basic",
+			"class": "i-adjective",
+			"variant": "basic",
+			"weight": 20
+		},
+		{
+			"id": "na-adjective-na",
+			"class": "na-adjective",
+			"variant": "na",
+			"weight": 20
+		},
+		{
+			"id": "verb-basic",
+			"class": "verb",
+			"variant": "basic",
+			"weight": 20
+		},
+		{
+			"id": "verb-past",
+			"class": "verb",
+			"variant": "past",
+			"weight": 10
+		},
+		{
+			"id": "verb-progressive",
+			"class": "verb",
+			"variant": "progressive",
+			"weight": 4
+		},
+		{
+			"id": "verb-negative",
+			"class": "verb",
+			"variant": "negative",
+			"weight": 4
+		},
+		{
+			"id": "sahen-basic",
+			"class": "sahen",
+			"variant": "basic",
+			"weight": 20
+		},
+		{
+			"id": "sahen-past",
+			"class": "sahen",
+			"variant": "past",
+			"weight": 10
+		},
+		{
+			"id": "sahen-progressive",
+			"class": "sahen",
+			"variant": "progressive",
+			"weight": 4
+		},
+		{
+			"id": "sahen-negative",
+			"class": "sahen",
+			"variant": "negative",
+			"weight": 4
+		}
+	],
+	"nounSuffixes": [
+		{
+			"id": "noun-no",
+			"weight": 30,
+			"literal": "の"
+		},
+		{
+			"id": "noun-teki-na",
+			"weight": 12,
+			"literal": "的な"
+		},
+		{
+			"id": "noun-no-yo-na",
+			"weight": 8,
+			"literal": "のような"
+		},
+		{
+			"id": "noun-ppoi",
+			"weight": 5,
+			"literal": "っぽい"
+		},
+		{
+			"id": "noun-ka-shita",
+			"weight": 5,
+			"literal": "化した"
+		},
+		{
+			"id": "noun-ka-sareta",
+			"weight": 3,
+			"literal": "化された"
+		}
+	]
+}

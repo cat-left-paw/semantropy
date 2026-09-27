@@ -1,0 +1,57 @@
+{
+	"name": "semantropy",
+	"version": "0.0.1",
+	"description": "A desktop-only Obsidian plugin that creates meaning-disrupting variations of Japanese Markdown without changing the source note",
+	"main": "main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc --noEmit --skipLibCheck && node esbuild.config.mjs production",
+		"prepare:dictionary": "node scripts/prepareDictionary.mjs",
+		"generate:templates": "node scripts/fakeDictionary/generate.mjs",
+		"generate:collision-patterns": "node scripts/collision/generate.mjs",
+		"generate:fake-proverb-recipes": "node scripts/fakeProverb/generate.mjs",
+		"build:distribution": "tsc --noEmit --skipLibCheck && node scripts/buildDistribution.mjs",
+		"prepare:release-smoke": "node scripts/prepareReleaseSmokeVault.mjs",
+		"verify:distribution": "vitest run --config vitest.distribution.config.ts",
+		"verify:reproducible": "node scripts/buildDistribution.mjs --twice",
+		"benchmark:distribution": "vitest run --config vitest.benchmark.config.ts tests/benchmark.distribution.ts",
+		"typecheck": "tsc --noEmit --skipLibCheck",
+		"lint": "eslint . --max-warnings 0",
+		"test": "vitest run",
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
+	"keywords": [
+		"obsidian",
+		"creative-writing",
+		"japanese",
+		"morphological-analysis"
+	],
+	"author": "Cat Left Paw / 猫乃 左手",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cat-left-paw/semantropy.git"
+	},
+	"bugs": {
+		"url": "https://github.com/cat-left-paw/semantropy/issues"
+	},
+	"homepage": "https://github.com/cat-left-paw/semantropy#readme",
+	"devDependencies": {
+		"@eslint/js": "^9.39.4",
+		"@types/node": "^22.15.17",
+		"acorn": "8.18.0",
+		"esbuild": "0.25.5",
+		"eslint": "^9.39.4",
+		"eslint-plugin-obsidianmd": "^0.4.0",
+		"eslint-scope": "8.4.0",
+		"globals": "^17.6.0",
+		"jiti": "^2.6.1",
+		"jsdom": "^29.1.1",
+		"lindera-wasm": "6.0.0",
+		"obsidian": "latest",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.59.1",
+		"vitest": "^3.2.4"
+	}
+}

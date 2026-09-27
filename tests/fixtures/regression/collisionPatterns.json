@@ -1,0 +1,638 @@
+{
+	"schemaVersion": 2,
+	"dataVersion": 2,
+	"recipes": [
+		{
+			"id": "noun-pair",
+			"label": "Standard",
+			"enabled": true,
+			"selectable": true,
+			"weight": 100,
+			"parts": [
+				{
+					"kind": "modifier",
+					"slotId": "m1",
+					"optional": true,
+					"profile": "all"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "connector",
+					"slotId": "c1",
+					"optional": false
+				},
+				{
+					"kind": "modifier",
+					"slotId": "m2",
+					"optional": true,
+					"profile": "all"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				}
+			],
+			"presence": [
+				{
+					"slots": [],
+					"weight": 45
+				},
+				{
+					"slots": [
+						"m1"
+					],
+					"weight": 20
+				},
+				{
+					"slots": [
+						"m2"
+					],
+					"weight": 27
+				},
+				{
+					"slots": [
+						"m1",
+						"m2"
+					],
+					"weight": 8
+				}
+			]
+		},
+		{
+			"id": "plain-pair",
+			"label": "Noun pair",
+			"enabled": true,
+			"selectable": true,
+			"weight": 24,
+			"parts": [
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "connector",
+					"slotId": "c1",
+					"optional": false
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				}
+			],
+			"presence": []
+		},
+		{
+			"id": "triple-left",
+			"label": "Triple lead",
+			"enabled": true,
+			"selectable": true,
+			"weight": 12,
+			"parts": [
+				{
+					"kind": "modifier",
+					"slotId": "m1",
+					"optional": true,
+					"profile": "all"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "connector",
+					"slotId": "c1",
+					"optional": false
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				},
+				{
+					"kind": "connector",
+					"slotId": "c2",
+					"optional": false
+				},
+				{
+					"kind": "noun",
+					"slotId": "n3",
+					"optional": false
+				}
+			],
+			"presence": [
+				{
+					"slots": [],
+					"weight": 70
+				},
+				{
+					"slots": [
+						"m1"
+					],
+					"weight": 30
+				}
+			]
+		},
+		{
+			"id": "triple-right",
+			"label": "Triple echo",
+			"enabled": true,
+			"selectable": true,
+			"weight": 10,
+			"parts": [
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "connector",
+					"slotId": "c1",
+					"optional": false
+				},
+				{
+					"kind": "modifier",
+					"slotId": "m2",
+					"optional": true,
+					"profile": "all"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				},
+				{
+					"kind": "connector",
+					"slotId": "c2",
+					"optional": false
+				},
+				{
+					"kind": "modifier",
+					"slotId": "m3",
+					"optional": true,
+					"profile": "all"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n3",
+					"optional": false
+				}
+			],
+			"presence": [
+				{
+					"slots": [],
+					"weight": 50
+				},
+				{
+					"slots": [
+						"m2"
+					],
+					"weight": 20
+				},
+				{
+					"slots": [
+						"m3"
+					],
+					"weight": 20
+				},
+				{
+					"slots": [
+						"m2",
+						"m3"
+					],
+					"weight": 10
+				}
+			]
+		},
+		{
+			"id": "named",
+			"label": "Named",
+			"enabled": true,
+			"selectable": true,
+			"weight": 8,
+			"parts": [
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l1",
+					"optional": false,
+					"literalId": "named-link"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				}
+			],
+			"presence": []
+		},
+		{
+			"id": "question",
+			"label": "Question",
+			"enabled": true,
+			"selectable": true,
+			"weight": 6,
+			"parts": [
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l1",
+					"optional": false,
+					"literalId": "topic-link"
+				},
+				{
+					"kind": "modifier",
+					"slotId": "m2",
+					"optional": true,
+					"profile": "all"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l2",
+					"optional": false,
+					"literalId": "possessive-link"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n3",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l3",
+					"optional": false,
+					"literalId": "object-link"
+				},
+				{
+					"kind": "predicate",
+					"slotId": "v1",
+					"optional": false,
+					"profile": "regular-verb-basic"
+				},
+				{
+					"kind": "literal",
+					"slotId": "l4",
+					"optional": false,
+					"literalId": "question-end"
+				}
+			],
+			"presence": [
+				{
+					"slots": [],
+					"weight": 70
+				},
+				{
+					"slots": [
+						"m2"
+					],
+					"weight": 30
+				}
+			]
+		},
+		{
+			"id": "denial",
+			"label": "Denial",
+			"enabled": true,
+			"selectable": true,
+			"weight": 6,
+			"parts": [
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l1",
+					"optional": false,
+					"literalId": "topic-link"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l2",
+					"optional": false,
+					"literalId": "denial-end"
+				}
+			],
+			"presence": []
+		},
+		{
+			"id": "purpose",
+			"label": "For",
+			"enabled": true,
+			"selectable": true,
+			"weight": 8,
+			"parts": [
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				},
+				{
+					"kind": "literal",
+					"slotId": "l1",
+					"optional": false,
+					"literalId": "purpose-link"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n2",
+					"optional": false
+				}
+			],
+			"presence": []
+		},
+		{
+			"id": "sahen-noun",
+			"label": "Sahen",
+			"enabled": true,
+			"selectable": true,
+			"weight": 12,
+			"parts": [
+				{
+					"kind": "modifier",
+					"slotId": "m1",
+					"optional": false,
+					"profile": "sahen-basic"
+				},
+				{
+					"kind": "noun",
+					"slotId": "n1",
+					"optional": false
+				}
+			],
+			"presence": []
+		}
+	],
+	"literals": [
+		{
+			"id": "named-link",
+			"literal": "という名の"
+		},
+		{
+			"id": "topic-link",
+			"literal": "は"
+		},
+		{
+			"id": "possessive-link",
+			"literal": "の"
+		},
+		{
+			"id": "object-link",
+			"literal": "を"
+		},
+		{
+			"id": "question-end",
+			"literal": "か"
+		},
+		{
+			"id": "denial-end",
+			"literal": "ではない"
+		},
+		{
+			"id": "purpose-link",
+			"literal": "のための"
+		}
+	],
+	"connectors": [
+		{
+			"id": "empty",
+			"form": "empty",
+			"weight": 14,
+			"literal": null
+		},
+		{
+			"id": "no",
+			"form": "literal",
+			"weight": 28,
+			"literal": "の"
+		},
+		{
+			"id": "to",
+			"form": "literal",
+			"weight": 12,
+			"literal": "と"
+		},
+		{
+			"id": "ya",
+			"form": "literal",
+			"weight": 8,
+			"literal": "や"
+		},
+		{
+			"id": "teki",
+			"form": "literal",
+			"weight": 5,
+			"literal": "的"
+		},
+		{
+			"id": "teki-na",
+			"form": "literal",
+			"weight": 6,
+			"literal": "的な"
+		},
+		{
+			"id": "to-no",
+			"form": "literal",
+			"weight": 5,
+			"literal": "との"
+		},
+		{
+			"id": "e-no",
+			"form": "literal",
+			"weight": 4,
+			"literal": "への"
+		},
+		{
+			"id": "kara-no",
+			"form": "literal",
+			"weight": 3,
+			"literal": "からの"
+		},
+		{
+			"id": "to-shite-no",
+			"form": "literal",
+			"weight": 3,
+			"literal": "としての"
+		},
+		{
+			"id": "no-yo-na",
+			"form": "literal",
+			"weight": 4,
+			"literal": "のような"
+		},
+		{
+			"id": "to-iu",
+			"form": "literal",
+			"weight": 3,
+			"literal": "という"
+		},
+		{
+			"id": "to-iu-na-no",
+			"form": "literal",
+			"weight": 1,
+			"literal": "という名の"
+		},
+		{
+			"id": "no-hate-no",
+			"form": "literal",
+			"weight": 1,
+			"literal": "の果ての"
+		},
+		{
+			"id": "no-tame-no",
+			"form": "literal",
+			"weight": 2,
+			"literal": "のための"
+		},
+		{
+			"id": "ni-yoru",
+			"form": "literal",
+			"weight": 3,
+			"literal": "による"
+		},
+		{
+			"id": "ni-okeru",
+			"form": "literal",
+			"weight": 1,
+			"literal": "における"
+		},
+		{
+			"id": "ni-taisuru",
+			"form": "literal",
+			"weight": 2,
+			"literal": "に対する"
+		},
+		{
+			"id": "o-meguru",
+			"form": "literal",
+			"weight": 2,
+			"literal": "をめぐる"
+		},
+		{
+			"id": "ppoi",
+			"form": "literal",
+			"weight": 2,
+			"literal": "っぽい"
+		}
+	],
+	"modifierForms": [
+		{
+			"id": "i-adjective-basic",
+			"class": "i-adjective",
+			"variant": "basic",
+			"weight": 20
+		},
+		{
+			"id": "na-adjective-na",
+			"class": "na-adjective",
+			"variant": "na",
+			"weight": 20
+		},
+		{
+			"id": "verb-basic",
+			"class": "verb",
+			"variant": "basic",
+			"weight": 20
+		},
+		{
+			"id": "verb-past",
+			"class": "verb",
+			"variant": "past",
+			"weight": 10
+		},
+		{
+			"id": "verb-progressive",
+			"class": "verb",
+			"variant": "progressive",
+			"weight": 4
+		},
+		{
+			"id": "verb-negative",
+			"class": "verb",
+			"variant": "negative",
+			"weight": 4
+		},
+		{
+			"id": "sahen-basic",
+			"class": "sahen",
+			"variant": "basic",
+			"weight": 20
+		},
+		{
+			"id": "sahen-past",
+			"class": "sahen",
+			"variant": "past",
+			"weight": 10
+		},
+		{
+			"id": "sahen-progressive",
+			"class": "sahen",
+			"variant": "progressive",
+			"weight": 4
+		},
+		{
+			"id": "sahen-negative",
+			"class": "sahen",
+			"variant": "negative",
+			"weight": 4
+		}
+	],
+	"nounSuffixes": [
+		{
+			"id": "noun-no",
+			"weight": 30,
+			"literal": "の"
+		},
+		{
+			"id": "noun-teki-na",
+			"weight": 12,
+			"literal": "的な"
+		},
+		{
+			"id": "noun-no-yo-na",
+			"weight": 8,
+			"literal": "のような"
+		},
+		{
+			"id": "noun-ppoi",
+			"weight": 5,
+			"literal": "っぽい"
+		},
+		{
+			"id": "noun-ka-shita",
+			"weight": 5,
+			"literal": "化した"
+		},
+		{
+			"id": "noun-ka-sareta",
+			"weight": 3,
+			"literal": "化された"
+		}
+	]
+}
