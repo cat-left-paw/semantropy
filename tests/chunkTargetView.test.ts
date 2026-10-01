@@ -62,7 +62,17 @@ function harness(target = 30, level: BodySemantropy = OFF) {
 	};
 	return { view, control, calls, open };
 }
-async function loadAll(view: SemantropyView) { while (body(view).hasNext()) expect(await view.loadNextSection()).toBe("applied"); }
+/**
+ * Loads every remaining Chunk. Between Chunks it yields one macrotask: with the immediate
+ * scheduler a long note otherwise runs for a minute on a slow CI runner without giving the
+ * test worker a turn, and Vitest then fails the run with "Timeout calling onTaskUpdate".
+ */
+async function loadAll(view: SemantropyView) {
+	while (body(view).hasNext()) {
+		expect(await view.loadNextSection()).toBe("applied");
+		await new Promise(resolve => setTimeout(resolve, 0));
+	}
+}
 
 describe("CHUNK-01: first Chunk and independent Current Note vocabulary", () => {
 	it.each([3000, 5000])("materializes one prefix at target %i, retaining no unloaded analysis", async target => {
