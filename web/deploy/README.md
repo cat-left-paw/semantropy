@@ -160,6 +160,6 @@ attestationは `gh attestation verify main.js --repo cat-left-paw/semantropy` �
 
 ## 5. 公開後
 
-- README（英日）にPlaygroundのURLを加えるかは、オーナーが別途決める
+- README（英日）の「ブラウザで試す」／「Try it in a browser」にPlaygroundのURLを載せている（2026-10-01 オーナー決定）。URLや辞書データのサイズが変わったら、そこも直す
 - 辞書やプリセットを変えると `assets/engine-<hash>.bin` と `presets/<id>-<hash>.txt` の名前が変わるので、
   古いキャッシュは使われない

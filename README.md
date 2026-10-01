@@ -16,6 +16,12 @@ Semantropy is a desktop-only Obsidian plugin for creative writing in Japanese. I
 
 The analyzer is Lindera WebAssembly with an embedded compact IPADIC dictionary. It works locally and offline after installation. No dictionary directory or runtime download is required.
 
+## Try it in a browser
+
+A web Playground runs Semantropy without installing anything: <https://cat-left-paw.github.io/semantropy/>
+
+Paste Japanese text or pick a preset, then reshuffle it, change the vocabulary or use Recompose. Analysis and generation run entirely in the browser; the text you enter is not sent anywhere, and there is no analytics. The first visit loads about 11 MB of dictionary data. The page is in Japanese, and collected fragments are kept only in that browser.
+
 ## Getting started
 
 1. Open a Japanese Markdown note in Obsidian Desktop 1.13.7 or later.
