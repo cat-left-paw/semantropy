@@ -2,12 +2,19 @@ import { prepareFakeDictionaryGeneration } from "../dictionary/generateFakeDefin
 import { analyzeManualMorphSource, buildManualMorphVocabulary, type ManualMorphSourceAnalysis, type ManualMorphVocabulary } from "../transform/manualMorphology";
 import type { SourceSnapshot } from "./SourceSnapshot";
 import { type VocabularySnapshot, type VocabularyDrawMode } from "../vocabulary/vocabularySnapshot";
+import { DEFAULT_SOURCE_WEIGHT, type SourceWeight } from "../vocabulary/sourceWeights";
+import type { EnclosedTermDelimiter } from "../vocabulary/enclosedTerms";
 import type { JapaneseTokenizer } from "../tokenizer/JapaneseTokenizer";
 import type { RubyVocabulary } from "../analysis/rubyVocabulary";
 import type { DictionaryVocabularyPool } from "../dictionary/vocabularyPool";
 import { FAKE_DICTIONARY_PLACEHOLDERS } from "../dictionary/placeholders";
 
-export type VocabularySelection = { mode: "current" | "selected"; paths: readonly string[]; drawMode: VocabularyDrawMode };
+/**
+ * `weights` (0.1.0 S3) is a Selected Notes weight by path. Only paths whose
+ * weight is not ×1 have an entry; like the paths, it is never persisted.
+ */
+export type VocabularySelection = { mode: "current" | "selected"; paths: readonly string[]; drawMode: VocabularyDrawMode;
+ weights?: Readonly<Record<string, SourceWeight>> };
 export const initialVocabularySelection = (): VocabularySelection => ({ mode: "current", paths: [], drawMode: "uniform" });
 export const VOCABULARY_PREPARATION_ERROR = "Could not prepare Vocabulary. Check selected notes and retry.";
 export const VOCABULARY_REFRESH_REQUIRED = "Refresh target before using this note as Vocabulary.";
@@ -23,6 +30,26 @@ export function vocabularyPaths(paths: readonly string[]): string[] {
  const normalized = paths.map(path => path.replace(/\\/gu, "/").replace(/\/{2,}/gu, "/").replace(/^(\.\/)+/u, ""));
  if (normalized.some(path => !path || path.startsWith("/") || /^[A-Za-z]:/u.test(path) || path.includes("\0") || path.split("/").some(p => !p || p === "." || p === ".."))) throw Error(VOCABULARY_PREPARATION_ERROR);
  return [...new Set(normalized)].sort();
+}
+
+/** The weight a selection gives one path: ×1 unless it has an entry of its own. */
+export function selectionWeight(selection: VocabularySelection, path: string): SourceWeight {
+ const weights = selection.weights;
+ return weights && Object.prototype.hasOwnProperty.call(weights, path) ? weights[path]! : DEFAULT_SOURCE_WEIGHT;
+}
+
+/**
+ * The Source weights an Apply uses, keyed like `vocabularyPaths()`: Selected
+ * Notes only, and only for selected paths. Current Note is always unweighted.
+ */
+export function selectionSourceWeights(selection: VocabularySelection): Record<string, SourceWeight> | null {
+ if (selection.mode !== "selected" || !selection.weights) return null;
+ const weights: Record<string, SourceWeight> = {};
+ for (const path of selection.paths) {
+  const weight = selectionWeight(selection, path);
+  if (weight !== DEFAULT_SOURCE_WEIGHT) weights[vocabularyPaths([path])[0]!] = weight;
+ }
+ return Object.keys(weights).length ? weights : null;
 }
 
 export function snapshotRubyVocabulary(snapshot: VocabularySnapshot): RubyVocabulary {
@@ -42,6 +69,8 @@ export async function prepareVocabulary(input: {
  readText: (path: string) => Promise<string>;
  tokenizer: JapaneseTokenizer; isCurrent: () => boolean; checkpoint: () => Promise<boolean>;
  progress: (done: number, total: number) => void;
+ /** 0.1.0 S4: every Source, the current note included, is read with these enclosed-term delimiters. */
+ enclosedTerms?: readonly EnclosedTermDelimiter[];
 }): Promise<ManualMorphVocabulary | null> {
  const paths = input.selection.mode === "current" ? (input.target ? [input.target.sourcePath] : []) : vocabularyPaths(input.selection.paths);
  if (!paths.length) throw Error(VOCABULARY_PREPARATION_ERROR);
@@ -53,7 +82,7 @@ export async function prepareVocabulary(input: {
    const text = input.target && path === input.target.sourcePath ? input.target.text : await input.readText(path);
    if (!input.isCurrent() || !(await input.checkpoint())) return null;
    const analyzed = await analyzeManualMorphSource({ text, sourcePath: path, tokenizer: input.tokenizer,
-    isCurrent: input.isCurrent, checkpoint: input.checkpoint, mode: "target-prototype" });
+    isCurrent: input.isCurrent, checkpoint: input.checkpoint, mode: "target-prototype", enclosedTerms: input.enclosedTerms ?? null });
    if (analyzed.status === "stale") return null;
    if (analyzed.status !== "ready") throw Error(VOCABULARY_PREPARATION_ERROR);
    sources.push(analyzed.analysis);
@@ -61,6 +90,6 @@ export async function prepareVocabulary(input: {
   input.progress(sources.length, paths.length);
  }
  if (!input.isCurrent() || !(await input.checkpoint())) return null;
- const active = buildManualMorphVocabulary({ sources, drawMode: input.selection.drawMode });
+ const active = buildManualMorphVocabulary({ sources, drawMode: input.selection.drawMode, sourceWeights: selectionSourceWeights(input.selection) });
  return input.isCurrent() ? active : null;
 }

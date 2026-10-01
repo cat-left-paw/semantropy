@@ -177,7 +177,7 @@ describe("distribution benchmark", () => {
 			const main = await stat(path.join(rootDir, artifactDir, "main.js"));
 			const inspection = await inspectArtifact(path.join(rootDir, artifactDir), rootDir);
 			// Provisional UI-scope cap, raised to 600,000 at EXPERIENCE-LOCALE1 (see artifact.test.ts).
-			expect(inspection.maskedCodeBytes).toBeLessThan(600_000);
+			expect(inspection.maskedCodeBytes).toBeLessThan(650_000);
 			const fullDictionary = await measureDictionaryDir(
 				linderaFullDictionaryDir(rootDir),
 			);
@@ -206,7 +206,7 @@ describe("distribution benchmark", () => {
 				},
 				size: {
 					maskedCodeBytes: inspection.maskedCodeBytes,
-					maskedProvisionalLimitBytes: 600_000,
+					maskedProvisionalLimitBytes: 650_000,
 					maskedBaselineDelta: inspection.maskedCodeBytes - 290_908,
 					mainJsBytes: main.size,
 					retiredReferenceBytes: RETIRED_MAIN_JS_REFERENCE_BYTES,

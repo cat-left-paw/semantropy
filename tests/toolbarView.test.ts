@@ -295,8 +295,10 @@ describe("TOOLBAR1 action hierarchy and accessibility (UI-02)", () => {
 		expect(document.getElementById(group.getAttribute("aria-labelledby")!)?.textContent).toBe("Phrase generation");
 		expect(collision.closest('[aria-label="Display settings"]')).toBeNull();
 		expect(tabOrder(h.view)).toContain(collision);
+		// 0.1.0 S5 adds Recompose to Phrase generation; the other later operations stay absent.
+		expect(pick<HTMLButtonElement>(h.view, ".semantropy-recompose-open").closest(".semantropy-toolbar-group")).toBe(group);
 		for (const absent of [
-			"Vertical", "縦書き", "Recompose", "Seed",
+			"Vertical", "縦書き", "Seed",
 		]) {
 			expect(text).not.toContain(absent);
 		}
@@ -461,7 +463,9 @@ describe("TOOLBAR1 display settings never change generation (UI-03)", () => {
 		const bodyEl = pick<HTMLElement>(h.view, ".semantropy-body");
 		expect(bodyEl.style.fontFamily).toContain("serif");
 		expect(bodyEl.style.fontSize).toBe("20px");
-		expect(bodyEl.style.backgroundColor).not.toBe("");
+		// 0.1.0 S2: colours belong to the whole preview region around the body.
+		expect(bodyEl.style.backgroundColor).toBe("");
+		expect(pick<HTMLElement>(h.view, ".semantropy-scroll").style.backgroundColor).not.toBe("");
 		// The Toolbar keeps the interface font and colours.
 		const toolbar = pick<HTMLElement>(h.view, ".semantropy-toolbar");
 		expect(toolbar.style.fontFamily).toBe("");
@@ -581,7 +585,7 @@ describe("TOOLBAR1 display settings never change generation (UI-03)", () => {
 		expect(h.shared.store.getDisplaySettings().bodyBackground).toBe("#123456");
 		expect(select.value).toBe("custom");
 		expect(field.disabled).toBe(false);
-		expect(pick<HTMLElement>(h.view, ".semantropy-body").style.backgroundColor).not.toBe("");
+		expect(pick<HTMLElement>(h.view, ".semantropy-scroll").style.backgroundColor).not.toBe("");
 	});
 
 	it("cancels an unsubmitted Custom draft when the menu closes", async () => {
@@ -903,6 +907,7 @@ describe("TOOLBAR1 display settings never change generation (UI-03)", () => {
 		});
 		const bodyEl = pick<HTMLElement>(h.view, ".semantropy-body");
 		expect([bodyEl.style.fontFamily, bodyEl.style.fontSize, bodyEl.style.backgroundColor]).toEqual(["", "", ""]);
+		expect(pick<HTMLElement>(h.view, ".semantropy-scroll").style.backgroundColor).toBe("");
 	});
 });
 

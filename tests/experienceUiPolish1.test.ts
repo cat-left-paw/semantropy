@@ -229,7 +229,7 @@ describe("settings schema 6 showRibbonIcon", () => {
 		});
 		const off = parseAutomaticPosSettings({ schemaVersion: 6, ...kept, showRibbonIcon: false });
 		expect(off.showRibbonIcon).toBe(false);
-		expect(serializeAutomaticPosSettings(off)).toMatchObject({ schemaVersion: 7, showRibbonIcon: false, uiLanguage: "en", bodySemantropy: 40, collectionPath: "Kept.md" });
+		expect(serializeAutomaticPosSettings(off)).toMatchObject({ schemaVersion: 8, showRibbonIcon: false, uiLanguage: "en", bodySemantropy: 40, collectionPath: "Kept.md" });
 		for (const showRibbonIcon of ["option", "false", 0, 1, null, undefined]) {
 			const parsed = parseAutomaticPosSettings({ schemaVersion: 6, ...kept, showRibbonIcon });
 			expect(parsed.showRibbonIcon).toBe(true);

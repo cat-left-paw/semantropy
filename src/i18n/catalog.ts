@@ -45,6 +45,7 @@ const EN = {
 			vocabulary: { name: "Change vocabulary", description: "Choose the vocabulary source notes and the draw mode." },
 			collision: { name: "Collision", description: "Generate Collision phrases from the active Vocabulary." },
 			fakeProverb: { name: "Fake proverb", description: "Generate fake proverbs from the active Vocabulary." },
+			recompose: { name: "Recompose", description: "Build new text from how the active Vocabulary's sentences join." },
 			display: { name: "Display settings", description: "Body font, size, colours, ruby and markers." },
 			more: { name: "More actions", description: "Actions that do not fit in this pane." },
 		},
@@ -70,8 +71,12 @@ const EN = {
 		px: (value: number) => `${value} px`,
 		size: "Size:",
 		sizeName: "Body font size",
-		background: "Body background",
-		foreground: "Body text colour",
+		theme: "Theme",
+		themeDefaultOption: "Default (Obsidian theme)",
+		themeLight: "Light",
+		themeDark: "Dark",
+		background: "Background colour",
+		foreground: "Text colour",
 		rowLabel: (label: string) => `${label}:`,
 		custom: "Custom…",
 		hexName: (label: string) => `${label} custom hex value, such as #RRGGBB`,
@@ -96,7 +101,7 @@ const EN = {
 		markerApplyError: "The marker setting is saved, but this view could not redraw its markers. Change it again, or reopen the view.",
 	},
 	status: {
-		onboarding: "Open a note → open Semantropy → choose a Vocabulary Source → try a word → Collect.",
+		onboarding: "Open a Japanese note → open Semantropy → choose a Vocabulary Source → try a word → Collect. Semantropy works on Japanese text only.",
 		preparingVocabulary: "Preparing vocabulary…",
 		vocabularyStale: "A Vocabulary Source changed. Choose Update vocabulary to use it.",
 		vocabularyMissing: "A Vocabulary Source is missing. Choose Update vocabulary to pick another.",
@@ -114,10 +119,11 @@ const EN = {
 		loadNextFailed: "Could not load the next section. Try again.",
 		updatingMarkers: "Updating markers…",
 		openingTarget: "Opening target…",
-		manualMenu: "Manual word actions",
+		manualMenu: "Word actions",
 		manualShuffle: "Shuffle this word",
 		manualRestore: "Restore original",
 		manualAutomatic: "Use automatic result",
+		manualDefine: "Look up in Fake Dictionary",
 	},
 	vocabulary: {
 		summary: (mode: string, draw: string, note: string) =>
@@ -151,6 +157,9 @@ const EN = {
 		noneSelected: "No notes selected.",
 		remove: "Remove",
 		removeName: (path: string) => `Remove ${path}`,
+		weight: "Weight",
+		weightName: (path: string) => `Weight of ${path}`,
+		weightedDraw: (draw: string) => `${draw}, weighted`,
 		notFound: "not found in the Vault",
 		issueChanged: "changed",
 		issueMissing: "missing",
@@ -269,10 +278,39 @@ const EN = {
 		copyFailed: "Could not copy fake proverb.",
 		collectFailed: "Could not collect fake proverb.",
 	},
+	recompose: {
+		title: "Recompose",
+		intro: "Builds new text from how the sentences of the active Vocabulary Sources join. Click a piece of the text to continue from there.",
+		method: "Method",
+		methods: { joint: "Joints (phrases)", ngram: "Morpheme n-gram" },
+		methodHints: {
+			joint: "Jumps to another place that shares the same joint (a particle or an ending). The grammar holds while the content leaps.",
+			ngram: "Continues from another place where the last few words are the same. A higher leap looks at fewer words.",
+		},
+		leap: "Leap",
+		sentences: "Sentences per step",
+		generate: "Generate new",
+		more: "Continue",
+		branch: "Branch from the chosen place",
+		copy: "Copy",
+		collect: "Collect",
+		clear: "Clear",
+		empty: "Nothing generated yet.",
+		pickHint: "Click a piece, or focus the text and use the arrow keys, to choose where Branch continues from.",
+		ready: (sources: number, sentences: number) => `${sources} Source${sources === 1 ? "" : "s"}, ${sentences} sentence${sentences === 1 ? "" : "s"}.`,
+		preparing: "Preparing the Sources…",
+		noVocabulary: "No usable Vocabulary. Apply a Vocabulary (or refresh the Target) first.",
+		tooFew: "The Vocabulary Sources have no sentences to recompose.",
+		failed: "Could not recompose.",
+		changed: "The Vocabulary changed. Continue and Branch need a new Generate; Copy and Collect keep using the Vocabulary this text came from.",
+		copied: "Copied.",
+		copyFailed: "Could not copy the recomposed text.",
+		collectFailed: "Could not collect the recomposed text.",
+	},
 	attribution: ATTRIBUTION_LABELS.en,
 	settings: {
 		languageName: "Interface language",
-		languageDescription: "Language of Semantropy's buttons, menus and messages. Notes and generated text are never translated.",
+		languageDescription: "Language of Semantropy's buttons, menus and messages. Semantropy transforms Japanese text only; this setting changes the interface, not the text it can work on. Notes and generated text are never translated.",
 		languageSaveFailed: "Could not save the interface language. The previous language is still in use.",
 		ribbonName: "Show ribbon icon",
 		ribbonDescription: "Show an icon that opens Semantropy on Obsidian's ribbon.",
@@ -283,12 +321,17 @@ const EN = {
 		attributionVocabularyName: "Record Vocabulary notes",
 		attributionSemantropyName: "Record generation Semantropy level",
 		attributionDateName: "Record collection date",
-		attributionFeatureDescription: "Reshuffle, Collision, Fake proverb, or Fake Dictionary.",
+		attributionFeatureDescription: "Reshuffle, Collision, Fake proverb, Fake Dictionary, or Recompose.",
 		attributionTargetDescription: "Omitted when the result has no Target note.",
 		attributionVocabularyDescription: "Notes used to generate the result.",
 		attributionSemantropyDescription: "Omitted when the result has no Semantropy level.",
 		attributionDateDescription: "The date in your time zone; no time of day.",
 		attributionSaveFailed: "Could not save this Collection attribution setting. The previous setting is still in use.",
+		termsName: "Extra term delimiters",
+		termsDescription: "In a Vocabulary Source, text between these marks is also read as one noun. The standard {{…}} is always on. Write each pair as open…close, separated by spaces, up to 4 (for example 【…】 ［［…］］). Used from the next time Vocabulary is applied or the Target is opened.",
+		termsSaved: "Saved.",
+		termsInvalid: (items: string) => `Not a pair: ${items}. Nothing was saved.`,
+		termsSaveFailed: "Could not save the delimiters. The previous ones are still in use.",
 		collectionName: "Collection file",
 		collectionDescription: "Vault-relative Markdown file path where collect stores fragments.",
 		save: "Save",
@@ -332,6 +375,7 @@ const JA: Messages = {
 			vocabulary: { name: "語彙を変更", description: "語彙に使うノートと抽選方式を選びます。" },
 			collision: { name: "衝突フレーズ", description: "現在の語彙から衝突フレーズを生成します。" },
 			fakeProverb: { name: "架空ことわざ", description: "現在の語彙から架空ことわざを生成します。" },
+			recompose: { name: "再構成", description: "現在の語彙ソースの文のつながりから、新しい文章を組み立てます。" },
 			display: { name: "表示設定", description: "本文のフォント、サイズ、色、ルビ、マーカー。" },
 			more: { name: "その他の操作", description: "このペインに入りきらない操作。" },
 		},
@@ -357,8 +401,12 @@ const JA: Messages = {
 		px: (value) => `${value} px`,
 		size: "サイズ:",
 		sizeName: "本文の文字サイズ",
-		background: "本文の背景色",
-		foreground: "本文の文字色",
+		theme: "テーマ",
+		themeDefaultOption: "既定（Obsidianのテーマ）",
+		themeLight: "ライト",
+		themeDark: "ダーク",
+		background: "背景色",
+		foreground: "文字色",
 		rowLabel: (label) => `${label}:`,
 		custom: "カスタム…",
 		hexName: (label) => `${label}のカスタム値（#RRGGBB形式）`,
@@ -401,10 +449,11 @@ const JA: Messages = {
 		loadNextFailed: "次の区間を読み込めませんでした。もう一度お試しください。",
 		updatingMarkers: "マーカーを更新しています…",
 		openingTarget: "対象ノートを開いています…",
-		manualMenu: "語の手動操作",
+		manualMenu: "語の操作",
 		manualShuffle: "この語をシャッフル",
 		manualRestore: "元に戻す",
 		manualAutomatic: "自動の結果を使う",
+		manualDefine: "でたらめ辞書で引く",
 	},
 	vocabulary: {
 		summary: (mode, draw, note) =>
@@ -438,6 +487,9 @@ const JA: Messages = {
 		noneSelected: "ノートは選択されていません。",
 		remove: "外す",
 		removeName: (path) => `${path}を外す`,
+		weight: "重み",
+		weightName: (path) => `${path}の重み`,
+		weightedDraw: (draw) => `${draw}・重み付き`,
 		notFound: "Vaultに見つかりません",
 		issueChanged: "変更あり",
 		issueMissing: "見つかりません",
@@ -560,10 +612,39 @@ const JA: Messages = {
 		copyFailed: "架空ことわざをコピーできませんでした。",
 		collectFailed: "架空ことわざを収集できませんでした。",
 	},
+	recompose: {
+		title: "再構成",
+		intro: "現在の語彙ソースの文のつながりを使って、元とは別の流れの文章を組み立てます。文章の一部をクリックすると、その位置から分岐できます。",
+		method: "生成方式",
+		methods: { joint: "継ぎ目（文節）", ngram: "形態素nグラム" },
+		methodHints: {
+			joint: "助詞や語尾などの「継ぎ目」が同じ別の場所へ跳びます。文法のつながりを保ったまま、中身が飛躍します。",
+			ngram: "直前の数語が同じ別の場所へつながります。飛躍率を上げるほど、見る語数が減って崩れます。",
+		},
+		leap: "飛躍率",
+		sentences: "1回の文数",
+		generate: "新しく生成",
+		more: "続きを生成",
+		branch: "選んだ位置から分岐",
+		copy: "コピー",
+		collect: "収集",
+		clear: "クリア",
+		empty: "まだ生成していません。",
+		pickHint: "文章の一部をクリックするか、文章の枠を選んで矢印キーで、分岐する位置を選べます。",
+		ready: (sources, sentences) => `語彙ソース${sources}件、${sentences}文。`,
+		preparing: "語彙ソースを準備しています…",
+		noVocabulary: "使える語彙がありません。先に語彙を適用するか、対象を再読込してください。",
+		tooFew: "語彙ソースに再構成できる文がありません。",
+		failed: "再構成できませんでした。",
+		changed: "語彙が変わりました。続きと分岐には新しく生成してください。コピーと収集には、この文章を作った語彙を使います。",
+		copied: "コピーしました。",
+		copyFailed: "再構成した文章をコピーできませんでした。",
+		collectFailed: "再構成した文章を収集できませんでした。",
+	},
 	attribution: ATTRIBUTION_LABELS.ja,
 	settings: {
 		languageName: "表示言語",
-		languageDescription: "Semantropyのボタン、メニュー、メッセージの言語です。ノートと生成された文章は翻訳しません。",
+		languageDescription: "Semantropyのボタン、メニュー、メッセージの言語です。Semantropyが扱える文章は日本語だけで、英語を選んでも英語の文章は変換しません。ノートと生成された文章は翻訳しません。",
 		languageSaveFailed: "表示言語を保存できませんでした。以前の言語のままです。",
 		ribbonName: "リボンアイコンを表示",
 		ribbonDescription: "Semantropyを開くアイコンをObsidianのリボンに表示します。",
@@ -571,7 +652,7 @@ const JA: Messages = {
 		attributionGroupName: "収集ノートに生成由来を記録",
 		attributionFeatureName: "生成の種類を記録",
 		attributionTargetName: "対象ノートを記録",
-		attributionVocabularyName: "語彙ノートを記録",
+		attributionVocabularyName: "語彙ソースを記録",
 		attributionSemantropyName: "生成時のSemantropy値を記録",
 		attributionDateName: "収集した日付を記録",
 		attributionFeatureDescription: "シャッフル、衝突フレーズなど。",
@@ -580,6 +661,11 @@ const JA: Messages = {
 		attributionSemantropyDescription: "値がない結果では省略します。",
 		attributionDateDescription: "ユーザー環境の日付。時刻は記録しません。",
 		attributionSaveFailed: "この収集の由来の設定を保存できませんでした。以前の設定のままです。",
+		termsName: "追加の囲み記号",
+		termsDescription: "語彙ソースの中で、この記号で囲んだ部分も1つの名詞として扱います。標準の {{…}} は常に有効です。「開始…終了」を空白で区切って4組まで（例: 【…】 ［［…］］）。次に語彙を適用したときや対象を開いたときから使われます。",
+		termsSaved: "保存しました。",
+		termsInvalid: (items) => `組として読めません: ${items}。保存していません。`,
+		termsSaveFailed: "囲み記号を保存できませんでした。以前の設定のままです。",
 		collectionName: "収集ファイル",
 		collectionDescription: "収集した断片を保存する、Vault内のMarkdownファイルのパス。",
 		save: "保存",
@@ -595,7 +681,46 @@ export const UI_CATALOGS: Readonly<Record<"en" | "ja", Messages>> = Object.freez
 /** The English catalog, for code that needs the canonical English (tests, stored message identity). */
 export const EN_MESSAGES: Messages = EN;
 
+/** Part of a catalog: any subset of keys at any depth; a template or a text replaces the whole entry. */
+export type UiOverrides<T = Messages> = {
+	readonly [K in keyof T]?: T[K] extends (...args: never[]) => unknown ? T[K] : T[K] extends object ? UiOverrides<T[K]> : T[K];
+};
+
+let hostOverrides: Readonly<Partial<Record<"en" | "ja", UiOverrides>>> = {};
+const mergedCatalogs = new Map<"en" | "ja", Messages>();
+
+/**
+ * 0.1.0 S1: lets a host word a few entries its own way — the web Playground
+ * says 文章 where Obsidian says ノート. Obsidian sets none, so its text is the
+ * catalog above. A later call replaces the earlier overrides.
+ */
+export function setUiOverrides(overrides: Readonly<Partial<Record<"en" | "ja", UiOverrides>>>): void {
+	hostOverrides = overrides;
+	mergedCatalogs.clear();
+}
+
+function mergeCatalog(base: Readonly<Record<string, unknown>>, patch: Readonly<Record<string, unknown>>): Record<string, unknown> {
+	const out: Record<string, unknown> = { ...base };
+	for (const [key, value] of Object.entries(patch)) {
+		if (value === undefined) continue;
+		const current = base[key];
+		out[key] = current !== null && typeof current === "object" && value !== null && typeof value === "object"
+			? mergeCatalog(current as Record<string, unknown>, value as Record<string, unknown>)
+			: value;
+	}
+	return Object.freeze(out);
+}
+
 /** The interface text in the current language. Read it when rendering, never cache it across a change. */
 export function ui(): Messages {
-	return currentUiLanguage() === "ja" ? JA : EN;
+	const language = currentUiLanguage() === "ja" ? "ja" : "en";
+	const base = language === "ja" ? JA : EN;
+	const patch = hostOverrides[language];
+	if (!patch) return base;
+	let merged = mergedCatalogs.get(language);
+	if (!merged) {
+		merged = mergeCatalog(base, patch) as unknown as Messages;
+		mergedCatalogs.set(language, merged);
+	}
+	return merged;
 }

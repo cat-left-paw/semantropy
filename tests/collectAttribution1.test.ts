@@ -280,7 +280,7 @@ it("applies one attribution item at a time and restores the toggle when the save
 		const rows = Array.from(tab.containerEl.querySelectorAll(".semantropy-attribution-setting"));
 		expect(tab.containerEl.querySelector(".semantropy-attribution-group .setting-group-heading")?.textContent).toBe("収集ノートに生成由来を記録");
 		expect(rows.map((row) => row.querySelector(".setting-item-name")?.textContent)).toEqual([
-			"生成の種類を記録", "対象ノートを記録", "語彙ノートを記録", "生成時のSemantropy値を記録", "収集した日付を記録",
+			"生成の種類を記録", "対象ノートを記録", "語彙ソースを記録", "生成時のSemantropy値を記録", "収集した日付を記録",
 		]);
 		const featureSwitch = rows[0]?.querySelector("[role=switch]") as HTMLElement | null;
 		expect(featureSwitch?.getAttribute("aria-checked")).toBe("true");

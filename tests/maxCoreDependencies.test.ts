@@ -27,7 +27,7 @@ const SHARED = ["adverb/adverbBridgeProfile", "adverb/adverbCapability", "adverb
 	"analysis/activeContinuation", "analysis/locateTokens", "analysis/projectMarkdownSource", "analysis/reuseTargetAnalysis", "analysis/rubyAnalysis",
 	"analysis/rubyVocabulary", "analysis/targetChunkIr", "application/analyzeSelectedSource", "dictionary/placeholders", "random/seededRandom",
 	"transform/automaticPosGuard", "transform/manualAdverbAuthority", "transform/manualAdverbGuard", "transform/manualMorphology",
-	"transform/regularConjugationTypes", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "vocabulary/sha256",
+	"transform/regularConjugationTypes", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "text/enclosedTermDelimiters", "vocabulary/enclosedTerms", "vocabulary/sha256", "vocabulary/sourceWeights",
 	"vocabulary/vocabularySnapshot"].map(name => `src/${name}.ts`);
 
 describe("MAX-CORE1 dependency boundary", () => {

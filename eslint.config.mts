@@ -17,6 +17,11 @@ export default defineConfig(
 		"vitest.config.ts",
 		"vitest.benchmark.config.ts",
 		"vitest.distribution.config.ts",
+		// The web Playground is not Obsidian plugin code and has its own lint
+		// configuration (web/eslint.config.mjs, `npm run lint:web`).
+		"web",
+		"dist-web",
+		"vitest.web.config.ts",
 	]),
 	{
 		languageOptions: {
@@ -57,7 +62,7 @@ export default defineConfig(
 		},
 	},
 	{
-		files: ["src/render/rubyBodyRenderer.ts", "src/render/safeTargetPrototype.ts", "src/render/safeTargetDom.ts", "src/render/targetBodyController.ts", "src/render/chunkTargetBodyController.ts", "src/view/VocabularyControls.ts", "src/view/SemantropyToolbar.ts", "src/view/CollisionModal.ts", "src/view/FakeProverbModal.ts", "src/view/VocabularyModal.ts", "src/view/AutomaticPosToolbar.ts"],
+		files: ["src/render/rubyBodyRenderer.ts", "src/render/safeTargetPrototype.ts", "src/render/safeTargetDom.ts", "src/render/targetBodyController.ts", "src/render/chunkTargetBodyController.ts", "src/view/VocabularyControls.ts", "src/view/SemantropyToolbar.ts", "src/view/CollisionModal.ts", "src/view/FakeProverbModal.ts", "src/view/RecomposeModal.ts", "src/view/VocabularyModal.ts", "src/view/AutomaticPosToolbar.ts"],
 		rules: {
 			// This detached DOM adapter intentionally uses standard ownerDocument
 			// APIs, also in documents without Obsidian's window.createEl helpers.

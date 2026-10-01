@@ -1,0 +1,69 @@
+# Semantropy plugin release → a draft GitHub Release with attested files.
+#
+# Published as `.github/workflows/release.yml` in the public repository
+# (cat-left-paw/semantropy) by web/deploy/syncPublic.mjs. Pushing a tag that
+# equals manifest.json's version (for example `0.1.0`, without a "v") builds
+# the three release files from that tag on GitHub's runner, checks them, attests
+# their provenance and attaches them to a draft Release. The owner then tests
+# the downloaded files in Obsidian, writes the release notes and publishes the
+# draft. Nothing is committed, and no Release is published automatically.
+name: Release plugin
+
+on:
+  push:
+    tags: ["*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Check that the tag is manifest.json's version
+        run: |
+          version="$(node -p "require('./manifest.json').version")"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest.json version $version" >&2
+            exit 1
+          fi
+          node -e "const v = require('./versions.json'); if (!v[process.argv[1]]) { console.error('versions.json has no ' + process.argv[1]); process.exit(1); }" "$version"
+      - run: npm ci
+      # Prepares the pinned dictionary (download + SHA-256 checks) and builds dist/semantropy/.
+      - run: npm run build:distribution
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      # The bundled artifact tests pin the production code (masked and with
+      # canonical identifiers), so the attested files are the reviewed code.
+      - run: npm run verify:distribution
+      - name: List the release files
+        run: |
+          ls -l dist/semantropy
+          sha256sum dist/semantropy/main.js dist/semantropy/manifest.json dist/semantropy/styles.css
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            dist/semantropy/main.js
+            dist/semantropy/manifest.json
+            dist/semantropy/styles.css
+      - name: Create a draft Release with the three files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --draft --verify-tag --title "$GITHUB_REF_NAME" \
+            --notes "Draft built by GitHub Actions from tag $GITHUB_REF_NAME. Replace these notes before publishing." \
+            dist/semantropy/main.js dist/semantropy/manifest.json dist/semantropy/styles.css

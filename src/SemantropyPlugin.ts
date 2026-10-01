@@ -112,6 +112,7 @@ export abstract class SemantropyPlugin extends Plugin {
 				new SemantropyView(leaf, {
 					automaticPosCoordinator: this.automaticCoordinator,
 					getAutomaticPos: () => this.settingsStore.getSettings().automaticPos,
+					getEnclosedTermDelimiters: () => this.settingsStore.getEnclosedTermDelimiters(),
 					getTokenizer: () => this.getTokenizer(),
 					listVocabularyNotes: () => this.app.vault.getMarkdownFiles().map(file => file.path),
 					isVocabularyViewActive: () => this.app.workspace.getActiveViewOfType(SemantropyView) === leaf.view,
@@ -207,6 +208,8 @@ export abstract class SemantropyPlugin extends Plugin {
 			setShowRibbonIcon: (value) => this.setShowRibbonIcon(value),
 			getCollectAttribution: () => this.settingsStore.getCollectAttribution(),
 			setCollectAttribution: (key, value) => this.setCollectAttribution(key, value),
+			getEnclosedTermDelimiters: () => this.settingsStore.getEnclosedTermDelimiters(),
+			setEnclosedTermDelimiters: (pairs) => this.settingsStore.setEnclosedTermDelimiters(pairs),
 		});
 		this.addSettingTab(this.settingTab);
 	}

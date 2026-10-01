@@ -25,6 +25,7 @@ import { EN_MESSAGES, ui } from "../i18n/catalog";
 import { localize } from "../i18n/messages";
 import { isUiLanguage, type UiLanguage } from "../i18n/language";
 import { COLLECT_ATTRIBUTION_KEYS, type CollectAttribution, type CollectAttributionKey } from "../settings/automaticPosSettings";
+import { formatEnclosedTermDelimiterList, parseEnclosedTermDelimiterList, type EnclosedTermDelimiter } from "../vocabulary/enclosedTerms";
 
 export type SemantropySettingTabHost = {
 	getCollectionPath: () => string;
@@ -41,6 +42,9 @@ export type SemantropySettingTabHost = {
 	getCollectAttribution: () => CollectAttribution;
 	/** Saves one item; the host keeps whatever the store then holds. */
 	setCollectAttribution: (key: CollectAttributionKey, value: boolean) => Promise<boolean>;
+	/** 0.1.0 S4: the extra enclosed-term pairs. The row is shown only when the host offers both. */
+	getEnclosedTermDelimiters?: () => readonly EnclosedTermDelimiter[];
+	setEnclosedTermDelimiters?: (pairs: readonly EnclosedTermDelimiter[]) => Promise<boolean>;
 };
 
 /** Indexed by Obsidian 1.13+ settings search. English identities; shown in the current language. */
@@ -82,6 +86,11 @@ export class SemantropySettingTab extends PluginSettingTab {
 	private ribbonFailed = false;
 	private ribbonGeneration = 0;
 	private attributionGroup: SettingGroup | null = null;
+	private termsSetting: Setting | null = null;
+	private termsInput: TextComponent | null = null;
+	private termsStatusEl: HTMLElement | null = null;
+	private termsStatus: { kind: "idle" | "saved" | "failed" } | { kind: "invalid"; items: string } = { kind: "idle" };
+	private termsGeneration = 0;
 	private attributionGeneration = 0;
 	private readonly attribution = new Map<CollectAttributionKey, {
 		setting: Setting;
@@ -121,6 +130,11 @@ export class SemantropySettingTab extends PluginSettingTab {
 				desc: ui().settings.collectionDescription,
 				render: (setting, group) => this.renderCollectionPath(setting, group),
 			},
+			...(this.host.getEnclosedTermDelimiters && this.host.setEnclosedTermDelimiters ? [{
+				name: ui().settings.termsName,
+				desc: ui().settings.termsDescription,
+				render: (setting: Setting, group: SettingGroup) => this.renderEnclosedTerms(setting, group),
+			}] : []),
 			{
 				type: "group",
 				heading: ui().settings.attributionGroupName,
@@ -182,6 +196,8 @@ export class SemantropySettingTab extends PluginSettingTab {
 			row?.toggle.setValue(this.host.getCollectAttribution()[key]);
 		}
 		this.collectionSetting?.setName(t.collectionName).setDesc(t.collectionDescription);
+		this.termsSetting?.setName(t.termsName).setDesc(t.termsDescription);
+		this.syncTermsStatus();
 		this.saveButton?.setButtonText(t.save);
 		this.languageDropdown?.setValue(this.host.getUiLanguage());
 		this.ribbonToggle?.setValue(this.host.getShowRibbonIcon());
@@ -204,6 +220,10 @@ export class SemantropySettingTab extends PluginSettingTab {
 		this.ribbonToggle = null;
 		this.ribbonStatusEl = null;
 		this.attributionGroup = null;
+		this.termsGeneration += 1;
+		this.termsSetting = null;
+		this.termsInput = null;
+		this.termsStatusEl = null;
 		this.attributionGeneration += 1;
 		this.attribution.clear();
 		this.containerEl.empty();
@@ -395,6 +415,62 @@ export class SemantropySettingTab extends PluginSettingTab {
 	private syncAttributionStatus(key: CollectAttributionKey): void {
 		const row = this.attribution.get(key);
 		row?.statusEl.setText(row.failed ? ui().settings.attributionSaveFailed : "");
+	}
+
+	/**
+	 * 0.1.0 S4: the extra enclosed-term pairs, saved by an explicit Save. An item
+	 * that is not a pair saves nothing and is named in the status line.
+	 */
+	async saveEnclosedTerms(): Promise<"saved" | "invalid" | "failed"> {
+		const set = this.host.setEnclosedTermDelimiters;
+		if (!set) return "failed";
+		const { pairs, invalid } = parseEnclosedTermDelimiterList(this.termsInput?.getValue() ?? "");
+		if (invalid.length) {
+			this.termsStatus = { kind: "invalid", items: invalid.join(" ") };
+			this.syncTermsStatus();
+			return "invalid";
+		}
+		const generation = this.termsGeneration;
+		let saved = false;
+		try { saved = await set(pairs); }
+		catch { /* A failed queue repair is a save failure for this control. */ }
+		if (this.termsGeneration !== generation) return saved ? "saved" : "failed";
+		if (!saved) console.error("[Semantropy] failed to save the enclosed-term delimiters");
+		this.termsStatus = { kind: saved ? "saved" : "failed" };
+		this.termsInput?.setValue(formatEnclosedTermDelimiterList(this.host.getEnclosedTermDelimiters?.() ?? []));
+		this.syncTermsStatus();
+		return saved ? "saved" : "failed";
+	}
+
+	private renderEnclosedTerms(setting: Setting, group: SettingGroup): () => void {
+		this.termsGeneration += 1;
+		this.termsSetting = setting;
+		this.termsStatus = { kind: "idle" };
+		setting.setClass("semantropy-terms-setting");
+		setting.addText((text) => {
+			this.termsInput = text;
+			text.setPlaceholder("【…】 ［［…］］");
+			text.setValue(formatEnclosedTermDelimiterList(this.host.getEnclosedTermDelimiters?.() ?? []));
+			text.onChange(() => { this.termsStatus = { kind: "idle" }; this.syncTermsStatus(); });
+		});
+		setting.addButton((button) => {
+			button.setClass("semantropy-terms-save");
+			button.setButtonText(ui().settings.save);
+			button.onClick(() => { void this.saveEnclosedTerms(); });
+		});
+		this.termsStatusEl = group.listEl.createDiv({ cls: "semantropy-terms-status" });
+		this.syncTermsStatus();
+		return () => {
+			this.termsSetting = null;
+			this.termsInput = null;
+			this.termsStatusEl = null;
+		};
+	}
+
+	private syncTermsStatus(): void {
+		const t = ui().settings, status = this.termsStatus;
+		this.termsStatusEl?.setText(status.kind === "saved" ? t.termsSaved : status.kind === "failed" ? t.termsSaveFailed
+			: status.kind === "invalid" ? t.termsInvalid(status.items) : "");
 	}
 
 	private renderCollectionPath(

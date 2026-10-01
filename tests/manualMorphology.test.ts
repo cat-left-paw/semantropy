@@ -517,6 +517,8 @@ describe("manual morphology evidence provenance (review P1)", () => {
 			"manualMorphConnection",
 			// ADVERB-MANUAL1 reads only registered runs from a genuine owner; this does not accept caller runs.
 			"readManualMorphCandidateBuckets",
+			// 0.1.0 S5: Recompose reads each registered Source's analyzed document; nothing enters through it.
+			"readManualMorphSourceDocuments",
 			"readManualMorphVocabularySources",
 		]);
 	});

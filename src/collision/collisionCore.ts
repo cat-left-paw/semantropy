@@ -35,9 +35,10 @@
  * `Docs/pre_release_collision_core1_record.md` §6.
  */
 
-import { freezeAnalysis } from "../analysis/rubyVocabulary";
+import { freezeAnalysis, type VocabularyOrigin } from "../analysis/rubyVocabulary";
 import { createSeededRandom, UINT32_MAX } from "../random/seededRandom";
 import type { VocabularyDrawMode } from "../vocabulary/vocabularySnapshot";
+import { drawWeight, sourceWeightLookup, type SourceWeightLookup } from "../vocabulary/sourceWeights";
 import {
 	compileCollisionPatternSet,
 	type CompiledCollisionPatternSet,
@@ -247,6 +248,8 @@ type ModifierChoice = {
 	 * from another form's records steer this form's draw.
 	 */
 	readonly formFrequency: number;
+	/** The origins of the same records, read only for Source weights (0.1.0 S3). */
+	readonly formOrigins: readonly (readonly VocabularyOrigin[])[];
 };
 
 type PreparedPatternSet = {
@@ -467,16 +470,18 @@ function preparePool(
 			// One record contributes to one form once; the pool's own dedupe
 			// guarantees a display form appears at most once per (surface, form).
 			const perForm = new Map<string, number>();
+			const perFormOrigins = new Map<string, (readonly VocabularyOrigin[])[]>();
 			for (const variant of candidate.variants) {
 				const total = (perForm.get(variant.formId) ?? 0) + variant.base.frequency;
 				if (!Number.isSafeInteger(total) || total <= 0) {
 					return reject("invalid-pool");
 				}
 				perForm.set(variant.formId, total);
+				perFormOrigins.set(variant.formId, [...(perFormOrigins.get(variant.formId) ?? []), variant.base.origins]);
 			}
 			for (const [formId, formFrequency] of perForm) {
 				const list = byForm.get(formId) ?? [];
-				list.push({ candidate, formFrequency });
+				list.push({ candidate, formFrequency, formOrigins: perFormOrigins.get(formId)! });
 				byForm.set(formId, list);
 			}
 		}
@@ -610,11 +615,18 @@ type DrawContext = {
 	readonly pattern: PreparedPatternSet;
 	readonly prepared: PreparedPool;
 	readonly drawMode: VocabularyDrawMode;
+	/** 0.1.0 S3: the pool's Source weights, or `null` for the unweighted draw. */
+	readonly weights: SourceWeightLookup;
 	readonly random: { next(): number };
 };
 
-function lexemeWeight(drawMode: VocabularyDrawMode, frequency: number): number {
-	return drawMode === "uniform" ? 1 : frequency;
+/** Without Source weights, exactly the unweighted rule: 1 for Uniform, frequency for Frequency. */
+function lexemeWeight(
+	context: DrawContext,
+	frequency: number,
+	origins: readonly VocabularyOrigin[] | (() => Iterable<VocabularyOrigin>),
+): number {
+	return drawWeight(context.drawMode, context.weights, frequency, origins);
 }
 
 function drawNoun(
@@ -628,7 +640,7 @@ function drawNoun(
 	const repeated = remaining.length === 0;
 	const choices = repeated ? context.prepared.nouns : remaining;
 	const weightOf = (noun: CollisionNounCandidate): number =>
-		lexemeWeight(context.drawMode, noun.frequency);
+		lexemeWeight(context, noun.frequency, noun.origins);
 	const total = totalWeight(choices, weightOf, "invalid-pool");
 	const picked = pickWeighted(choices, weightOf, total, context.random);
 	used.add(picked.surface);
@@ -658,7 +670,7 @@ function drawModifier(
 		return reject("invalid-pool");
 	}
 	const weightOf = (choice: ModifierChoice): number =>
-		lexemeWeight(context.drawMode, choice.formFrequency);
+		lexemeWeight(context, choice.formFrequency, () => choice.formOrigins.flat());
 	const total = totalWeight(choices, weightOf, "invalid-pool");
 	const picked = pickWeighted(choices, weightOf, total, context.random);
 	return { surface: picked.candidate.surface, formId: form.formId };
@@ -673,7 +685,7 @@ function drawPredicate(
 		return reject("invalid-pool");
 	}
 	const weightOf = (candidate: CollisionPredicateCandidate): number =>
-		lexemeWeight(context.drawMode, candidate.frequency);
+		lexemeWeight(context, candidate.frequency, candidate.origins);
 	const total = totalWeight(choices, weightOf, "invalid-pool");
 	return pickWeighted(choices, weightOf, total, context.random).surface;
 }
@@ -926,6 +938,7 @@ export function generateCollisionResults(input: {
 			pattern,
 			prepared,
 			drawMode: input.drawMode,
+			weights: sourceWeightLookup({ sources: provenance.sources, sourceWeights: prepared.pool.sourceWeights }),
 			random,
 		};
 

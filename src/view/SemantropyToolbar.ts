@@ -1,9 +1,8 @@
 import {
-	BODY_BACKGROUND_PRESETS,
 	BODY_FONT_SIZE_MAX_PX,
 	BODY_FONT_SIZE_MIN_PX,
-	BODY_FOREGROUND_PRESETS,
 	bodyContrastWarning,
+	isBodyTheme,
 	normalizeBodyColor,
 	type BodyFontFamily,
 	type SemantropyDisplaySettings,
@@ -50,6 +49,7 @@ export const TOOLBAR_CONTROLS = {
 	vocabulary: { ...CONTROL_TEXT.vocabulary, icon: "library" },
 	collision: { ...CONTROL_TEXT.collision, icon: "blend" },
 	fakeProverb: { ...CONTROL_TEXT.fakeProverb, icon: "graduation-cap" },
+	recompose: { ...CONTROL_TEXT.recompose, icon: "wand-sparkles" },
 	display: { ...CONTROL_TEXT.display, icon: "sliders-horizontal" },
 	more: { ...CONTROL_TEXT.more, icon: "ellipsis" },
 } as const satisfies Record<keyof typeof CONTROL_TEXT, { name: string; icon: IconName; description: string }>;
@@ -60,7 +60,7 @@ export type ToolbarControlKey = keyof typeof TOOLBAR_CONTROLS;
  * the highest rank goes first. The primary actions go last.
  */
 const OVERFLOW_RANK: Readonly<Record<Exclude<ToolbarControlKey, "more">, number>> = {
-	fakeProverb: 10, collision: 9, display: 8, automatic: 7, vocabulary: 6, level: 5,
+	recompose: 11, fakeProverb: 10, collision: 9, display: 8, automatic: 7, vocabulary: 6, level: 5,
 	collect: 4, copy: 3, refresh: 2, reshuffle: 1,
 };
 
@@ -73,6 +73,8 @@ export type ToolbarCallbacks = {
 	collect: () => void;
 	collision?: () => void;
 	fakeProverb?: () => void;
+	/** 0.1.0 S5. */
+	recompose?: () => void;
 	cancelVocabulary: () => void;
 	setBodySemantropy: (value: BodySemantropy) => void;
 	/** Persist first, then apply. The toolbar never mutates settings itself. */
@@ -196,6 +198,7 @@ export class SemantropyToolbar {
 	private levelSelect: HTMLSelectElement | null = null;
 	private fontSelect: HTMLSelectElement | null = null;
 	private sizeSelect: HTMLSelectElement | null = null;
+	private themeSelect: HTMLSelectElement | null = null;
 	private menuButton: HTMLButtonElement | null = null;
 	private menu: HTMLElement | null = null;
 	private displayItem: HTMLElement | null = null;
@@ -247,7 +250,7 @@ export class SemantropyToolbar {
 
 		this.primary = this.group("is-primary", () => ui().toolbar.groups.primary);
 		const vocabulary = this.group("is-vocabulary", () => ui().toolbar.groups.vocabulary);
-		const generation = this.input.collision || this.input.fakeProverb ? this.group("is-generation", () => ui().toolbar.groups.generation) : null;
+		const generation = this.input.collision || this.input.fakeProverb || this.input.recompose ? this.group("is-generation", () => ui().toolbar.groups.generation) : null;
 		// Generation settings sits with Settings at the row's end. More sections follow this same order.
 		this.textGroup = this.group("is-text", () => ui().toolbar.groups.text);
 		this.settingsGroup = this.group("is-settings", () => ui().toolbar.groups.settings);
@@ -321,6 +324,11 @@ export class SemantropyToolbar {
 			this.iconButton(this.item("fakeProverb", generation), "fakeProverb", () => {
 				this.closePopups(); this.input.fakeProverb?.();
 			}, "semantropy-fake-proverb-open");
+		}
+		if (generation && this.input.recompose) {
+			this.iconButton(this.item("recompose", generation), "recompose", () => {
+				this.closePopups(); this.input.recompose?.();
+			}, "semantropy-recompose-open");
 		}
 		this.buildOverflow();
 
@@ -544,6 +552,7 @@ export class SemantropyToolbar {
 		if (this.sizeSelect)
 			this.sizeSelect.value =
 				display.bodyFontSizePx === null ? "" : String(display.bodyFontSizePx);
+		if (this.themeSelect) this.themeSelect.value = display.bodyTheme;
 		for (const [key, button] of this.toggles) {
 			const on = display[key] === true;
 			button.setAttribute("aria-pressed", on ? "true" : "false");
@@ -551,17 +560,14 @@ export class SemantropyToolbar {
 		}
 		for (const [key, select] of this.colorSelects) {
 			const value = display[key];
-			const custom =
-				this.colorDrafts.has(key) ||
-				(value !== null &&
-					!(key === "bodyBackground"
-						? BODY_BACKGROUND_PRESETS
-						: BODY_FOREGROUND_PRESETS
-					).includes(value));
+			// 0.1.0 S2: a colour is either the theme's or a custom one; there are no presets.
+			const custom = this.colorDrafts.has(key) || value !== null;
 			select.value = custom ? "custom" : value === null ? "" : value;
 			const field = this.colorInputs.get(key);
 			if (field) {
 				field.disabled = !custom;
+				// 0.1.0 (owner report): the field takes a row only for Custom, so Display settings fits a phone.
+				field.hidden = !custom;
 				if (custom && field.value.trim() === "" && value !== null) {
 					field.value = value;
 				}
@@ -795,16 +801,31 @@ export class SemantropyToolbar {
 					bodyFontSizePx: value === "" ? null : Number(value),
 				}),
 		);
-		this.colorRow(menu, "bodyBackground", () => ui().display.background, BODY_BACKGROUND_PRESETS);
-		this.colorRow(menu, "bodyForeground", () => ui().display.foreground, BODY_FOREGROUND_PRESETS);
+		// 0.1.0 S2: one theme for text and background together, then optional custom colours.
+		this.themeSelect = this.select(
+			this.child(menu, "div", "semantropy-display-row"),
+			() => ui().display.rowLabel(ui().display.theme),
+			() => ui().display.theme,
+			"semantropy-body-theme",
+			[
+				["default", () => ui().display.themeDefaultOption],
+				["light", () => ui().display.themeLight],
+				["dark", () => ui().display.themeDark],
+			],
+			(value) => { if (isBodyTheme(value)) this.input.setDisplay({ bodyTheme: value }); },
+		);
+		this.colorRow(menu, "bodyForeground", () => ui().display.foreground, []);
+		this.colorRow(menu, "bodyBackground", () => ui().display.background, []);
 		this.contrastEl = this.child(menu, "div", "semantropy-contrast-warning");
 		this.contrastEl.setAttribute("role", "status");
 
 		const d = () => ui().display;
-		this.toggle(menu, "showRuby", () => d().ruby, () => d().rubyDescription);
-		this.toggle(menu, "showReplacementMarkers", () => d().replacementMarker, () => d().replacementMarkerDescription);
-		this.toggle(menu, "showManualMarkers", () => d().manualMarker, () => d().manualMarkerDescription);
-		this.toggle(menu, "showDictionaryMarkers", () => d().dictionaryMarker, () => d().dictionaryMarkerDescription);
+		// 0.1.0 (owner report): the four switches sit two per row.
+		const toggles = this.child(menu, "div", "semantropy-display-toggles");
+		this.toggle(toggles, "showRuby", () => d().ruby, () => d().rubyDescription);
+		this.toggle(toggles, "showReplacementMarkers", () => d().replacementMarker, () => d().replacementMarkerDescription);
+		this.toggle(toggles, "showManualMarkers", () => d().manualMarker, () => d().manualMarkerDescription);
+		this.toggle(toggles, "showDictionaryMarkers", () => d().dictionaryMarker, () => d().dictionaryMarkerDescription);
 		this.button(menu, () => d().reset, () => d().resetDescription, () => this.input.resetDisplay(), "semantropy-display-reset");
 		this.manualShuffleButton = this.button(menu, () => d().shuffleSelected, null, () => this.input.shuffleSelected(), "semantropy-manual-shuffle-selected");
 		this.manualRestoreButton = this.button(menu, () => d().restoreSelected, null, () => this.input.restoreSelected(), "semantropy-manual-restore-selected");
@@ -830,7 +851,8 @@ export class SemantropyToolbar {
 				// value is submitted or the reader leaves it.
 				this.colorDrafts.add(key);
 				this.setMenuMessage(null);
-				this.colorInputs.get(key)?.focus();
+				const field = this.colorInputs.get(key);
+				if (field) { field.hidden = false; field.disabled = false; field.focus(); }
 				return;
 			}
 			this.colorDrafts.delete(key);
@@ -846,6 +868,7 @@ export class SemantropyToolbar {
 		// a screen reader as well as the eye.
 		this.labels.attr(field, "aria-label", () => ui().display.hexName(label()));
 		field.disabled = true;
+		field.hidden = true;
 		row.appendChild(field);
 		this.colorInputs.set(key, field);
 		this.listen(field, "change", () => {
@@ -938,12 +961,47 @@ export class SemantropyToolbar {
 	private alignPopup(panel: HTMLElement, anchor: HTMLElement): void {
 		if (panel.hidden || this.morePanel.contains(panel) && panel !== this.morePanel) {
 			panel.style.removeProperty("left");
+			// A popup inside More scrolls with More, so More is what has to fit.
+			if (!this.morePanel.hidden) {
+				this.fitPopupHeight(this.morePanel);
+				if (panel !== this.morePanel && !panel.hidden) this.revealInMore(panel);
+			}
 			return;
 		}
 		const root = this.root.getBoundingClientRect();
 		const left = anchor.getBoundingClientRect().left - root.left;
 		const room = Math.max(0, this.root.clientWidth - panel.offsetWidth);
 		panel.style.left = `${Math.round(Math.min(Math.max(0, left), room))}px`;
+		this.fitPopupHeight(panel);
+	}
+
+	/**
+	 * 0.1.0 S1: an open popup never reaches past the bottom of the View (or the
+	 * window), where the View's own clipping would hide its last controls; it
+	 * scrolls inside that height instead.
+	 */
+	private fitPopupHeight(panel: HTMLElement): void {
+		const view = this.root.parentElement;
+		if (!view || panel.hidden) return;
+		const bounds = view.getBoundingClientRect();
+		// A layout-less document (no rendering) has nothing to fit.
+		if (bounds.height === 0) return;
+		const windowBottom = this.root.ownerDocument.defaultView?.innerHeight ?? bounds.bottom;
+		const bottom = Math.min(bounds.bottom, windowBottom);
+		const room = Math.max(96, Math.floor(bottom - panel.getBoundingClientRect().top - 8));
+		// 0.1.0 (owner report): no fixed cap, so a tall phone screen shows the whole Display settings.
+		panel.style.setProperty("max-height", `${room}px`);
+	}
+
+	/**
+	 * 0.1.0: a popup opened inside More (Display settings on a narrow pane) is
+	 * scrolled into More's visible area — just far enough to show its end,
+	 * never past its start.
+	 */
+	private revealInMore(panel: HTMLElement): void {
+		const more = this.morePanel.getBoundingClientRect(), inner = panel.getBoundingClientRect();
+		if (inner.bottom <= more.bottom) return;
+		this.morePanel.scrollTop += Math.max(0, Math.min(inner.bottom - more.bottom + 4, inner.top - more.top - 4));
 	}
 
 	private setVisible(

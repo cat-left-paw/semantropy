@@ -20,7 +20,7 @@ const CORE1_MODULES = ["fakeProverbAuthority", "fakeProverbCore", "fakeProverbTe
 const SHARED = ["analysis/activeContinuation", "analysis/locateTokens", "analysis/projectMarkdownSource", "analysis/reuseTargetAnalysis",
 	"analysis/rubyAnalysis", "analysis/rubyVocabulary", "analysis/targetChunkIr", "application/analyzeSelectedSource", "dictionary/placeholders",
 	"fakeProverb/compileRecipeSet", "fakeProverb/recipeData", "random/seededRandom", "transform/manualMorphology", "transform/maxRealizer",
-	"transform/regularConjugationTypes", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "vocabulary/sha256",
+	"transform/regularConjugationTypes", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "text/enclosedTermDelimiters", "vocabulary/enclosedTerms", "vocabulary/sha256", "vocabulary/sourceWeights",
 	"vocabulary/vocabularySnapshot"].map((name) => `src/${name}.ts`);
 
 describe("FAKE-PROVERB-CORE1 dependency boundary", () => {

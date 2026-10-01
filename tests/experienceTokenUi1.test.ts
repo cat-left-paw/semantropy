@@ -325,7 +325,7 @@ describe("UX-12 affordance only where the View would act", () => {
 		expect(body.classList.contains("is-manual-live") && body.isConnected).toBe(false);
 	});
 
-	it("never marks a dictionary-only word as clickable, and a click there opens nothing", async () => {
+	it("never marks a dictionary-only word as Manual-operable, and a click there offers only the Fake Dictionary (0.1.0 S1)", async () => {
 		const h = manualMorphHarness(lexiconTokenizer([token({ surface: "三", detail1: "数" }), token({ surface: "五", detail1: "数" }),
 			token({ surface: "猫" }), token({ surface: "犬" }), suffix("と", "助詞", "並立助詞")]));
 		await h.open("猫と三。\n");
@@ -336,8 +336,19 @@ describe("UX-12 affordance only where the View would act", () => {
 		expect(numeral.classList.contains("semantropy-dictionary-operable")).toBe(true);
 		expect(numeral.classList.contains("semantropy-manual-operable")).toBe(false);
 		click(numeral);
-		expect(menuOf(h.view)).toBeNull();
+		expect(Array.from(menuOf(h.view)!.querySelectorAll("button"), button => button.textContent)).toEqual(["Look up in Fake Dictionary"]);
 		expect(wordEl(h, "猫").classList.contains("semantropy-manual-operable")).toBe(true);
+		// 0.1.0 S1 review: while looking up would not act (here, a Fake Dictionary request is running), a
+		// dictionary-only word opens nothing, and a Manual word's menu offers the item disabled.
+		(Reflect.get(h.view, "closeManualMenu") as () => void).call(h.view);
+		const busy = Reflect.get(h.view, "dictionaryBusy") as { acquire: () => number | null; release: (token: number) => void };
+		const held = busy.acquire()!;
+		click(wordEl(h, "三"));
+		expect(menuOf(h.view)).toBeNull();
+		click(wordEl(h, "猫"));
+		const define = Array.from(menuOf(h.view)!.querySelectorAll("button")).find(button => button.textContent === "Look up in Fake Dictionary")!;
+		expect(define.disabled).toBe(true);
+		busy.release(held);
 	});
 
 	it("is live straight after a plain open, before any other chrome update", async () => {

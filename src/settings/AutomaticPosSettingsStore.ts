@@ -5,6 +5,7 @@ import type { BodySemantropy } from "./bodySemantropy";
 import { supportedDictionarySemantropy, type DictionarySemantropy } from "./dictionarySemantropy";
 import { parseDisplaySettings, type SemantropyDisplaySettings } from "./displaySettings";
 import type { UiLanguage } from "../i18n/language";
+import type { EnclosedTermDelimiter } from "../text/enclosedTermDelimiters";
 
 export type SettingsPublication = {
 	current(): boolean;
@@ -31,6 +32,9 @@ export class AutomaticPosSettingsStore {
 	getUiLanguage(): UiLanguage { return this.settings.uiLanguage; }
 	setUiLanguage(uiLanguage: UiLanguage) { return this.update({ uiLanguage }); }
 	getShowRibbonIcon(): boolean { return this.settings.showRibbonIcon; }
+	/** 0.1.0 S4: the extra enclosed-term delimiter pairs. */
+	getEnclosedTermDelimiters(): readonly EnclosedTermDelimiter[] { return this.settings.enclosedTermDelimiters; }
+	setEnclosedTermDelimiters(enclosedTermDelimiters: readonly EnclosedTermDelimiter[]) { return this.update({ enclosedTermDelimiters }); }
 	setShowRibbonIcon(showRibbonIcon: boolean) { return this.update({ showRibbonIcon }); }
 	getCollectAttribution() { return this.settings.collectAttribution; }
 	/** Applies one item against the settings committed when this turn runs, so a queued change to another item is kept. */

@@ -19,9 +19,11 @@ async function graph(entry: string) {
 const V3_COMMON = ["analysis/rubyVocabulary", "collect/collectProvenance", "collect/fragmentIdentityValidation", "collect/v3/CollectedFragmentV3",
 	"collect/v3/automaticPartsOfSpeech", "collect/v3/collectDataV3", "dictionary/placeholders", "path/vaultRelativePath", "random/seededRandom",
 	"settings/semantropyRange", "transform/maxVersions", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens",
-	"vocabulary/sha256", "vocabulary/vocabularySnapshot"];
+	"vocabulary/sha256", "vocabulary/sourceWeights", "vocabulary/vocabularySnapshot"];
 const V4_COMMON = [...V3_COMMON, "collect/v4/CollectedFragmentV4", "collect/v4/collectDataV4", "fakeProverb/fakeProverbText",
-	"fakeProverb/fakeProverbVersions", "fakeProverb/recipeData"];
+	"fakeProverb/fakeProverbVersions", "fakeProverb/recipeData",
+	// 0.1.0 S5: metadata 5 validates a recompose entry against the pure Recompose versions leaf, not the generator.
+	"recompose/recomposeVersions"];
 const SERIALIZER = ["collect/escapeFragmentMarkdown", "collect/v3/serializeFragmentV3", "collect/v4/serializeFragmentV4",
 	"collect/v4/collectAttribution", "i18n/attributionLabels"];
 const EXPECTED: Record<string, readonly string[]> = {
@@ -61,7 +63,7 @@ describe("FAKE-PROVERB-COLLECT1 dependency boundary", () => {
 			if (/from\s+["'][^"']*(?:collect\/v4\/|\.\/v4\/)/u.test(await readFile(path, "utf8"))) importers.push(path);
 		}
 		expect(importers.sort()).toEqual(["src/SemantropyPlugin.ts", "src/application/bodyFragmentFromAutomatic.ts", "src/collect/collectMessages.ts",
-			"src/view/CollisionSession.ts", "src/view/FakeProverbSession.ts", "src/view/SemantropyView.ts"]);
+			"src/view/CollisionSession.ts", "src/view/FakeProverbSession.ts", "src/view/RecomposeModal.ts", "src/view/SemantropyView.ts"]);
 		expect(importers.filter((path) => path.startsWith("src/collect/v3/"))).toEqual([]);
 	});
 });

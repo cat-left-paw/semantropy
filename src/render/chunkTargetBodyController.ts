@@ -10,6 +10,8 @@ import { analyzeManualMorphSource, buildManualMorphVocabulary, isManualMorphVoca
 import { drawManualOverride } from "../analysis/manualDisplay";
 import { snapshotRubyVocabulary, snapshotDictionaryPool } from "../application/prepareVocabulary";
 import { type VocabularySnapshot, type VocabularyDrawMode } from "../vocabulary/vocabularySnapshot";
+import type { SourceWeight } from "../vocabulary/sourceWeights";
+import type { EnclosedTermDelimiter } from "../vocabulary/enclosedTerms";
 import { targetDomTransaction, captureTargetInteraction } from "./targetDomTransaction";
 import type { SemantropyReadyAnalysis } from "../application/SemantropySession";
 import type { SourceSnapshot } from "../application/SourceSnapshot";
@@ -177,6 +179,10 @@ export class ChunkTargetBodyController {
 		ownerDocument: Document; targetSize?: number; targetRevision?: number; dictionarySemantropy?: DictionarySemantropy; markerVisibility?: DisplayMarkerVisibility;
 	vocabularySources?: readonly ManualMorphSourceAnalysis[]; drawMode?: VocabularyDrawMode;
 	automaticPos?: AutomaticPosOptions;
+	/** 0.1.0 S3: the committed Selected Notes weights, so reopening keeps them. */
+	sourceWeights?: Readonly<Record<string, SourceWeight>> | null;
+	/** 0.1.0 S4: how the Target text is read when it is also a Vocabulary Source. The Target itself never is. */
+	enclosedTerms?: readonly EnclosedTermDelimiter[];
 	}): Promise<TargetOpenResult> {
 		this.release();
 		this.initialOptions = input.automaticPos ?? DEFAULT_AUTOMATIC_POS;
@@ -201,8 +207,21 @@ export class ChunkTargetBodyController {
 				tokenizer: measured, isCurrent: owned, checkpoint, phase: name => timer.begin(name), mode: "target-prototype" });
 			if (extracted.status === "error") return { status: "analyze-error" };
 			if (extracted.status !== "ready" || !(await checkpoint())) return { status: "stale" };
-			const sources = input.vocabularySources?.map(source => source.path === input.snapshot.sourcePath ? extracted.analysis : source) ?? [extracted.analysis];
-			const activeVocabulary = buildManualMorphVocabulary({ sources, drawMode: input.drawMode ?? "uniform" });
+			// The Target's own analysis serves as its Source, unless the text has an enclosed term: a Source reads
+			// that as one noun and the Target does not, so only then is the text analyzed a second time.
+			let targetVocabulary = extracted.analysis;
+			const servesAsSource = !input.vocabularySources || input.vocabularySources.some(source => source.path === input.snapshot.sourcePath);
+			// A cheap prefilter on the raw text: recognition runs on the projected text, where emphasis or ruby
+			// marks inside a term are already gone, so any opening delimiter at all triggers the Source reading.
+			if (servesAsSource && input.enclosedTerms?.some(pair => input.snapshot.text.includes(pair.open))) {
+				const termed = await analyzeManualMorphSource({ text: input.snapshot.text, sourcePath: input.snapshot.sourcePath,
+					tokenizer: measured, isCurrent: owned, checkpoint, mode: "target-prototype", enclosedTerms: input.enclosedTerms });
+				if (termed.status === "error") return { status: "analyze-error" };
+				if (termed.status !== "ready" || !(await checkpoint())) return { status: "stale" };
+				targetVocabulary = termed.analysis;
+			}
+			const sources = input.vocabularySources?.map(source => source.path === input.snapshot.sourcePath ? targetVocabulary : source) ?? [targetVocabulary];
+			const activeVocabulary = buildManualMorphVocabulary({ sources, drawMode: input.drawMode ?? "uniform", sourceWeights: input.sourceWeights ?? null });
 			this.targetSource = extracted.analysis; this.targetIndex = index; this.targetDescriptors = descriptors;
 			const vocabularySnapshot = activeVocabulary.snapshot;
 			const vocabulary = snapshotRubyVocabulary(vocabularySnapshot);

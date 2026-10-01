@@ -131,10 +131,11 @@ describe("the shipped entry point", () => {
 			}
 		).getSettingDefinitions();
 		// LOCALE1: a new install (no stored settings) is Japanese, and the language row comes first.
-		expect(definitions.map(item => item.name)).toEqual(["表示言語", "リボンアイコンを表示", "収集ファイル", undefined]);
-		expect(definitions[3]).toMatchObject({ type: "group", heading: "収集ノートに生成由来を記録" });
-		expect(definitions[3]?.items?.map(item => item.name)).toEqual([
-			"生成の種類を記録", "対象ノートを記録", "語彙ノートを記録", "生成時のSemantropy値を記録", "収集した日付を記録",
+		// 0.1.0 S4 adds the extra enclosed-term delimiters row before the attribution group.
+		expect(definitions.map(item => item.name)).toEqual(["表示言語", "リボンアイコンを表示", "収集ファイル", "追加の囲み記号", undefined]);
+		expect(definitions[4]).toMatchObject({ type: "group", heading: "収集ノートに生成由来を記録" });
+		expect(definitions[4]?.items?.map(item => item.name)).toEqual([
+			"生成の種類を記録", "対象ノートを記録", "語彙ソースを記録", "生成時のSemantropy値を記録", "収集した日付を記録",
 		]);
 		for (const definition of definitions.flatMap(item => item.items ?? [item])) {
 			expect(typeof definition.render).toBe("function");

@@ -68,6 +68,8 @@ describe("TOOLBAR1 settings schema 3 migration", () => {
 			vocabularyDrawMode: "uniform",
 			bodyFontFamily: "theme",
 			bodyFontSizePx: null,
+			// 0.1.0 S2: the display defaults carry the theme; schema 3 itself still never stores it.
+			bodyTheme: "default",
 			bodyBackground: null,
 			bodyForeground: null,
 			showRuby: true,

@@ -221,7 +221,7 @@ describe("multi-View transaction and lifecycle at MAX", () => {
 		vi.restoreAllMocks();
 		expect(await x.view.applyAutomaticPos(ALL)).toBe("committed");
 		for (const h of [x, y]) { expect(h.current("歩い").displaySurface).toBe("書い"); expect(h.controller().getAutomaticProvenance()!.bodyAlgorithmVersion).toBe(11); }
-		expect(s.disk()).toMatchObject({ schemaVersion: 7, bodySemantropy: 100, automaticPos: ALL, showRibbonIcon: true });
+		expect(s.disk()).toMatchObject({ schemaVersion: 8, bodySemantropy: 100, automaticPos: ALL, showRibbonIcon: true });
 		await x.view.onClose(); await y.view.onClose();
 	});
 	it.each(["close", "disable", "source", "apply"] as const)("releases the MAX projection on %s and never republishes it", async event => {

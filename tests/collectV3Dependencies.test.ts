@@ -9,10 +9,12 @@ async function graph(entry: string) {
 it.each(Object.keys(pinned).filter(entry => !["src/main.ts", "src/SemantropyPlugin.ts"].includes(entry)))("allows only the shared identity validator in production and v2 graphs: %s", async entry => {
 	const { inputs } = await graph(entry);
 	const baseline = pinned[entry]!;
-	expect(inputs).toEqual([...baseline, ...(baseline.includes("src/collect/fragmentIdentity.ts") ? ["src/collect/fragmentIdentityValidation.ts"] : [])].sort());
+	// 0.1.0 S3: every graph that reaches the Vocabulary Snapshot now also reaches its Source weight leaf.
+	expect(inputs).toEqual([...baseline, ...(baseline.includes("src/collect/fragmentIdentity.ts") ? ["src/collect/fragmentIdentityValidation.ts"] : []),
+		...(baseline.includes("src/vocabulary/vocabularySnapshot.ts") ? ["src/vocabulary/sourceWeights.ts"] : [])].sort());
 	expect(inputs.filter(path => /\/collect\/v3\/|automaticPosVersions|maxVersions/u.test(path))).toEqual([]);
 });
-const common = ["analysis/rubyVocabulary", "collect/collectProvenance", "collect/fragmentIdentityValidation", "collect/v3/CollectedFragmentV3", "collect/v3/automaticPartsOfSpeech", "collect/v3/collectDataV3", "dictionary/placeholders", "path/vaultRelativePath", "random/seededRandom", "settings/semantropyRange", "transform/maxVersions", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "vocabulary/sha256", "vocabulary/vocabularySnapshot"];
+const common = ["analysis/rubyVocabulary", "collect/collectProvenance", "collect/fragmentIdentityValidation", "collect/v3/CollectedFragmentV3", "collect/v3/automaticPartsOfSpeech", "collect/v3/collectDataV3", "dictionary/placeholders", "path/vaultRelativePath", "random/seededRandom", "settings/semantropyRange", "transform/maxVersions", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "vocabulary/sha256", "vocabulary/sourceWeights", "vocabulary/vocabularySnapshot"];
 it.each(["CollectFragmentUseCaseV3", "FragmentRepositoryV3", "automaticPartsOfSpeech"])("keeps the v3 graph pure: %s", async name => {
 	const { inputs, code } = await graph(`src/collect/v3/${name}.ts`);
 	const modules = name === "automaticPartsOfSpeech" ? ["collect/v3/automaticPartsOfSpeech", "collect/v3/collectDataV3"] : [...common,

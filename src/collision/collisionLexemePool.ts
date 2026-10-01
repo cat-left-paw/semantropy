@@ -36,6 +36,7 @@ import {
 	type VocabularyOrigin,
 } from "../analysis/rubyVocabulary";
 import type { JapaneseToken } from "../tokenizer/JapaneseTokenizer";
+import { isSourceWeight, type SourceWeight } from "../vocabulary/sourceWeights";
 import {
 	COLLISION_PROJECTION_POLICY_VERSION,
 	MANUAL_PROJECTION_POLICY_VERSION,
@@ -203,6 +204,12 @@ export type CollisionLexemePool = {
 	readonly predicatesByProfile: Readonly<
 		Record<CollisionPredicateCandidateProfile, readonly CollisionPredicateCandidate[]>
 	>;
+	/**
+	 * 0.1.0 S3: the Snapshot's Source weights, one per `provenance.sources`
+	 * entry, present only when the Snapshot has them. Kept outside `provenance`,
+	 * which Collect copies field by field.
+	 */
+	readonly sourceWeights?: readonly SourceWeight[];
 };
 
 /**
@@ -971,6 +978,7 @@ export function buildCollisionLexemePool(input: {
 			predicates: predicateCandidates,
 			modifiersByProfile,
 			predicatesByProfile,
+			...(snapshot.sourceWeights ? { sourceWeights: [...snapshot.sourceWeights] } : {}),
 		});
 		return { ok: true, pool };
 	} catch (error) {
@@ -1615,6 +1623,16 @@ export function inspectCollisionLexemePoolStructure(
 			}
 			previousPath = source.path;
 			sources.add(JSON.stringify([source.path, source.contentHash]));
+		}
+		// Absent means every Source is ×1; present, it is one weight per Source and not all ×1.
+		if (
+			pool.sourceWeights !== undefined &&
+			(!isList(pool.sourceWeights) ||
+				pool.sourceWeights.length !== provenance.sources.length ||
+				!pool.sourceWeights.every(isSourceWeight) ||
+				pool.sourceWeights.every((weight) => weight === 1))
+		) {
+			return "invalid-provenance";
 		}
 
 		if (!isList(pool.nouns) || !isList(pool.modifiers) || !isList(pool.predicates)) {

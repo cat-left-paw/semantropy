@@ -1,4 +1,5 @@
 import { Modal, type App } from "obsidian";
+import { iconLabel } from "./controlIcon";
 import type { FakeProverbBatch } from "../fakeProverb/fakeProverbBatch";
 import { FAKE_PROVERB_ROW_COUNT, FakeProverbSession, fakeProverbMessage } from "./FakeProverbSession";
 import { ui } from "../i18n/catalog";
@@ -49,6 +50,15 @@ export class FakeProverbModal extends Modal {
 		const el = this.element(parent, "button"); el.type = "button"; this.labels.text(el, text);
 		el.addEventListener("click", action); off.push(() => el.removeEventListener("click", action)); return el;
 	}
+	/** 0.1.0 S1: an icon-only row action; the name is its `aria-label` (Obsidian's tooltip) and a touch-screen label. */
+	private iconButton(parent: HTMLElement, icon: string, text: () => string, action: () => void, off: (() => void)[]) {
+		const el = this.element(parent, "button"); el.type = "button"; el.className = "semantropy-action semantropy-modal-row-action is-icon-only";
+		iconLabel(el, icon, text());
+		this.labels.attr(el, "aria-label", text);
+		const label = el.querySelector<HTMLElement>(".semantropy-action-label");
+		if (label) this.labels.text(label, text);
+		el.addEventListener("click", action); off.push(() => el.removeEventListener("click", action)); return el;
+	}
 	/** LOCALE1: re-words the dialog in place. Row text, the published batch, focus and scroll stay. */
 	relabel() {
 		if (!this.session) return;
@@ -73,17 +83,19 @@ export class FakeProverbModal extends Modal {
 	private row(position: number): RowUI {
 		const off: (() => void)[] = [];
 		const root = this.element(this.list!, "li"); root.className = "semantropy-fake-proverb-row";
-		const proverb = this.element(root, "p"); proverb.className = "semantropy-fake-proverb-proverb";
+		// 0.1.0 S1: the proverb and its Copy / Collect share one line, the actions on the right.
+		const head = this.element(root, "div"); head.className = "semantropy-fake-proverb-head";
+		const proverb = this.element(head, "p"); proverb.className = "semantropy-fake-proverb-proverb";
+		const controls = this.element(head, "div"); controls.className = "semantropy-modal-row-actions";
 		const gloss = this.element(root, "blockquote"); gloss.className = "semantropy-fake-proverb-gloss";
-		const controls = this.element(root, "div"); controls.className = "semantropy-fake-proverb-controls";
 		// The slot is resolved at click time from the published batch at this position.
 		const write = (kind: "copy" | "collect") => {
 			const slot = this.session?.slotAt(position);
 			if (slot) void this.session?.write(slot, kind);
 		};
 		// aria-disabled rather than disabled: a button that becomes unavailable keeps keyboard focus.
-		const copy = this.button(controls, () => ui().common.copy, () => write("copy"), off);
-		const collect = this.button(controls, () => ui().common.collect, () => write("collect"), off);
+		const copy = this.iconButton(controls, "copy", () => ui().common.copy, () => write("copy"), off);
+		const collect = this.iconButton(controls, "inbox", () => ui().common.collect, () => write("collect"), off);
 		const status = this.element(root, "p"); status.setAttribute("role", "status"); status.setAttribute("aria-live", "polite");
 		return { root, proverb, gloss, copy, collect, status, off };
 	}

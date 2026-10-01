@@ -6,12 +6,13 @@ Semantropy is a desktop-only Obsidian plugin for creative writing in Japanese. I
 
 ## What you can do
 
-- **Transform Japanese prose.** Open the current note, then use **Reshuffle text** for another variation. The first section appears initially; **Load next section** adds one section at a time. Changes to the source are marked stale until you choose **Refresh target**.
-- **Choose vocabulary.** Use the current note or explicitly selected notes. Choose Uniform or Frequency draws, and apply nouns, independent verbs, i-adjectives and regular adverbs separately. Nouns are enabled by default. Changes in the picker take effect only after **Apply Vocabulary**.
+- **Transform Japanese prose.** Open the current note, then use **Reshuffle text** for another variation. The first section appears initially; **Load next section** adds one section at a time. Changes to the source are marked stale until you choose **Refresh target**. A working indicator appears over the body while it is prepared or reshuffled.
+- **Choose vocabulary.** Use the current note or explicitly selected notes as Vocabulary Sources. Choose Uniform or Frequency draws. Each selected note can be weighted from ×0.25 to ×4; with every note at ×1, draws are exactly as before. Nouns, independent verbs, i-adjectives and regular adverbs are enabled separately; nouns are enabled by default. Changes in the dialog take effect only after **Apply Vocabulary**.
+- **Group words in a Vocabulary Source.** Text written like `{{猫又}}` in a Vocabulary Source is one noun. **Extra term delimiters** in the settings adds up to four more pairs such as `【…】`; `{{…}}` is always on. The Target's display is unchanged.
 - **Set Text Semantropy.** Off (0) leaves the text unchanged; Low (25), Medium (50), High (75) and MAX (100) progressively change more text or allow broader candidates. Intermediate whole-number values are also available. Unsupported conjugations retain the original text.
-- **Change one word manually.** Eligible displayed words offer **Shuffle this word**, **Restore original** and **Use automatic result**. Manual candidates must be observed in the active vocabulary. A one-word selection shows the number of alternatives or why none is available.
-- **Make other text.** Fake Dictionary creates a definition for a selected word and has its own Semantropy level. Collision generates 10, 20 or 50 results from random or chosen patterns. Fake proverb generates ten proverb-and-explanation pairs. Each result has explicit Copy and Collect actions.
-- **Choose how it looks.** The toolbar stays visible while the body scrolls. Display settings control the body font, size, colours, ruby readings and interaction markers without changing generated text. The interface is available in Japanese and English; command palette names remain English.
+- **Change one word.** Clicking a word in the body opens the **Word actions** menu: **Shuffle this word**, **Restore original**, **Use automatic result** and **Look up in Fake Dictionary**. Manual candidates must be observed in the active vocabulary. A one-word selection shows the number of alternatives or why none is available.
+- **Make other text.** Fake Dictionary creates a definition for a word and has its own Semantropy level. Collision generates 10, 20 or 50 results from random or chosen patterns, and each row can be regenerated with the same pattern. Fake proverb generates ten proverb-and-explanation pairs. **Recompose** builds new text from how the Vocabulary Sources' sentences join, and can continue it or branch from a chosen place. Each result has explicit Copy and Collect actions.
+- **Choose how it looks.** The toolbar stays visible while the body scrolls. Display settings control the body font, size, theme (Default (Obsidian theme), Light or Dark), text and background colours, ruby readings and interaction markers without changing generated text. The interface is available in Japanese and English, but only Japanese text can be transformed; command palette names remain English.
 
 The analyzer is Lindera WebAssembly with an embedded compact IPADIC dictionary. It works locally and offline after installation. No dictionary directory or runtime download is required.
 
@@ -21,7 +22,7 @@ The analyzer is Lindera WebAssembly with an embedded compact IPADIC dictionary. 
 2. Run **Semantropy: Open** from the command palette, or use the Semantropy ribbon icon.
 3. Use **Load next section** and **Reshuffle text** in the Semantropy view.
 4. Use **Change vocabulary** to choose Current Note or Selected Notes and a draw mode, then select **Apply Vocabulary**. **Automatic parts of speech** has a separate **Apply** action.
-5. Select text in the Semantropy view, then use **Copy selection** or **Collect selection**. For one word, use **Semantropy: Define selected word**, or hover over an available word while holding Alt on Windows or Option (⌥) on macOS. The hover modifier can be changed to Shift in the view.
+5. Select text in the Semantropy view, then use **Copy selection** or **Collect selection**. For one word, click it and choose **Look up in Fake Dictionary**, use **Semantropy: Define selected word**, or hover over it while holding Alt on Windows or Option (⌥) on macOS. The hover modifier can be changed to Shift in the view.
 
 Set the destination under **Settings → Semantropy → Collection file** and select **Save** before collecting. The default is `Semantropy Fragments.md`. New entries contain readable Markdown without metadata comments. Five optional attribution switches can add the generation type, Target note, Vocabulary notes, Text Semantropy level and local collection date; all are off by default. Existing entries are preserved. The Collection file cannot be a Target or Vocabulary Source used to produce the result.
 
@@ -30,20 +31,22 @@ Set the destination under **Settings → Semantropy → Collection file** and se
 - Analysis, generation and dictionary use run locally. The plugin makes no runtime network requests and contains no telemetry.
 - Semantropy reads the active Target and any notes explicitly applied as Vocabulary Sources. The transformed view is built from inert elements; note images and embeds are placeholders rather than network-loaded resources.
 - The source note is never overwritten. An explicit **Collect** writes only to the configured Collection Markdown file. An explicit **Copy** writes to the clipboard; an empty or invalid selection does not copy another fragment.
-- Plugin settings are stored in Obsidian's plugin `data.json`: the Semantropy levels, Collection path, draw mode, display preferences, hover modifier, automatic parts of speech, interface language, ribbon visibility and attribution switches. Note snapshots, tokens, generated text, manual changes and generation state are not persisted.
+- Plugin settings are stored in Obsidian's plugin `data.json`: the Semantropy levels, Collection path, draw mode, display preferences (including theme and colours), hover modifier, automatic parts of speech, interface language, ribbon visibility, attribution switches and extra term delimiters. Vocabulary weights, note snapshots, tokens, generated text, manual changes and generation state are not persisted.
 
 ## Limits and compatibility
 
 - Desktop only; mobile is unsupported. Transformation is designed for Japanese text. Vocabulary can come from the current note or selected notes, not an entire folder or Vault.
 - Semantropy displays paragraphs, simple headings, emphasis, line breaks and supported ruby. Links, code, math, tags and unsupported Markdown are protected from transformation. Links are not interactive; images and embeds appear as placeholders. This view is not Obsidian Reading view.
 - Manual verb and i-adjective changes use supported forms observed in the vocabulary; unsupported forms stay unchanged. A very large note, especially at MAX, can take several seconds to prepare. A single parser or tokenizer step may delay cancellation.
+- Template syntax such as `{{date}}` in a Vocabulary Source is read as a noun (`date`) like any other enclosed term.
 - A narrow pane with high zoom can leave little room for the body below the fixed toolbar. Vertical writing, a dedicated Collection view, folder-wide vocabulary and user-editable templates are not included.
+- 0.1.0 uses a new settings format. Settings saved by 0.1.0 cannot be read by 0.0.1; going back to 0.0.1 resets the settings to their defaults.
 
-The macOS 0.0.1 release candidate `main.js` measures 14,184,815 bytes (about 14.2 MB) because it embeds WebAssembly and the dictionary. Builds on other operating systems can differ; check the published GitHub Release for the size of the asset you install. This exceeds [Obsidian Sync Standard's 5 MB per-file limit](https://obsidian.md/help/sync/plans). Standard users should install or update the plugin on each device rather than rely on the plugin file to sync. Sync Plus allows files up to 200 MB.
+`main.js` is about 14 to 16 MB because it embeds WebAssembly and the dictionary (the macOS 0.0.1 build measured 14,184,815 bytes). The size differs by operating system and version; check the GitHub Release for the size of the asset you install. This exceeds [Obsidian Sync Standard's 5 MB per-file limit](https://obsidian.md/help/sync/plans). Standard users should install or update the plugin on each device rather than rely on the plugin file to sync. Sync Plus allows files up to 200 MB.
 
 ## Installation
 
-Once Semantropy is listed in Obsidian's Community Plugins browser, install it there. To install from a GitHub Release manually, place that release's `main.js`, `manifest.json` and `styles.css` in:
+Install Semantropy from Obsidian's Community Plugins browser. To install from a GitHub Release manually, place that release's `main.js`, `manifest.json` and `styles.css` in:
 
 ```text
 <vault>/.obsidian/plugins/semantropy/

@@ -149,6 +149,16 @@ describe("distribution artifact shape", () => {
 		// Masked code is 567,997; canonical identifiers are 718,710 / 38b3159f…e55c.
 		// The Strict line breaks and owner UI/date revision is 15,751,892 bytes / 3345891e…1286 on Windows.
 		// Masked code is 569,449; canonical identifiers are 720,420 / 955bec50…27c7.
+		// 0.1.0 (S1–S5 and their review corrections) was 15,794,886 bytes / 475d3584…ed43 on Windows.
+		// Masked code was 611,148; canonical identifiers were 773,817 / b94c220e…b359.
+		// With the owner's Recompose provenance (mixed method, leap range) it was 15,795,800 bytes / 64f0725d…3f83.
+		// Masked code was 612,062; canonical identifiers were 775,118 / 65d38cd2…ae0a.
+		// With the delayed Collision row note (no flicker) it was 15,796,378 bytes / d33c45ed…942f.
+		// Masked code was 612,640; canonical identifiers were 775,814 / c9c11249…5d8e.
+		// With the pencil-sparkles icon, the plain Recompose title and uncapped popups it was
+		// 15,796,580 bytes / c634e41a…e207. Masked code was 612,842; canonical identifiers were 776,081 / 6fc6786f…0c7b.
+		// With wand-sparkles (and its fallback), the compact Display settings and the output scrolling it is
+		// 15,796,866 bytes / 4fd24c6a…bd32b. Masked code is 613,128; canonical identifiers are 776,464 / 7374d3ea…587d.
 		// This PR is 15,739,297 bytes on Windows and 14,170,925 on macOS. The bundle
 		// embeds host-compressed payloads. Native esbuild builds also choose different
 		// short local names on macOS and Windows, while the token sequence and every
@@ -159,10 +169,10 @@ describe("distribution artifact shape", () => {
 		const { masked, literals } = maskBase64Literals(code, LINDERA_DICTIONARY_FILE_NAMES);
 		expect(literals).toHaveLength(10);
 		expect(literals.filter(literal => literal.chars < 4096)).toHaveLength(3);
-		expect(Buffer.byteLength(masked)).toBe(569449);
+		expect(Buffer.byteLength(masked)).toBe(613128);
 		const canonical = canonicalizeMinifiedIdentifiers(masked);
-		expect(Buffer.byteLength(canonical)).toBe(720420);
-		expect(sha256Hex(Buffer.from(canonical))).toBe("955bec5059ec7b7a1d4270f8dcd30b044fb343d299c5e80db5a5582eb80927c7");
+		expect(Buffer.byteLength(canonical)).toBe(776464);
+		expect(sha256Hex(Buffer.from(canonical))).toBe("7374d3eac0d2dde49993ba54e177fd7f8ba1e43f4c1f9b82517b0dd78926587d");
 	});
 	it("contains only main.js, manifest.json and styles.css", () => {
 		expect(inspection.fileNames).toEqual(DISTRIBUTION_FILE_NAMES);
@@ -230,7 +240,9 @@ describe("distribution artifact shape", () => {
 		// 600,000 for the English / Japanese catalog (option A, esbuild charset unchanged).
 		// It is not a usage target; growth is still recorded per slice, and a slice expected
 		// to exceed it needs another explicit decision.
-		expect(inspection.maskedCodeBytes).toBeLessThan(600_000);
+		// 0.1.0, 2026-10-01: with S4 at 585,835 and S5 (Recompose in Obsidian) expected to
+		// exceed 600,000, the owner raised the provisional cap to 650,000 on the same terms.
+		expect(inspection.maskedCodeBytes).toBeLessThan(650_000);
 	});
 
 	it("rebuilds byte-identically from the same dictionary source", async () => {
@@ -853,12 +865,13 @@ describe("distribution artifact Collection path settings", () => {
 			for (const flag of [true, false]) {
 				const options = { noun: flag, verb: flag, iAdjective: flag, adverb: flag };
 				expect(await view.applyAutomaticPos(options)).toBe("committed");
-				expect(loaded.records.savedData).toMatchObject({ schemaVersion: 7, automaticPos: options, uiLanguage: "en", showRibbonIcon: true });
+				// 0.1.0 S2: the live writer is settings schema 8.
+				expect(loaded.records.savedData).toMatchObject({ schemaVersion: 8, automaticPos: options, uiLanguage: "en", showRibbonIcon: true });
 			}
 			// MAX-VIEW1: the bundled body path is MAX-CORE1, one compatible version set, with the saved 100 kept as 100 (MAX).
 			expect(view.targetBody.getAutomaticProvenance()).toMatchObject({ bodyAlgorithmVersion: 11, algorithmVersion: 3, projectionVersion: "automatic-body-projection-3", bodySemantropy: 100 });
 			expect(view.targetBody.getAutomaticProvenance().vocabularyFingerprint).toMatch(/^vocabulary-fingerprint-sha256-3:/u);
-			expect(loaded.records.savedData).toMatchObject({ schemaVersion: 7, bodySemantropy: 100, uiLanguage: "en", showRibbonIcon: true });
+			expect(loaded.records.savedData).toMatchObject({ schemaVersion: 8, bodySemantropy: 100, uiLanguage: "en", showRibbonIcon: true });
 			expect(loaded.records.writeCalls).toEqual([]); expect(loaded.records.fetchCalls).toEqual([]);
 			emulateCollectionMarkdown(loaded);
 			const range = document.createRange(); range.selectNodeContents(view.targetBody.getContainer());
@@ -904,9 +917,10 @@ describe("distribution artifact Collection path settings", () => {
 			};
 			const definitions = tab.getSettingDefinitions();
 			// LOCALE1: schema 3 data keeps English; the Interface language row comes first.
-			expect(definitions.map(item => item.name)).toEqual(["Interface language", "Show ribbon icon", "Collection file", undefined]);
-			expect(definitions[3]).toMatchObject({ type: "group", heading: "Record generation details in Collection" });
-			expect(definitions[3]?.items?.map(item => item.name)).toEqual([
+			// 0.1.0 S4 adds the extra enclosed-term delimiters row before the attribution group.
+			expect(definitions.map(item => item.name)).toEqual(["Interface language", "Show ribbon icon", "Collection file", "Extra term delimiters", undefined]);
+			expect(definitions[4]).toMatchObject({ type: "group", heading: "Record generation details in Collection" });
+			expect(definitions[4]?.items?.map(item => item.name)).toEqual([
 				"Record generation type", "Record Target note", "Record Vocabulary notes", "Record generation Semantropy level", "Record collection date",
 			]);
 			for (const definition of definitions.flatMap(item => item.items ?? [item])) {
@@ -944,7 +958,7 @@ describe("distribution artifact Collection path settings", () => {
 			}
 			expect(loaded.records.writeCalls).toEqual([]);
 			expect(loaded.records.savedData).toMatchObject({
-				schemaVersion: 7,
+				schemaVersion: 8,
 				uiLanguage: "en",
 				showRibbonIcon: true,
 				bodySemantropy: 100,

@@ -15,6 +15,12 @@
  *     bindings, rowSlotId, counts, shortfall, draft, pool, token, nonce or
  *     Source text.
  *
+ * 0.1.0 S5: Collect metadata 5 adds the `recompose` type and nothing else. A
+ * recompose entry is labelled 5; the four earlier types keep metadata 4 exactly.
+ * It records the algorithm, the method (`mixed` when the pieces came from more
+ * than one), the smallest and largest leap used, and the Vocabulary provenance
+ * of the Sources it was built from — never the units, spans, corpus or nonce.
+ *
  * Everything here is structural validation and detached capture. It never
  * proves that a value is a genuine, committed generation result: VIEW1 must
  * obtain the row from BATCH1 (`readFakeProverbRow()`) and pass that capture.
@@ -50,6 +56,7 @@ import type { FakeProverbRowRecord } from "../../fakeProverb/fakeProverbBatch";
 import { fakeProverbCanonicalText, isFakeProverbSafeText } from "../../fakeProverb/fakeProverbText";
 import { FAKE_PROVERB_ALGORITHM_VERSION } from "../../fakeProverb/fakeProverbVersions";
 import { FAKE_PROVERB_ID_MAX_LENGTH, FAKE_PROVERB_RECIPE_SCHEMA_VERSION } from "../../fakeProverb/recipeData";
+import { RECOMPOSE_ALGORITHM_VERSION, isRecomposeRecordedMethod, type RecomposeRecordedMethod } from "../../recompose/recomposeVersions";
 import {
 	exactCollectFieldsV4,
 	guardCollectV4,
@@ -63,6 +70,8 @@ import {
 export type { FragmentValidationReasonV4 } from "./collectDataV4";
 
 export const COLLECT_METADATA_VERSION_V4 = 4 as const;
+/** 0.1.0 S5: the version of a `recompose` entry. */
+export const COLLECT_METADATA_VERSION_V5 = 5 as const;
 
 type Version4<T> = T extends unknown ? Omit<T, "metadataVersion"> & { readonly metadataVersion: typeof COLLECT_METADATA_VERSION_V4 } : never;
 
@@ -83,18 +92,36 @@ export type FakeProverbFragmentInputV4 = {
 	readonly rowId: string;
 	readonly canonicalText: string;
 };
-export type CollectFragmentInputV4 = BodyFragmentInputV4 | FakeDictionaryFragmentInputV4 | CollisionFragmentInputV4 | FakeProverbFragmentInputV4;
+export type RecomposeFragmentInputV5 = {
+	readonly metadataVersion: typeof COLLECT_METADATA_VERSION_V5;
+	readonly type: "recompose";
+	/** The Collection body: the recomposed text as shown, paragraphs separated by one blank line. */
+	readonly text: string;
+	readonly algorithmVersion: typeof RECOMPOSE_ALGORITHM_VERSION;
+	/** The method of every piece, or `mixed` when the pieces came from more than one. */
+	readonly method: RecomposeRecordedMethod;
+	/** The smallest and largest leap (0 close to the Sources … 100) of the steps the pieces came from. */
+	readonly leapMin: number;
+	readonly leapMax: number;
+	readonly vocabulary: CollectVocabularyProvenance;
+};
+export type CollectFragmentInputV4 = BodyFragmentInputV4 | FakeDictionaryFragmentInputV4 | CollisionFragmentInputV4 | FakeProverbFragmentInputV4
+	| RecomposeFragmentInputV5;
 
 export type BodyFragmentMetadataV4 = Version4<BodyFragmentMetadataV3>;
 export type FakeDictionaryFragmentMetadataV4 = Version4<FakeDictionaryFragmentMetadataV3>;
 export type CollisionFragmentMetadataV4 = Version4<CollisionFragmentMetadataV3>;
 export type FakeProverbFragmentMetadataV4 = FragmentIdentity & Omit<FakeProverbFragmentInputV4, "text">;
-export type FragmentMetadataV4 = BodyFragmentMetadataV4 | FakeDictionaryFragmentMetadataV4 | CollisionFragmentMetadataV4 | FakeProverbFragmentMetadataV4;
+export type RecomposeFragmentMetadataV5 = FragmentIdentity & Omit<RecomposeFragmentInputV5, "text">;
+export type FragmentMetadataV4 = BodyFragmentMetadataV4 | FakeDictionaryFragmentMetadataV4 | CollisionFragmentMetadataV4 | FakeProverbFragmentMetadataV4
+	| RecomposeFragmentMetadataV5;
 export type CollectedFragmentV4 = { readonly text: string; readonly metadata: FragmentMetadataV4 };
 
 /** Input fields of a fake-proverb value, in canonical order. */
 const fakeProverbInputKeys = ["metadataVersion", "type", "text", "algorithmVersion", "recipeDataVersion", "vocabulary",
 	"proverbRecipeId", "glossRecipeId", "batchId", "rowId", "canonicalText"] as const;
+/** Input fields of a recompose value, in canonical order. */
+const recomposeInputKeys = ["metadataVersion", "type", "text", "algorithmVersion", "method", "leapMin", "leapMax", "vocabulary"] as const;
 /** The same lowercase kebab-case grammar Recipe Schema 1 compiles entry IDs with. */
 const RECIPE_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u;
 /** BATCH1 batch and row identities: domain-separated SHA-256, lowercase hex. */
@@ -168,6 +195,24 @@ function readFakeProverb(data: Record<string, unknown>): FakeProverbFragmentInpu
 		recipeDataVersion: data["recipeDataVersion"], vocabulary, proverbRecipeId, glossRecipeId, batchId, rowId, canonicalText });
 }
 
+/** The recompose fields other than the text, shared by input capture and the metadata boundary. */
+function readRecomposeFields(data: Record<string, unknown>): Omit<RecomposeFragmentInputV5, "metadataVersion" | "type" | "text"> {
+	if (data["algorithmVersion"] !== RECOMPOSE_ALGORITHM_VERSION) refuseCollectV4("invalid-algorithm-version");
+	const method = data["method"];
+	if (!isRecomposeRecordedMethod(method)) refuseCollectV4("invalid-recompose-method");
+	const leapMin = data["leapMin"], leapMax = data["leapMax"];
+	const isLeap = (value: unknown): value is number => typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 100;
+	if (!isLeap(leapMin) || !isLeap(leapMax) || leapMin > leapMax) refuseCollectV4("invalid-recompose-leap");
+	return { algorithmVersion: RECOMPOSE_ALGORITHM_VERSION, method, leapMin, leapMax, vocabulary: readVocabulary(data["vocabulary"]) };
+}
+
+function readRecompose(data: Record<string, unknown>): RecomposeFragmentInputV5 {
+	exactCollectFieldsV4(data, recomposeInputKeys);
+	const text = data["text"];
+	if (typeof text !== "string" || !text.trim()) refuseCollectV4("empty-text");
+	return freezeCollectValue({ metadataVersion: COLLECT_METADATA_VERSION_V5, type: "recompose" as const, text, ...readRecomposeFields(data) });
+}
+
 /** Keeps a v3 reason: the v3 builders and capture throw an Error whose message is the fixed code. */
 function refuseFromV3(error: unknown): never {
 	const reason = error instanceof Error && /^[a-z]+(?:-[a-z]+)*$/u.test(error.message) ? error.message : "invalid-fragment-fields";
@@ -181,6 +226,11 @@ function refuseFromV3(error: unknown): never {
 export function readCollectFragmentInputV4(input: unknown): CollectReadResultV4<CollectFragmentInputV4> {
 	return guardCollectV4<CollectFragmentInputV4>(() => {
 		const data = ownCollectDataV4(input);
+		// Metadata 5 is the recompose type alone; every other type stays metadata 4.
+		if (data["type"] === "recompose") {
+			if (data["metadataVersion"] !== COLLECT_METADATA_VERSION_V5) refuseCollectV4("invalid-metadata-version");
+			return readRecompose(data);
+		}
 		if (data["metadataVersion"] !== COLLECT_METADATA_VERSION_V4) refuseCollectV4("invalid-metadata-version");
 		if (data["type"] === "fake-proverb") return readFakeProverb(data);
 		if (!V3_TYPES.includes(data["type"] as string)) refuseCollectV4("invalid-fragment-fields");
@@ -198,6 +248,13 @@ export function validateFragmentInputV4(input: unknown): FragmentValidationReaso
 
 /** Exact whitelist in canonical metadata order. Input is already captured. */
 function copyFragmentMetadataV4(input: CollectFragmentInputV4, identity: FragmentIdentity): FragmentMetadataV4 {
+	if (input.type === "recompose") {
+		return {
+			id: identity.id, metadataVersion: COLLECT_METADATA_VERSION_V5, type: input.type, created: identity.created,
+			algorithmVersion: input.algorithmVersion, method: input.method, leapMin: input.leapMin, leapMax: input.leapMax,
+			vocabulary: { sources: input.vocabulary.sources.map(copyPathIdentity), fingerprint: input.vocabulary.fingerprint, drawMode: input.vocabulary.drawMode },
+		};
+	}
 	if (input.type === "fake-proverb") {
 		return {
 			id: identity.id, metadataVersion: COLLECT_METADATA_VERSION_V4, type: input.type, created: identity.created,
@@ -231,6 +288,18 @@ function pick(data: Record<string, unknown>, keys: readonly string[]): Record<st
 export function captureFragmentMetadataV4(metadata: FragmentMetadataV4): FragmentMetadataV4 {
 	const result = guardCollectV4(() => {
 		const data = ownCollectDataV4(metadata);
+		if (data["type"] === "recompose") {
+			if (data["metadataVersion"] !== COLLECT_METADATA_VERSION_V5) refuseCollectV4("invalid-metadata-version");
+			exactCollectFieldsV4(data, ["id", "metadataVersion", "type", "created", "algorithmVersion", "method", "leapMin", "leapMax", "vocabulary"]);
+			let identity: FragmentIdentity;
+			try {
+				identity = captureFragmentIdentityV3({ id: data["id"], created: data["created"] });
+			} catch (error) {
+				return refuseFromV3(error);
+			}
+			const fields = readRecomposeFields(data);
+			return freezeCollectValue(copyFragmentMetadataV4({ metadataVersion: COLLECT_METADATA_VERSION_V5, type: "recompose", text: "-", ...fields }, identity));
+		}
 		if (data["metadataVersion"] !== COLLECT_METADATA_VERSION_V4) refuseCollectV4("invalid-metadata-version");
 		if (V3_TYPES.includes(data["type"] as string)) {
 			let v3: FragmentMetadataV3;

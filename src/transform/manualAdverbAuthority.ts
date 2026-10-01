@@ -6,6 +6,7 @@ import { adverbBridgeCapabilities, evaluateAdverbCandidate } from "../adverb/adv
 import { TO_OPTIONAL_ADVERB_BRIDGE_PROFILE } from "../adverb/adverbBridgeProfile";
 import { createSeededRandom } from "../random/seededRandom";
 import { sha256Hex } from "../vocabulary/sha256";
+import { drawWeight, sourceWeightLookup } from "../vocabulary/sourceWeights";
 import type { ManualVocabularyCandidate, VocabularySourceIdentity } from "../vocabulary/vocabularySnapshot";
 import { isManualMorphVocabulary, readManualMorphVocabularySources, type ManualMorphVocabulary, type ManualMorphSourceAnalysis } from "./manualMorphology";
 import { count, fields, frozen, guarded, refuse, text, type ManualAdverbReason, type ManualAdverbResult } from "./manualAdverbGuard";
@@ -231,7 +232,10 @@ export function drawManualAdverbCandidate(input: { authority: ManualAdverbAuthor
 		if (!evaluation.diagnostic.available) refuse(evaluation.diagnostic.reason ?? "invalid-evaluation");
 		const seed = parseInt(sha256Hex(JSON.stringify(["semantropy/manual-adverb/draw", data.nonce])).slice(0, 8), 16);
 		const random = createSeededRandom(seed);
-		const weight = (group: ManualAdverbEvaluation["alternatives"][number]) => handle.provenance.drawMode === "frequency" ? group.frequency : 1;
+		// 0.1.0 S3: the owner's Source weights; without them this is the existing weight exactly.
+		const weights = sourceWeightLookup(AUTHORITIES.get(handle)!.vocabulary.snapshot);
+		const weight = (group: ManualAdverbEvaluation["alternatives"][number]) => drawWeight(handle.provenance.drawMode, weights, group.frequency,
+			() => group.candidates.flatMap(candidate => candidate.record.origins));
 		const total = count(evaluation.alternatives.reduce((sum, group) => sum + weight(group), 0));
 		let draw = random.next() * total;
 		const group = evaluation.alternatives.find(item => { draw -= weight(item); return draw < 0; });

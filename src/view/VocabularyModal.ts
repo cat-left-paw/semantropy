@@ -1,5 +1,6 @@
 import { Modal, type App } from "obsidian";
-import type { VocabularySelection } from "../application/prepareVocabulary";
+import { selectionWeight, type VocabularySelection } from "../application/prepareVocabulary";
+import { DEFAULT_SOURCE_WEIGHT, SOURCE_WEIGHT_CHOICES, isSourceWeight, type SourceWeight } from "../vocabulary/sourceWeights";
 import type { VocabularyControlsState } from "./VocabularyControls";
 import { buildVocabularyTree, filterVocabularyTree, vocabularyNoteName, type VocabularyFolder } from "./vocabularyTree";
 import { EN_MESSAGES, ui } from "../i18n/catalog";
@@ -64,6 +65,8 @@ export class VocabularyModal extends Modal {
 	private moreButtons = new WeakMap<HTMLElement, MoreEntry>();
 	private boxes = new WeakMap<HTMLElement, string>();
 	private removers = new WeakMap<HTMLElement, string>();
+	/** 0.1.0 S3: the weight select of each selected row, by the path it weighs. */
+	private weighers = new WeakMap<HTMLElement, string>();
 	/** The note checkboxes that currently exist, so a draft change can update them in place. */
 	private rendered = new Map<string, HTMLInputElement>();
 	private filterRendered = 0;
@@ -72,7 +75,7 @@ export class VocabularyModal extends Modal {
 	private status: HTMLElement | null = null;
 	private selectedList: HTMLUListElement | null = null;
 	/** One row per selected path, kept in path order and updated in place. */
-	private selectedRows = new Map<string, { item: HTMLLIElement; issue: HTMLSpanElement; remove: HTMLButtonElement }>();
+	private selectedRows = new Map<string, { item: HTMLLIElement; issue: HTMLSpanElement; weight: HTMLSelectElement; remove: HTMLButtonElement }>();
 	private selectedEmpty: HTMLLIElement | null = null;
 	private selectedPaths: readonly string[] | null = null;
 	private selectedIssues = "";
@@ -131,6 +134,8 @@ export class VocabularyModal extends Modal {
 		for (const [path, row] of this.selectedRows) {
 			if (row.remove.textContent !== v.remove) row.remove.textContent = v.remove;
 			row.remove.setAttribute("aria-label", v.removeName(path));
+			row.weight.setAttribute("aria-label", v.weightName(path));
+			row.weight.title = v.weight;
 		}
 		if (this.selectedEmpty) this.selectedEmpty.textContent = v.noneSelected;
 		for (const more of Array.from(this.treeRoot?.querySelectorAll<HTMLButtonElement>("button.semantropy-vocabulary-more") ?? [])) {
@@ -192,6 +197,13 @@ export class VocabularyModal extends Modal {
 			this.setPath(path, false);
 			// The row is rebuilt; keep the reader in the list rather than losing focus to the body.
 			(this.selectedList?.querySelector<HTMLButtonElement>("button") ?? this.filter)?.focus();
+		});
+		this.listen(this.selectedList, "change", event => {
+			if (!this.filesSelectable() || !(event.target instanceof HTMLSelectElement)) return;
+			const path = this.weighers.get(event.target);
+			const weight = Number(event.target.value);
+			if (path === undefined || !isSourceWeight(weight)) return;
+			this.changeDraft(this.draftPaths(), { ...this.draftWeights(), [path]: weight });
 		});
 
 		const browse = this.mount(scroll, "section", "", "semantropy-vocabulary-browse", !files);
@@ -278,23 +290,33 @@ export class VocabularyModal extends Modal {
 			if (!region) continue;
 			if (show) this.reveal(region);
 			else this.conceal(region);
-			for (const control of Array.from(region.querySelectorAll<HTMLInputElement | HTMLButtonElement>("input, button"))) control.disabled = !show;
+			for (const control of Array.from(region.querySelectorAll<HTMLInputElement | HTMLButtonElement | HTMLSelectElement>("input, button, select"))) control.disabled = !show;
 		}
 	}
 
-	private changeDraft(paths: readonly string[] = this.draftPaths()): void {
+	private changeDraft(paths: readonly string[] = this.draftPaths(), weights: Readonly<Record<string, SourceWeight>> = this.draftWeights()): void {
 		const input = this.input;
 		if (!input || !this.source || !this.draw) return;
 		const mode = this.source.value === "selected" ? "selected" : "current";
 		// Conceal first. The draft callback syncs immediately, still in this turn.
 		this.presentFileSelection(mode === "selected");
+		// Only selected paths keep a weight, and ×1 is the absence of one, so removing a note forgets its weight.
+		const kept = Object.fromEntries(paths.flatMap(path => {
+			const weight = Object.prototype.hasOwnProperty.call(weights, path) ? weights[path] : undefined;
+			return weight !== undefined && weight !== DEFAULT_SOURCE_WEIGHT ? [[path, weight]] : [];
+		}));
 		input.draft({
 			mode,
 			drawMode: this.draw.value === "frequency" ? "frequency" : "uniform",
 			// A mode switch keeps the Selected Notes paths so they can be restored before Apply.
 			paths: [...paths],
+			...(Object.keys(kept).length ? { weights: kept } : {}),
 		});
 		this.sync();
+	}
+
+	private draftWeights(): Readonly<Record<string, SourceWeight>> {
+		return this.input?.state().draft.weights ?? {};
 	}
 
 	private setPath(path: string, on: boolean): void {
@@ -465,6 +487,10 @@ export class VocabularyModal extends Modal {
 			this.selectedIssues = issues;
 			this.renderSelected(this.selectedList, draft.paths, new Map(state.staleSources.map(issue => [issue.path, issue.reason])));
 		}
+		for (const [path, row] of this.selectedRows) {
+			const weight = String(selectionWeight(draft, path));
+			if (row.weight.value !== weight) row.weight.value = weight;
+		}
 	}
 
 	/**
@@ -489,13 +515,24 @@ export class VocabularyModal extends Modal {
 				this.el(item, "span", path).className = "semantropy-vocabulary-selected-path";
 				const issue = this.el(item, "span");
 				issue.className = "semantropy-vocabulary-selected-issue";
+				const weight = this.el(item, "select");
+				weight.className = "semantropy-vocabulary-weight";
+				for (const choice of SOURCE_WEIGHT_CHOICES) {
+					const option = this.el(weight, "option", `×${choice}`);
+					option.value = String(choice);
+				}
+				weight.value = String(DEFAULT_SOURCE_WEIGHT);
+				weight.disabled = !this.filesSelectable();
+				weight.setAttribute("aria-label", ui().vocabulary.weightName(path));
+				weight.title = ui().vocabulary.weight;
+				this.weighers.set(weight, path);
 				const remove = this.el(item, "button", ui().vocabulary.remove);
 				remove.type = "button";
 				remove.disabled = !this.filesSelectable();
 				remove.setAttribute("aria-label", ui().vocabulary.removeName(path));
 				this.removers.set(remove, path);
 				list.insertBefore(item, cursor);
-				row = { item, issue, remove };
+				row = { item, issue, weight, remove };
 				this.selectedRows.set(path, row);
 			} else cursor = row.item.nextSibling;
 			// The stale reason is a code ("changed" / "missing"); only its label is shown.

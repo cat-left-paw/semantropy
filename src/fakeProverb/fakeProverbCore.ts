@@ -31,6 +31,7 @@
 import { freezeAnalysis } from "../analysis/rubyVocabulary";
 import { createSeededRandom, UINT32_MAX, type SeededRandom } from "../random/seededRandom";
 import type { VocabularyDrawMode } from "../vocabulary/vocabularySnapshot";
+import { drawWeight, sourceWeightLookup, type SourceWeightLookup } from "../vocabulary/sourceWeights";
 import {
 	isFakeProverbGlossCompatible,
 	type CompiledFakeProverbGloss,
@@ -132,6 +133,8 @@ function pickWeighted<T>(items: readonly T[], weightOf: (item: T) => number, ran
 type Prepared = {
 	readonly set: CompiledFakeProverbRecipeSet;
 	readonly drawMode: VocabularyDrawMode;
+	/** 0.1.0 S3: the bound owner's Source weights, or `null` for the unweighted draw. */
+	readonly weights: SourceWeightLookup;
 	readonly literals: ReadonlyMap<string, string>;
 	readonly profiles: ReadonlyMap<string, CompiledFakeProverbProfile>;
 	readonly candidates: ReadonlyMap<string, readonly FakeProverbCandidate[]>;
@@ -159,7 +162,7 @@ function drawSlot(part: CompiledFakeProverbSlotPart, scope: "proverb" | "gloss",
 	const all = prepared.candidates.get(form)!;
 	const fresh = all.filter((candidate) => !used.has(candidate.surface));
 	const pool = fresh.length > 0 ? fresh : all;
-	const candidate = pickWeighted(pool, (entry) => (prepared.drawMode === "frequency" ? entry.frequency : 1), random);
+	const candidate = pickWeighted(pool, (entry) => drawWeight(prepared.drawMode, prepared.weights, entry.frequency, entry.origins), random);
 	used.add(candidate.surface);
 	return Object.freeze({ scope, slotId: part.slotId, kind: part.kind, profileId: part.profileId, form, surface: candidate.surface, candidate });
 }
@@ -234,13 +237,14 @@ export function generateFakeProverbs(input: {
 		if (drawMode !== "uniform" && drawMode !== "frequency") refuseFakeProverb("invalid-request");
 		const authority = data["authority"] as FakeProverbAuthority;
 		// Origin, owner liveness and binding on every call; structure was proven at mint (no re-derivation).
-		const { recipeSet: set } = resolveFakeProverbAuthority(authority, data["recipeSet"], false);
+		const { recipeSet: set, owner } = resolveFakeProverbAuthority(authority, data["recipeSet"], false);
 		// The draw mode is the one the Vocabulary was captured with; a different one is stale settings.
 		if (drawMode !== authority.provenance.drawMode) refuseFakeProverb("provenance-mismatch");
 
 		const prepared: Prepared = {
 			set,
 			drawMode,
+			weights: sourceWeightLookup(owner.snapshot),
 			literals: new Map(set.literals.map((entry) => [entry.id, entry.literal])),
 			profiles: new Map(set.profiles.map((entry) => [entry.id, entry])),
 			candidates: new Map(authority.forms.map((entry) => [entry.form, entry.candidates])),

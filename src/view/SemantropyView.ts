@@ -10,7 +10,8 @@ import { dictionaryDiagnostics, dictionaryDiagnosticMessage, type DictionaryDiag
 import type { VocabularySnapshot } from "../vocabulary/vocabularySnapshot";
 import type { DisplayMarkerVisibility, DisplaySlot } from "../analysis/displaySlots";
 import { targetDomTransaction } from "../render/targetDomTransaction";
-import { prepareVocabulary, initialVocabularySelection, vocabularyPaths, VOCABULARY_DRAW_MODE_SAVE_ERROR, VOCABULARY_PREPARATION_ERROR, VOCABULARY_REFRESH_REQUIRED, type VocabularySelection } from "../application/prepareVocabulary";
+import { prepareVocabulary, initialVocabularySelection, selectionSourceWeights, vocabularyPaths, VOCABULARY_DRAW_MODE_SAVE_ERROR, VOCABULARY_PREPARATION_ERROR, VOCABULARY_REFRESH_REQUIRED, type VocabularySelection } from "../application/prepareVocabulary";
+import { enclosedTermSyntax, type EnclosedTermDelimiter } from "../vocabulary/enclosedTerms";
 import { dictionaryAltLabel } from "./dictionaryModifierLabel";
 import { VocabularyControls, type VocabularySourceIssue } from "./VocabularyControls";
 import { VocabularyModal } from "./VocabularyModal";
@@ -25,6 +26,7 @@ import { UiLabels } from "../i18n/uiLabels";
 import { CollisionModal } from "./CollisionModal";
 import { FakeProverbSession } from "./FakeProverbSession";
 import { FakeProverbModal } from "./FakeProverbModal";
+import { RecomposeModal } from "./RecomposeModal";
 import { ANALYZE_ERROR_MESSAGE } from "../application/analyzeNoteTexts";
 import { bodyFragmentFromAutomatic } from "../application/bodyFragmentFromAutomatic";
 import { collectVocabularyFromSnapshot } from "../application/collectVocabulary";
@@ -132,6 +134,7 @@ import { toSemantropyViewModel } from "./semantropyViewModel";
 import { ChunkTargetBodyController, PROVISIONAL_TARGET_CHUNK_SIZE } from "../render/chunkTargetBodyController";
 import {
 	BODY_FONT_STACKS,
+	BODY_THEME_PALETTES,
 	defaultSemantropyDisplaySettings,
 	type SemantropyDisplaySettings,
 } from "../settings/displaySettings";
@@ -192,6 +195,10 @@ export type CollectDefinitionOutcome = CollectSelectedFragmentOutcome;
  */
 export type SemantropyViewHost = {
 	automaticPosCoordinator?: AutomaticPosCoordinator;
+	/** 0.1.0 S5: false leaves out the Recompose dialog entry (the web page has its own Recompose panel). */
+	recomposeDialog?: boolean;
+	/** 0.1.0 S4: extra enclosed-term delimiter pairs from settings. The standard `{{` `}}` is always on. */
+	getEnclosedTermDelimiters?: () => readonly EnclosedTermDelimiter[];
 	getAutomaticPos?: () => AutomaticPosOptions;
 	getTokenizer: () => JapaneseTokenizer;
 	/** Current body for a Vault path: editor buffer first, saved text second. */
@@ -266,6 +273,7 @@ export class SemantropyView extends ItemView {
 	private fakeProverbSession: FakeProverbSession | null = null;
 	private fakeProverbModal: FakeProverbModal | null = null;
 	private fakeProverbDisabled = false;
+	private recomposeModal: RecomposeModal | null = null;
 	private vocabularyDraft = initialVocabularySelection();
 	private vocabularyGeneration = 0;
 	private vocabularyTask: { generation: number; paths: readonly string[]; token: number; dictionaryToken: number } | null = null;
@@ -284,7 +292,7 @@ export class SemantropyView extends ItemView {
 	 * change keeps Refresh blocked, as it always has. Open and close
 	 * supersede both.
 	 */
-	private bodyTask: { id: number; message: string; cancellable: boolean } | null = null;
+	private bodyTask: { id: number; message: string; cancellable: boolean; prominent: boolean } | null = null;
 	private bodyTaskCount = 0;
 	private pendingLevelChange: Promise<BodyLevelChangeOutcome> | null = null;
 	private pendingLevelSave = false;
@@ -296,6 +304,10 @@ export class SemantropyView extends ItemView {
 	private bodyEl: HTMLElement | null = null;
 	/** The only scrolling region: the Toolbar and the status line stay put. */
 	private scrollEl: HTMLElement | null = null;
+	/** 0.1.0 S1: the centred "working" card over the body while the Target or the Vocabulary is being prepared. */
+	private busyEl: HTMLElement | null = null;
+	private busyTextEl: HTMLElement | null = null;
+	private busyDetailEl: HTMLElement | null = null;
 	private toolbar: SemantropyToolbar | null = null;
 	private loadButton: HTMLButtonElement | null = null;
 	private unbindLoad: (() => void) | null = null;
@@ -396,7 +408,11 @@ export class SemantropyView extends ItemView {
 	 * items fit its one row; its own ResizeObserver does the same for any other
 	 * width change.
 	 */
-	onResize(): void { this.toolbar?.refreshLayout(); }
+	onResize(): void {
+		this.toolbar?.refreshLayout();
+		// The Toolbar may have changed height; the work card follows the body's top edge.
+		this.syncBusyOverlay();
+	}
 
 	async onOpen(): Promise<void> {
 		this.unregisterAutomatic?.();
@@ -405,6 +421,7 @@ export class SemantropyView extends ItemView {
 		this.collisionDisabled = false;
 		this.closeFakeProverb();
 		this.fakeProverbDisabled = false;
+		this.closeRecompose();
 		this.closeVocabularyPicker();
   this.definitionCache.clear();
 		this.cancelVocabularyPreparation();
@@ -428,6 +445,7 @@ export class SemantropyView extends ItemView {
 		this.automaticToolbar?.dispose(); this.automaticToolbar = null;
 		this.closeCollision();
 		this.closeFakeProverb();
+		this.closeRecompose();
 		this.closeVocabularyPicker();
   this.dictionaryPopover?.dispose(); this.dictionaryPopover = null;
   this.definitionCache.clear(); this.diagnosticSnapshot = null; this.diagnosticCounts = null;
@@ -452,6 +470,11 @@ export class SemantropyView extends ItemView {
 	}
 
 	/** Mode and paths are session-only; the persisted draw mode seeds the draft. */
+	/** The delimiter pairs a Vocabulary Source is read with: the standard pair plus the host's valid extras. */
+	private enclosedTerms(): readonly EnclosedTermDelimiter[] {
+		return enclosedTermSyntax(this.host.getEnclosedTermDelimiters?.() ?? []);
+	}
+
 	private initialSelection(): VocabularySelection {
 		return { ...initialVocabularySelection(), drawMode: this.displaySettings().vocabularyDrawMode };
 	}
@@ -521,6 +544,21 @@ export class SemantropyView extends ItemView {
 		this.fakeProverbModal = null; this.fakeProverbSession = null;
 	}
 	disableFakeProverb(): void { this.fakeProverbDisabled = true; this.closeFakeProverb(); }
+	/**
+	 * 0.1.0 S5: Recompose over the same active owner as Collision and Fake
+	 * proverb. The dialog keeps its output only while it is open.
+	 */
+	openRecompose(): void {
+		if (this.lifecycle.closed || this.recomposeModal) return;
+		this.dictionaryPopover?.close(); this.closeManualMenu();
+		const origin = this.modalOrigin();
+		const modal = new RecomposeModal(this.app, { active: () => this.collisionVocabulary(), nonce: () => issueUint32Seed(),
+			paint: () => this.scheduler().paint(), copy: text => this.host.writeClipboard(text), collect: input => this.host.collectFragment(input) }, () => {
+			if (this.recomposeModal === modal) this.recomposeModal = null;
+		}, origin);
+		this.recomposeModal = modal; modal.open();
+	}
+	closeRecompose(): void { this.recomposeModal?.close(); this.recomposeModal = null; }
 	disableAutomatic(): void { this.targetBody.invalidateAutomatic("plugin-disable"); void this.onClose(); }
 
 	private mountAutomatic(parent: HTMLElement): void {
@@ -691,7 +729,8 @@ export class SemantropyView extends ItemView {
 			const prepared = await prepareVocabulary({ selection, target,
 				readText: path => this.host.readCurrentText(path),
 				tokenizer: this.host.getTokenizer(), isCurrent: current, checkpoint: () => slice.checkpoint(),
-				progress: (done, total) => { if (current()) { this.sourceProgress = { done, total }; this.syncVocabularyChrome(); } } });
+				progress: (done, total) => { if (current()) { this.sourceProgress = { done, total }; this.syncVocabularyChrome(); } },
+				enclosedTerms: this.enclosedTerms() });
 			if (!prepared || !current()) return "aborted";
 			const staged = target ? await body.prepareVocabulary(prepared, { scheduler, isCurrent: current }) : null;
 			world = new FakeDictionaryWorld();
@@ -890,7 +929,7 @@ export class SemantropyView extends ItemView {
 		const token = this.lifecycle.busy.acquire();
 		if (token === null) return "busy";
 		const body = this.targetBody, scheduler = this.scheduler();
-		const task = this.beginBodyTask("Loading next section…", true);
+		const task = this.beginBodyTask("Loading next section…", true, false);
 		const current = () => this.isBodyTaskCurrent(task) && this.targetBody === body && this.session.getReadySnapshot() === state.snapshot;
 		try {
 			await scheduler.paint();
@@ -1327,7 +1366,7 @@ export class SemantropyView extends ItemView {
   if (this.lifecycle.closed) return "aborted";
   const token = this.lifecycle.busy.acquire(); if (token === null) return "busy";
   const owner = this.targetBody;
-  const task = this.beginBodyTask("Updating markers…", true);
+  const task = this.beginBodyTask("Updating markers…", true, false);
   const current = () => this.isBodyTaskCurrent(task) && this.targetBody === owner;
   try {
    this.updateChrome();
@@ -1661,6 +1700,8 @@ export class SemantropyView extends ItemView {
 			automaticPos: this.host.getAutomaticPos?.(),
 			vocabularySources: this.vocabularySelection.mode === "selected" ? this.targetBody.getVocabularySources() : undefined,
 			drawMode: this.vocabularySelection.drawMode,
+			sourceWeights: selectionSourceWeights(this.vocabularySelection),
+			enclosedTerms: this.enclosedTerms(),
 			targetSize: this.host.targetChunkSize ?? PROVISIONAL_TARGET_CHUNK_SIZE,
 			targetRevision: requestId,
 			snapshot,
@@ -1699,9 +1740,10 @@ export class SemantropyView extends ItemView {
 		};
 	}
 
-	private beginBodyTask(message: string, cancellable: boolean): number {
+	/** `prominent: false` keeps a quick, local task (the next section, markers) out of the centred card. */
+	private beginBodyTask(message: string, cancellable: boolean, prominent = true): number {
 		this.bodyTaskCount += 1;
-		this.bodyTask = { id: this.bodyTaskCount, message, cancellable };
+		this.bodyTask = { id: this.bodyTaskCount, message, cancellable, prominent };
 		this.updateChrome();
 		return this.bodyTaskCount;
 	}
@@ -1841,6 +1883,7 @@ export class SemantropyView extends ItemView {
 			collect: () => { void this.collectSelectedFragment(); },
 			collision: () => this.openCollision(),
 			fakeProverb: () => this.openFakeProverb(),
+			...(this.host.recomposeDialog === false ? {} : { recompose: () => this.openRecompose() }),
 			cancelVocabulary: () => { this.cancelVocabulary(); },
 			setBodySemantropy: (value) => { this.onLevelSelected(value); },
 			setDisplay: (patch) => { void this.changeDisplaySettings(patch); },
@@ -1865,6 +1908,13 @@ export class SemantropyView extends ItemView {
    if (modifier.value === "alt" || modifier.value === "shift") void this.changeDisplaySettings({ dictionaryModifier: modifier.value });
   });
   this.scrollEl = root.createDiv({ cls: "semantropy-scroll" });
+  // Visual only: the status line above already announces the same state.
+  this.busyEl = root.createDiv({ cls: "semantropy-busy", attr: { "aria-hidden": "true" } });
+  this.busyEl.hidden = true;
+  const busyCard = this.busyEl.createDiv({ cls: "semantropy-busy-card" });
+  busyCard.createDiv({ cls: "semantropy-busy-spinner" });
+  this.busyTextEl = busyCard.createDiv({ cls: "semantropy-busy-text" });
+  this.busyDetailEl = busyCard.createDiv({ cls: "semantropy-busy-detail" });
 		if (ready) {
 			this.bodyEl = this.scrollEl.createDiv({ cls: SEMANTROPY_BODY_CLASS });
 			this.loadButton = this.scrollEl.createEl("button", {
@@ -1882,6 +1932,8 @@ export class SemantropyView extends ItemView {
 		}
 		this.applyBodyDisplayStyles();
 		this.syncTokenAffordance();
+		// An Open draws the shell and then waits for analysis without another chrome pass.
+		this.syncBusyOverlay();
 	}
 
 	/**
@@ -1895,17 +1947,26 @@ export class SemantropyView extends ItemView {
 	 * Collect return: readings were never part of the logical text.
 	 */
 	private applyBodyDisplayStyles(): void {
+		const display = this.displaySettings();
+		// 0.1.0 S2: the theme and the custom colours belong to the whole preview
+		// region, so the space below the text matches it; the Toolbar keeps the host's.
+		const scroll = this.scrollEl;
+		if (scroll) {
+			scroll.classList.toggle("semantropy-theme-light", display.bodyTheme === "light");
+			scroll.classList.toggle("semantropy-theme-dark", display.bodyTheme === "dark");
+			const palette = display.bodyTheme === "default" ? null : BODY_THEME_PALETTES[display.bodyTheme];
+			for (const name of Object.keys(BODY_THEME_PALETTES.light)) scroll.style.setProperty(name, palette?.[name] ?? "");
+			scroll.style.setProperty("background-color", display.bodyBackground ?? "");
+			scroll.style.setProperty("color", display.bodyForeground ?? "");
+		}
 		const body = this.bodyEl;
 		if (!body) return;
-		const display = this.displaySettings();
 		const stack = BODY_FONT_STACKS[display.bodyFontFamily];
 		body.style.setProperty("font-family", stack ?? "");
 		body.style.setProperty(
 			"font-size",
 			display.bodyFontSizePx === null ? "" : `${display.bodyFontSizePx}px`,
 		);
-		body.style.setProperty("background-color", display.bodyBackground ?? "");
-		body.style.setProperty("color", display.bodyForeground ?? "");
 		body.classList.toggle("is-ruby-hidden", !display.showRuby);
 	}
 
@@ -2100,13 +2161,42 @@ export class SemantropyView extends ItemView {
 		this.automaticToolbar?.setBlocked(this.lifecycle.busy.isBusy());
 		this.collisionModal?.sync();
 		this.fakeProverbModal?.sync();
+		this.recomposeModal?.sync();
   this.dictionaryPopover?.validate(); this.syncDictionaryDiagnostics();
 		if (this.manualMenu && this.manualMenuRevision !== this.targetBody.getDisplayRevision()) this.closeManualMenu();
 		this.syncVocabularyChrome();
 		this.toolbar?.sync();
 		this.syncLoadControl();
 		this.syncTokenAffordance();
+		this.syncBusyOverlay();
 		this.retryMarkerVisibility();
+	}
+
+	/**
+	 * Shows the centred card while the Target is being opened, analyzed,
+	 * reshuffled, refreshed or re-levelled, or while the Vocabulary is being
+	 * prepared. It reads the same status model as the status line, so the two
+	 * never disagree; the committed body stays underneath, dimmed.
+	 */
+	private syncBusyOverlay(): void {
+		const overlay = this.busyEl;
+		if (!overlay || !this.busyTextEl || !this.busyDetailEl) return;
+		const status = this.statusModel();
+		const show = !this.lifecycle.closed && (status.kind === "preparing-vocabulary"
+			|| (status.kind === "loading-target" && this.bodyTask?.prominent !== false));
+		if (!show) {
+			if (!overlay.hidden) overlay.hidden = true;
+			return;
+		}
+		const text = status.message ? localize(status.message) : "";
+		const detail = status.detail ? localize(status.detail) : "";
+		if (this.busyTextEl.textContent !== text) this.busyTextEl.textContent = text;
+		if (this.busyDetailEl.textContent !== detail) this.busyDetailEl.textContent = detail;
+		this.busyDetailEl.hidden = detail === "";
+		// Cover the scrolling body only: the Toolbar and its Cancel stay usable.
+		const top = this.scrollEl ? this.scrollEl.offsetTop : 0;
+		overlay.style.setProperty("top", `${top}px`);
+		if (overlay.hidden) overlay.hidden = false;
 	}
 
 	/**
@@ -2119,9 +2209,18 @@ export class SemantropyView extends ItemView {
 	private syncTokenAffordance(): void {
 		const body = this.bodyEl;
 		if (!body) return;
-		const idle = !this.lifecycle.closed && !this.lifecycle.busy.isBusy() && this.targetBody.isDisplayIntact();
+		const idle = this.tokenActionIdle();
 		body.classList.toggle("is-manual-live", idle);
-		body.classList.toggle("is-dictionary-live", idle && this.dictionaryLive() && !this.dictionaryBusy.isBusy() && !this.vocabularyTask);
+		body.classList.toggle("is-dictionary-live", idle && this.dictionaryActionable());
+	}
+
+	private tokenActionIdle(): boolean {
+		return !this.lifecycle.closed && !this.lifecycle.busy.isBusy() && this.targetBody.isDisplayIntact();
+	}
+
+	/** Whether looking a word up would act now; the dictionary cursor and the word menu's item share it. */
+	private dictionaryActionable(): boolean {
+		return this.dictionaryLive() && !this.dictionaryBusy.isBusy() && !this.vocabularyTask;
 	}
 
 	/** The View-wide half of a Fake Dictionary hover's currency; the target checks the rest. */
@@ -2270,7 +2369,9 @@ export class SemantropyView extends ItemView {
 			const target = event.target instanceof Element ? event.target.closest<HTMLElement>(".semantropy-token") : null;
 			if (!target || !body.contains(target)) return;
 			const slot = this.targetBody.getSlotForElement(target);
-			if (!slot?.manualEligible) return;
+			// 0.1.0 S1: a word that offers only the Fake Dictionary opens the same menu with that one item,
+			// and only while looking it up would act (the same rule as its cursor).
+			if (!slot?.manualEligible && !(slot?.dictionaryAvailable && this.tokenActionIdle() && this.dictionaryActionable())) return;
 			if (!keyboard) {
 				const mouse = event as MouseEvent;
 				if (mouse.detail !== 1 || !this.contentEl.ownerDocument.getSelection()?.isCollapsed) return;
@@ -2295,7 +2396,22 @@ export class SemantropyView extends ItemView {
 			labels.text(button, label);
 			button.addEventListener("click", () => this.runManual(action, slot));
 		};
-		add(() => ui().view.manualShuffle, "shuffle", !slot.manualAvailable); add(() => ui().view.manualRestore, "restore"); add(() => ui().view.manualAutomatic, "automatic", !this.targetBody.hasManualOverride(slot));
+		if (slot.manualEligible) {
+			add(() => ui().view.manualShuffle, "shuffle", !slot.manualAvailable); add(() => ui().view.manualRestore, "restore"); add(() => ui().view.manualAutomatic, "automatic", !this.targetBody.hasManualOverride(slot));
+		}
+		if (slot.dictionaryAvailable) {
+			// 0.1.0 S1: the Fake Dictionary without a modifier key or the command palette.
+			// The word's own span is the selection, so the page's selection is left alone
+			// and defineSelectedWord applies exactly its one-word checks.
+			const define = menu.createEl("button", { attr: { type: "button", role: "menuitem" } });
+			define.disabled = !this.dictionaryActionable();
+			labels.text(define, () => ui().view.manualDefine);
+			define.addEventListener("click", () => {
+				const range = origin.ownerDocument.createRange();
+				range.selectNodeContents(origin);
+				void this.defineSelectedWord({ selection: { rangeCount: 1, getRangeAt: () => range } });
+			});
+		}
 		this.manualMenuLabels = labels;
 		menu.addEventListener("keydown", event => { if (event.key === "Escape") { event.preventDefault(); this.closeManualMenu(true); } });
 		this.manualMenu = menu; this.manualMenuOrigin = origin;
@@ -2604,7 +2720,7 @@ export class SemantropyView extends ItemView {
   if (!this.bodyEl || !this.scrollEl) return;
   this.dictionaryPopover = new DictionaryPopoverController(root, this.bodyEl, this.scrollEl, {
    modifier: () => this.displaySettings().dictionaryModifier,
-   canStart: () => !this.lifecycle.closed && !this.lifecycle.busy.isBusy() && !this.dictionaryBusy.isBusy() && !this.vocabularyTask && !this.definitionModal?.isOpen() && !this.collisionModal && !this.fakeProverbModal,
+   canStart: () => !this.lifecycle.closed && !this.lifecycle.busy.isBusy() && !this.dictionaryBusy.isBusy() && !this.vocabularyTask && !this.definitionModal?.isOpen() && !this.collisionModal && !this.fakeProverbModal && !this.recomposeModal,
    resolve: element => this.hoverTarget(element),
    begin: target => { this.closeManualMenu(); void this.defineHoverTarget(target); },
    closed: () => { this.pendingDefineId = null; this.definitionError = null; this.dictionaryWorld.invalidateDisplay(); },
@@ -2692,6 +2808,7 @@ export class SemantropyView extends ItemView {
 		this.dictionaryPopover?.relabel();
 		this.collisionModal?.relabel();
 		this.fakeProverbModal?.relabel();
+		this.recomposeModal?.relabel();
 		this.syncDictionaryDiagnostics();
 	}
 
@@ -2700,6 +2817,9 @@ export class SemantropyView extends ItemView {
 		this.loadButton = null;
 		this.bodyEl = null;
 		this.scrollEl = null;
+		this.busyEl = null;
+		this.busyTextEl = null;
+		this.busyDetailEl = null;
 	}
 }
 

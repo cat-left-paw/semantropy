@@ -3,10 +3,11 @@ import { CollisionSession, collisionMessage } from "./CollisionSession";
 import { ui } from "../i18n/catalog";
 import { localize } from "../i18n/messages";
 import { UiLabels } from "../i18n/uiLabels";
+import { iconLabel } from "./controlIcon";
 
 type RowUI = {
 	root: HTMLElement; text: HTMLElement; pattern: HTMLElement; status: HTMLElement;
-	selector: HTMLSelectElement; regenerate: HTMLButtonElement; cancel: HTMLButtonElement;
+	regenerate: HTMLButtonElement; cancel: HTMLButtonElement;
 	copy: HTMLButtonElement; collect: HTMLButtonElement; off: (() => void)[]; labels: UiLabels;
 };
 
@@ -18,6 +19,14 @@ type RowUI = {
 export function collisionRecipeLabel(recipe: { id: string; label: string }): string {
 	return Object.prototype.hasOwnProperty.call(ui().collision.recipeLabels, recipe.id) ? ui().collision.recipeLabels[recipe.id]! : recipe.label;
 }
+/**
+ * 0.1.0: a row's "Regenerating…" note and its Cancel appear only when the work
+ * outlasts this. A quick regeneration then changes the row's text alone, so the
+ * rows below never jump for a moment (the owner saw a flicker). `aria-busy` is
+ * still set at once.
+ */
+export const COLLISION_ROW_PENDING_DELAY_MS = 300;
+
 /** Text-only, keyed rows. A row commit never reconstructs the dialog or scroll box. */
 export class CollisionModal extends Modal {
 	private rows = new Map<string, RowUI>();
@@ -31,6 +40,9 @@ export class CollisionModal extends Modal {
 	private origin: HTMLElement | null;
 	/** LOCALE1: the dialog's fixed texts; each row keeps its own. */
 	private labels = new UiLabels();
+	/** When each row's pending work was first seen, and the one timer that re-syncs when a row's delay ends. */
+	private pendingSince = new Map<string, number>();
+	private pendingTimer: number | null = null;
 	constructor(app: App, private session: CollisionSession | null, private closed: (() => void) | null, origin: HTMLElement | null) {
 		super(app); this.origin = origin;
 	}
@@ -39,6 +51,18 @@ export class CollisionModal extends Modal {
 	}
 	private button(parent: HTMLElement, text: () => string, action: () => void, off = this.off, labels = this.labels) {
 		const el = this.element(parent, "button"); el.type = "button"; labels.text(el, text);
+		el.addEventListener("click", action); off.push(() => el.removeEventListener("click", action)); return el;
+	}
+	/**
+	 * 0.1.0 S1: a row action as an icon-only button. Its name is the `aria-label`
+	 * (Obsidian's tooltip) and a label span that stays hidden except on touch screens.
+	 */
+	private iconButton(parent: HTMLElement, icon: string, name: () => string, action: () => void, off: (() => void)[], labels: UiLabels) {
+		const el = this.element(parent, "button"); el.type = "button"; el.className = "semantropy-action semantropy-modal-row-action is-icon-only";
+		iconLabel(el, icon, name());
+		labels.attr(el, "aria-label", name);
+		const label = el.querySelector<HTMLElement>(".semantropy-action-label");
+		if (label) labels.text(label, name);
 		el.addEventListener("click", action); off.push(() => el.removeEventListener("click", action)); return el;
 	}
 	private select(parent: HTMLElement, name: () => string, options: readonly { id: string; label: () => string }[], labels = this.labels) {
@@ -80,17 +104,16 @@ export class CollisionModal extends Modal {
 		const labels = new UiLabels();
 		const root = this.element(this.list!, "li"); root.className = "semantropy-collision-row";
 		const text = this.element(root, "p"); text.className = "semantropy-collision-text";
-		const pattern = this.element(root, "p");
-		const controls = this.element(root, "div"); controls.className = "semantropy-collision-controls";
-		const selector = this.select(controls, () => ui().collision.regenerateWith, [{ id: "", label: () => ui().collision.samePattern }, ...this.recipes(this.session!.rowOptions())], labels);
-		const change = () => this.session?.select(slot, selector.value === "" ? { kind: "same" } : { kind: "fixed", recipeId: selector.value });
-		selector.addEventListener("change", change); off.push(() => selector.removeEventListener("change", change));
-		const regenerate = this.button(controls, () => ui().collision.regenerate, () => { void this.session?.regenerate(slot); }, off, labels);
-		const cancel = this.button(controls, () => ui().common.cancel, () => { this.session?.cancel(slot); regenerate.focus(); }, off, labels);
-		const copy = this.button(controls, () => ui().common.copy, () => { void this.session?.write(slot, "copy"); }, off, labels);
-		const collect = this.button(controls, () => ui().common.collect, () => { void this.session?.write(slot, "collect"); }, off, labels);
+		// 0.1.0 S1: the pattern and the row's actions share one line; a row regenerates with its own pattern.
+		const meta = this.element(root, "div"); meta.className = "semantropy-collision-meta";
+		const pattern = this.element(meta, "span"); pattern.className = "semantropy-collision-pattern";
+		const controls = this.element(meta, "div"); controls.className = "semantropy-modal-row-actions";
+		const regenerate = this.iconButton(controls, "dices", () => ui().collision.regenerate, () => { void this.session?.regenerate(slot); }, off, labels);
+		const cancel = this.iconButton(controls, "x", () => ui().common.cancel, () => { this.session?.cancel(slot); regenerate.focus(); }, off, labels);
+		const copy = this.iconButton(controls, "copy", () => ui().common.copy, () => { void this.session?.write(slot, "copy"); }, off, labels);
+		const collect = this.iconButton(controls, "inbox", () => ui().common.collect, () => { void this.session?.write(slot, "collect"); }, off, labels);
 		const status = this.element(root, "p"); status.setAttribute("role", "status"); status.setAttribute("aria-live", "polite");
-		return { root, text, pattern, selector, regenerate, cancel, copy, collect, status, off, labels };
+		return { root, text, pattern, regenerate, cancel, copy, collect, status, off, labels };
 	}
 	sync() {
 		const session = this.session, state = session?.read();
@@ -118,18 +141,33 @@ export class CollisionModal extends Modal {
 			if (ui.text.textContent !== row.committed.text) ui.text.textContent = row.committed.text;
 			const pattern = t.collision.currentPattern(collisionRecipeLabel(batch!.patternSet.recipes.find(recipe => recipe.id === row.committed.recipeId)!));
 			if (ui.pattern.textContent !== pattern) ui.pattern.textContent = pattern;
-			ui.selector.value = draft.selector.kind === "same" ? "" : draft.selector.recipeId;
-			ui.selector.disabled = ui.regenerate.disabled = !!state?.generation.pending;
-			ui.cancel.hidden = !draft.pending;
+			ui.regenerate.disabled = !!state?.generation.pending;
+			const shown = this.pendingShown(row.rowSlotId, draft.pending);
+			ui.cancel.hidden = !shown;
 			ui.copy.disabled = ui.collect.disabled = !session.canWrite(row.rowSlotId);
 			ui.root.setAttribute("aria-busy", String(draft.pending));
-			const status = t.common.join([draft.pending ? t.collision.regenerating : localize(collisionMessage(draft.lastError) || session.rowFeedback(row.rowSlotId, row.committed.rowId)),
+			const status = t.common.join([draft.pending ? shown ? t.collision.regenerating : "" : localize(collisionMessage(draft.lastError) || session.rowFeedback(row.rowSlotId, row.committed.rowId)),
 				draft.selector.kind === "fixed" && draft.selector.recipeId !== row.committed.recipeId ? t.collision.draft : "",
 				row.committed.limited ? t.collision.limited : ""]);
 			if (ui.status.textContent !== status) ui.status.textContent = status;
 		}
 	}
+	/** Whether a row's pending work has lasted long enough to be shown; schedules a re-sync for when it will. */
+	private pendingShown(slot: string, pending: boolean): boolean {
+		if (!pending) { this.pendingSince.delete(slot); return false; }
+		const now = Date.now(), since = this.pendingSince.get(slot) ?? now;
+		this.pendingSince.set(slot, since);
+		const remaining = since + COLLISION_ROW_PENDING_DELAY_MS - now;
+		if (remaining <= 0) return true;
+		const view = this.contentEl.ownerDocument.defaultView;
+		if (view && this.pendingTimer === null) {
+			this.pendingTimer = view.setTimeout(() => { this.pendingTimer = null; this.sync(); }, remaining);
+		}
+		return false;
+	}
 	onClose() {
+		if (this.pendingTimer !== null) this.contentEl.ownerDocument.defaultView?.clearTimeout(this.pendingTimer);
+		this.pendingTimer = null; this.pendingSince.clear();
 		this.session?.dispose(); this.session = null;
 		for (const row of this.rows.values()) { for (const off of row.off) off(); row.labels.clear(); }
 		for (const off of this.off) off(); this.off = []; this.rows.clear(); this.labels.clear();

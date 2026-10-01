@@ -18,9 +18,9 @@ describe("Collision batch dependency boundary", () => {
 			"src/application/collectVocabulary.ts", "src/collect/collectProvenance.ts", "src/collision/collisionBatch.ts",
 			"src/collision/collisionCore.ts", "src/collision/collisionLexemePool.ts", "src/collision/collisionVocabulary.ts",
 			"src/collision/compilePatternSet.ts", "src/collision/patternData.ts", "src/collision/regularInflection.ts",
-			"src/dictionary/placeholders.ts", "src/path/vaultRelativePath.ts", "src/random/seededRandom.ts", "src/transform/manualMorphology.ts",
+			"src/dictionary/placeholders.ts", "src/path/vaultRelativePath.ts", "src/random/seededRandom.ts", "src/text/enclosedTermDelimiters.ts", "src/transform/manualMorphology.ts",
 			"src/transform/regularConjugationTypes.ts", "src/transform/slotScore.ts", "src/transform/tokenPolicy.ts",
-			"src/transform/transformTokens.ts", "src/vocabulary/sha256.ts", "src/vocabulary/vocabularySnapshot.ts",
+			"src/transform/transformTokens.ts", "src/vocabulary/enclosedTerms.ts", "src/vocabulary/sha256.ts", "src/vocabulary/sourceWeights.ts", "src/vocabulary/vocabularySnapshot.ts",
 		]);
 		expect(inputs.join("\n")).not.toMatch(/node_modules|\/tokenizer\/|\/view\/|\/render\/|\/settings\/|fragmentRepository|generated\//u);
 		expect(code).not.toMatch(/MarkdownRenderer|\bVault\b|TFile|fetch\(|XMLHttpRequest|WebSocket|DOMParser|document\.|window\.|navigator\.|require\(|node:fs|readFile|writeFile|resourcePath|clipboard|localStorage|saveData|loadData/u);

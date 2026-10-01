@@ -1,10 +1,11 @@
 import type { LocatedAnalysisRun } from "../analysis/locateTokens";
-import { vocabularyDisplayFormId, type VerifiedRubyVariant } from "../analysis/rubyVocabulary";
+import { vocabularyDisplayFormId, type VerifiedRubyVariant, type VocabularyOrigin } from "../analysis/rubyVocabulary";
 import { adverbSurfaceEndsWithTo } from "../adverb/adverbFamily";
 import { readAdverbBridge } from "./maxAdverbBridge";
 import type { BodySemantropy } from "../settings/bodySemantropy";
 import { createSeededRandom, type SeededRandom } from "../random/seededRandom";
 import { sha256Hex } from "../vocabulary/sha256";
+import { drawWeight, sourceWeightLookup } from "../vocabulary/sourceWeights";
 import { transformWithVocabularySnapshot, type VocabularySourceIdentity } from "../vocabulary/vocabularySnapshot";
 import { evaluateManualMorphSlot, manualMorphConnection, readManualMorphVocabularySources, type ManualMorphCandidate,
 	type ManualMorphSourceAnalysis, type ManualMorphVocabulary } from "./manualMorphology";
@@ -65,9 +66,10 @@ export type MaxResult = {
 	readonly replaceableSlotCount: number;
 	readonly replacementCount: number;
 };
-type RecordLike = Pick<ManualMorphCandidate, "candidateId" | "displayFormId" | "surface" | "frequency" | "verifiedRubyVariants">;
+type RecordLike = Pick<ManualMorphCandidate, "candidateId" | "displayFormId" | "surface" | "frequency" | "origins" | "verifiedRubyVariants">;
 type Entry = { readonly record: RecordLike; readonly lexeme: null } | { readonly record: null; readonly lexeme: MaxLexeme; readonly key: MaxTargetFormKey };
-type Group = { readonly surface: string; readonly frequency: number; readonly entries: readonly Entry[] };
+/** `origins` are every origin the group's frequency counts (a Source may repeat); only Source weights read them. */
+type Group = { readonly surface: string; readonly frequency: number; readonly origins: readonly (readonly VocabularyOrigin[])[]; readonly entries: readonly Entry[] };
 type Choice = { readonly surface: string; readonly frequency: number; readonly candidates: readonly ManualMorphCandidate[] };
 type TargetState = { projection: MaxProjection; vocabulary: ManualMorphVocabulary; authority: ManualAdverbAuthority;
 	source: ManualMorphSourceAnalysis; runs: readonly LocatedAnalysisRun[]; strict: Map<string, readonly Choice[]>;
@@ -144,10 +146,11 @@ function legacyRuby(record: RecordLike, random: SeededRandom): VerifiedRubyVaria
 	return record.verifiedRubyVariants.length ? draw(record.verifiedRubyVariants, variant => variant.frequency, random) : null;
 }
 function grouped(entries: readonly (Entry & { surface: string; weight: number })[]): readonly Group[] {
-	const bySurface = new Map<string, { surface: string; frequency: number; entries: Entry[] }>();
+	const bySurface = new Map<string, { surface: string; frequency: number; origins: (readonly VocabularyOrigin[])[]; entries: Entry[] }>();
 	for (const entry of entries) {
-		const group = bySurface.get(entry.surface) ?? { surface: entry.surface, frequency: 0, entries: [] };
+		const group = bySurface.get(entry.surface) ?? { surface: entry.surface, frequency: 0, origins: [], entries: [] };
 		group.frequency += entry.weight;
+		group.origins.push(entry.lexeme ? entry.lexeme.origins : entry.record.origins);
 		if (!Number.isSafeInteger(group.frequency)) refuse("invalid-projection");
 		group.entries.push(entry.lexeme ? { record: null, lexeme: entry.lexeme, key: entry.key } : { record: entry.record, lexeme: null });
 		bySurface.set(entry.surface, group);
@@ -244,7 +247,7 @@ function adverbRelaxed(state: TargetState, followedByTo: boolean, currentSurface
 function nounPool(projection: MaxProjection, vocabulary: ManualMorphVocabulary) {
 	const previous = NOUN_POOLS.get(projection); if (previous) return previous;
 	const records = new Map(vocabulary.snapshot.projections.manual.candidates.map(record => [record.displayFormId, record as RecordLike]));
-	const groups = frozen(projection.noun.family.map(surface => ({ surface: surface.surface, frequency: surface.frequency,
+	const groups = frozen(projection.noun.family.map(surface => ({ surface: surface.surface, frequency: surface.frequency, origins: [surface.origins],
 		entries: surface.candidates.map(ref => ({ record: records.get(ref.displayFormId)!, lexeme: null })) })));
 	const value = { groups, records }; NOUN_POOLS.set(projection, value); return value;
 }
@@ -284,6 +287,10 @@ export function transformMax(input: { projection: MaxProjection; target: MaxTarg
 		const base = (part: Part) => bases.get(part) ?? bases.set(part, { profile: maxDomainBase(nonce, part, "profile"),
 			surface: maxDomainBase(nonce, part, "surface"), identity: maxDomainBase(nonce, part, "identity"), ruby: maxDomainBase(nonce, part, "ruby") }).get(part)!;
 		const nouns = options.noun ? nounPool(projection, owned.vocabulary) : null;
+		// 0.1.0 S3: without Source weights both weights below are the existing expressions exactly.
+		const weights = sourceWeightLookup(owned.vocabulary.snapshot);
+		const choiceWeight = (group: Choice) => drawWeight(projection.drawMode, weights, group.frequency, () => group.candidates.flatMap(candidate => candidate.origins));
+		const groupWeight = (group: Group) => drawWeight(projection.drawMode, weights, group.frequency, () => group.origins.flat());
 		let replaceableSlotCount = 0, replacementCount = 0;
 		for (const [i, run] of runs.entries()) for (const [j, item] of run.tokens.entries()) {
 			const token = item.token;
@@ -302,7 +309,7 @@ export function transformMax(input: { projection: MaxProjection; target: MaxTarg
 				const strict = strictChoices(state, run, j, part, currentSurface, adverbContext);
 				if (strict.length) {
 					// Consumed for every strict-eligible slot in order, exactly as Body 10 does, whatever profile the slot takes.
-					strictPick = { group: draw(strict, group => projection.drawMode === "frequency" ? group.frequency : 1, legacy[part]) };
+					strictPick = { group: draw(strict, choiceWeight, legacy[part]) };
 					strictEligible = true;
 				}
 			}
@@ -337,7 +344,7 @@ export function transformMax(input: { projection: MaxProjection; target: MaxTarg
 				}
 			} else {
 				const domains = base(part);
-				const group = pick(available, candidate => projection.drawMode === "frequency" ? candidate.frequency : 1,
+				const group = pick(available, groupWeight,
 					maxUnit(maxSlotHash(domains.surface, [item.tokenId, profile])));
 				const entry = group.entries[Math.floor(maxUnit(maxSlotHash(domains.identity, [item.tokenId, group.surface])) * group.entries.length)]!;
 				let record: RecordLike | null = entry.record, realization: MaxRealizationEvidence | null = null;

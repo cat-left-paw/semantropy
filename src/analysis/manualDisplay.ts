@@ -1,5 +1,6 @@
 import { alternativeSurfaceCount, type DisplaySlot, type DisplaySlotPlan, type ManualDiagnosticReason, type ManualOverride } from "./displaySlots";
-import { chooseRubyVariant, chooseVocabularyCandidate, freezeAnalysis, type VocabularyCandidate } from "./rubyVocabulary";
+import { chooseRubyVariant, chooseVocabularyCandidate, freezeAnalysis, type VocabularyCandidate, type VocabularyOrigin } from "./rubyVocabulary";
+import { drawWeight, sourceWeightLookup } from "../vocabulary/sourceWeights";
 import { evaluateManualMorphSlot, isManualMorphVocabulary, type ManualMorphRejection, type ManualMorphVocabulary } from "../transform/manualMorphology";
 import { isEligibleReplacementToken, vocabularyPoolKey } from "../transform/tokenPolicy";
 import { createSeededRandom } from "../random/seededRandom";
@@ -32,19 +33,22 @@ export function drawManualOverride(active: ManualMorphVocabulary, run: readonly 
 	const seed = manualSeed(generation, snapshot.fingerprint, slot.tokenId, localRevision), random = createSeededRandom(seed);
 	const morph = slot.manualClass !== "noun" ? morphChoices(active, run, slot, slot.displaySurface) : null;
 	if (morph && !morph.available) return null;
-	const buckets = new Map<string, { surface: string; frequency: number }>();
+	const buckets = new Map<string, { surface: string; frequency: number; origins: (readonly VocabularyOrigin[])[] }>();
 	const records = morph?.candidates ?? [];
 	const input = morph ? records : snapshot.projections.automaticBody.buckets.find(b => b.key === vocabularyPoolKey(slot.originalToken))?.surfaces ?? [];
 	for (const item of input) if (item.surface !== slot.displaySurface) {
 		const old = buckets.get(item.surface);
-		buckets.set(item.surface, { surface: item.surface, frequency: (old?.frequency ?? 0) + item.frequency });
+		buckets.set(item.surface, { surface: item.surface, frequency: (old?.frequency ?? 0) + item.frequency, origins: [...old?.origins ?? [], item.origins] });
 	}
 	const choices = [...buckets.values()];
 	if (!choices.length) return null;
 	let chosen = choices[Math.floor(random.next() * choices.length)]!;
-	if (snapshot.drawMode === "frequency") {
-		let draw = random.next() * choices.reduce((sum, item) => sum + item.frequency, 0);
-		for (const item of choices) { draw -= item.frequency; if (draw < 0) { chosen = item; break; } }
+	// 0.1.0 S3: without Source weights both draws are exactly as before. With them, the second draw is weighted in either mode.
+	const weights = sourceWeightLookup(snapshot);
+	if (snapshot.drawMode === "frequency" || weights) {
+		const weightOf = (item: (typeof choices)[number]) => drawWeight(snapshot.drawMode, weights, item.frequency, () => item.origins.flat());
+		let draw = random.next() * choices.reduce((sum, item) => sum + weightOf(item), 0);
+		for (const item of choices) { draw -= weightOf(item); if (draw < 0) { chosen = item; break; } }
 	}
 	if (!morph) {
 		const vocabulary = snapshotRubyVocabulary(snapshot);

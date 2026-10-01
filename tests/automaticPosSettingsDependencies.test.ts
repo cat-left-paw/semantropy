@@ -7,7 +7,9 @@ async function graph(entry: string) {
 }
 const base = ["path/vaultRelativePath", "settings/semantropyRange", "settings/bodySemantropy", "settings/dictionarySemantropy", "settings/collectionPath", "settings/displaySettings", "settings/semantropySettings", "settings/settingsData", "settings/automaticPosSettings",
 	// LOCALE1: schema 5 reads the closed interface-language pair from its pure leaf.
-	"i18n/language"];
+	"i18n/language",
+	// 0.1.0 S4: schema 8 validates the extra enclosed-term delimiters with a neutral pure leaf.
+	"text/enclosedTermDelimiters"];
 it.each(["automaticPosSettings", "AutomaticPosSettingsStore", "AutomaticPosSettingsController"])("has a closed settings-only graph: %s", async entry => {
 	const { inputs, code } = await graph(`src/settings/${entry}.ts`);
 	expect([...inputs].sort()).toEqual([...base, ...(entry === "automaticPosSettings" ? [] : [`settings/${entry}`])].map(path => `src/${path}.ts`).sort());

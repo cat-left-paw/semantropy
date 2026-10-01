@@ -31,7 +31,7 @@ export function attributionMarkdown(metadata: FragmentMetadataV4, raw: CollectAt
 	if (COLLECT_ATTRIBUTION_LINE_KEYS.every((key) => !snapshot[key])) return [];
 	const labels = ATTRIBUTION_LABELS[snapshot.uiLanguage];
 	const lines: string[] = [];
-	if (snapshot.feature) lines.push(...fieldLines(labels.feature, featureName(metadata.type, labels)));
+	if (snapshot.feature) lines.push(...fieldLines(labels.feature, featureText(metadata, labels)));
 	if (snapshot.target) {
 		const path = targetPath(metadata);
 		if (path !== null) lines.push(...fieldLines(labels.target, path));
@@ -48,12 +48,20 @@ export function attributionMarkdown(metadata: FragmentMetadataV4, raw: CollectAt
 	return lines;
 }
 
+/** Recompose also names its method (or mixed) and the leap it used, as one value or a range. */
+function featureText(metadata: FragmentMetadataV4, labels: AttributionLabels): string {
+	const name = featureName(metadata.type, labels);
+	if (metadata.type !== "recompose") return name;
+	return labels.recomposeDetail(name, labels.recomposeMethods[metadata.method], metadata.leapMin, metadata.leapMax);
+}
+
 function featureName(type: FragmentMetadataV4["type"], labels: AttributionLabels): string {
 	switch (type) {
 		case "body": return labels.body;
 		case "fake-dictionary": return labels.dictionary;
 		case "collision": return labels.collision;
 		case "fake-proverb": return labels.fakeProverb;
+		case "recompose": return labels.recompose;
 	}
 }
 

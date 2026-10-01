@@ -12,6 +12,9 @@ import { attributionMarkdown, type CollectAttributionSnapshot } from "./collectA
 export const BODY_FRAGMENT_METADATA_KEY_ORDER_V4 = BODY_FRAGMENT_METADATA_KEY_ORDER_V3;
 export const FAKE_DICTIONARY_FRAGMENT_METADATA_KEY_ORDER_V4 = FAKE_DICTIONARY_FRAGMENT_METADATA_KEY_ORDER_V3;
 export const COLLISION_FRAGMENT_METADATA_KEY_ORDER_V4 = COLLISION_FRAGMENT_METADATA_KEY_ORDER_V3;
+export const RECOMPOSE_FRAGMENT_METADATA_KEY_ORDER_V5 = Object.freeze([
+	"id", "metadataVersion", "type", "created", "algorithmVersion", "method", "leapMin", "leapMax", "vocabulary",
+] as const);
 export const FAKE_PROVERB_FRAGMENT_METADATA_KEY_ORDER_V4 = Object.freeze([
 	"id", "metadataVersion", "type", "created", "algorithmVersion", "recipeDataVersion", "vocabulary",
 	"proverbRecipeId", "glossRecipeId", "batchId", "rowId", "canonicalText",
@@ -40,8 +43,9 @@ export function fragmentMetadataCommentV4(metadata: FragmentMetadataV4): string 
 /**
  * The Collection body of one entry.
  *
- * `body`, `fake-dictionary` and `collision` keep the existing literal contract:
- * every ASCII punctuation character is escaped, so the text is shown as typed.
+ * `body`, `fake-dictionary`, `collision` and `recompose` keep the existing
+ * literal contract: every ASCII punctuation character is escaped, so the text is
+ * shown as typed.
  *
  * `fake-proverb` is written as its canonical Markdown, the same bytes Copy uses
  * (Fake Proverb Policy 1 §5 and §8), so the Collection shows the proverb in bold

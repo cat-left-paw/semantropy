@@ -6,50 +6,53 @@ Semantropyは、日本語の創作に使うデスクトップ専用のObsidian�
 
 ## できること
 
-- **日本語の文章を変換する。** 現在のノートを開き、**Reshuffle text** で別の結果を生成します。最初は本文の最初のsectionを表示し、**Load next section** で次のsectionを1つずつ追加します。原文の変更は古い状態として示し、**Refresh target** を選ぶまで表示を更新しません。
-- **語彙を選ぶ。** 現在のノートまたは明示的に選択したノートを使います。抽選方式はUniform／Frequencyから選べます。名詞・自立動詞・イ形容詞・通常の副詞は個別に有効化でき、既定では名詞だけが有効です。picker内の変更は **Apply Vocabulary** の成功後に反映されます。
-- **本文のSemantropy値を決める。** Off（0）は原文のまま、Low（25）・Medium（50）・High（75）・MAX（100）は変更量や候補範囲を段階的に変えます。中間の整数値も使えます。対応していない活用形は原文を維持します。
-- **1語だけ手動で変える。** 対応する表示語では **Shuffle this word**・**Restore original**・**Use automatic result** を選べます。手動候補には、使用中の語彙で実際に観測した形だけを使います。正確に1語を選択すると、代替候補数または使用できない理由を表示します。
-- **ほかの文章を作る。** でたらめ辞書は選択語の架空の定義を作り、本文とは独立したSemantropy値を持ちます。Collisionはランダムまたは指定したpatternから10／20／50件、架空ことわざはことわざと解説の組を10件生成します。結果ごとに明示的なCopy／Collect操作があります。
-- **表示を調整する。** 本文をスクロールしてもToolbarは画面に残ります。表示設定で本文のfont・size・色・Rubyの読み・操作用markerを変更できますが、生成した文章は変わりません。UIは日本語と英語に対応し、コマンドパレットの名前は両言語で英語のままです。
+- **日本語の文章を変換する。** 現在のノートを開き、**本文をシャッフル** で別の結果を生成します。最初は本文の最初の区間を表示し、**次の区間を読み込む** で1つずつ追加します。原文の変更は古い状態として示し、**対象ノートを再読込** を選ぶまで表示を更新しません。準備やシャッフルの間は、本文の上に作業中の表示が出ます。
+- **語彙を選ぶ。** 現在のノートか、選択したノートを語彙ソースに使います。抽選方式は均等／頻度から選べます。選択したノートごとに重み（×0.25〜×4）を付けられ、すべて×1なら従来と同じ抽選になります。名詞・自立動詞・イ形容詞・通常の副詞は個別に有効化でき、既定では名詞だけが有効です。ダイアログ内の変更は **語彙を適用** が成功してから反映されます。
+- **語彙ソースで語をまとめる。** 語彙ソースの中の `{{猫又}}` のように囲んだ部分は、1つの名詞として扱います。設定の **追加の囲み記号** で、`【…】` などの囲みを4組まで追加できます。`{{…}}` は常に有効です。対象ノートの表示は変わりません。
+- **本文のSemantropy値を決める。** オフ（0）は原文のまま、低（25）・中（50）・高（75）・MAX（100）は変更量や候補範囲を段階的に変えます。中間の整数値も使えます。対応していない活用形は原文を維持します。
+- **1語だけ変える。** 本文の語をクリックすると **語の操作** メニューが開き、**この語をシャッフル**・**元に戻す**・**自動の結果を使う**・**でたらめ辞書で引く** を選べます。手動の候補には、使用中の語彙で実際に観測した形だけを使います。
+- **ほかの文章を作る。** でたらめ辞書は語の架空の定義を作り、本文とは独立したSemantropy値を持ちます。衝突フレーズはランダムまたは指定したパターンから10／20／50件を作り、行ごとに同じパターンで作り直せます。架空ことわざはことわざと解説の組を10件作ります。**再構成** は、語彙ソースの文のつながりを使って別の流れの文章を組み立て、続きを生成したり、選んだ位置から分岐したりできます。どの結果にも明示的なコピーと収集の操作があります。
+- **表示を調整する。** 本文をスクロールしてもツールバーは画面に残ります。表示設定では、本文のフォント・サイズ、テーマ（既定（Obsidianのテーマ）・ライト・ダーク）、文字色・背景色、ルビ、操作用のマーカーを変えられます。生成した文章は変わりません。UIは日本語と英語を選べますが、変換できる文章は日本語だけです。コマンドパレットの名前は英語のままです。
 
-解析にはcompact IPADIC辞書を内包したLindera WebAssemblyを使います。インストール後はローカルかつオフラインで動き、別の辞書directoryや実行時downloadは必要ありません。
+解析にはcompact IPADIC辞書を内包したLindera WebAssemblyを使います。インストール後はローカルかつオフラインで動き、別の辞書フォルダや実行時のダウンロードは必要ありません。
 
 ## 使い始める
 
 1. Obsidian Desktop 1.13.7以降で日本語のMarkdownノートを開きます。
 2. コマンドパレットから **Semantropy: Open** を実行するか、Semantropyのリボンアイコンを使います。
-3. Semantropy Viewで **Load next section** と **Reshuffle text** を使います。
-4. **Change vocabulary** でCurrent Note／Selected Notesと抽選方式を選び、**Apply Vocabulary** で確定します。**Automatic parts of speech** にも別の **Apply** があります。
-5. View内の文章を選択し、**Copy selection** または **Collect selection** を使います。1語の辞書を開くには **Semantropy: Define selected word** を使うか、WindowsではAlt、macOSではOption（⌥）を押しながら対応語にhoverします。View内で修飾キーをShiftに変更できます。
+3. SemantropyのViewで **次の区間を読み込む** と **本文をシャッフル** を使います。
+4. **語彙を変更** で「現在のノート」か「選択したノート」と抽選方式を選び、**語彙を適用** で確定します。**自動置換する品詞** にも別の **適用** があります。
+5. View内の文章を選択して **選択範囲をコピー** または **選択範囲を収集** を使います。1語の辞書は、語をクリックして **でたらめ辞書で引く** を選ぶか、**Semantropy: Define selected word** を使うか、WindowsではAlt、macOSではOption（⌥）を押しながら語にポインタを合わせます。修飾キーはView内でShiftに変更できます。
 
-Collectする前に **設定 → Semantropy → Collection file** で保存先を指定し、**Save** を選びます。既定は `Semantropy Fragments.md` です。新しいentryはmetadata commentのない可読なMarkdownです。任意の5つの切替で、生成の種類、Targetノート、語彙ノート、本文Semantropy値、収集した日付を追記できます。既定ではすべてOFFです。既存entryは書き換えません。Collection fileを、その結果に使ったTargetやVocabulary Sourceと同じファイルにはできません。
+収集する前に **設定 → Semantropy → 収集ファイル** で保存先を指定し、**保存** を選びます。既定は `Semantropy Fragments.md` です。新しい項目はメタデータのコメントを含まない読みやすいMarkdownです。任意の5つの切替で、生成の種類、対象ノート、語彙ソース、本文のSemantropy値、収集した日付を追記できます。既定ではすべてオフです。既存の項目は書き換えません。収集ファイルを、その結果に使った対象ノートや語彙ソースと同じファイルにはできません。
 
 ## プライバシーとファイル操作
 
-- 解析・生成・辞書の利用はローカルで完結します。プラグインは実行時のnetwork requestやtelemetryを行いません。
-- Semantropyは現在のTargetと、語彙として明示的にApplyしたノートを読みます。変換Viewは無害な固定要素から組み立て、ノート内の画像やembedは外部resourceを読み込まずplaceholderで示します。
-- 原文ノートは上書きしません。**Collect** の明示実行時だけ、設定したCollection Markdownへ書き込みます。**Copy** の明示実行時だけClipboardへ書き込み、選択が空または無効な場合に別の断片をコピーしません。
-- Obsidianのプラグイン用 `data.json` には、本文と辞書のSemantropy値、Collection path、抽選方式、表示設定、hover修飾キー、自動品詞、表示言語、リボン表示、由来の切替を保存します。ノートのsnapshot、token、生成結果、手動変更、生成中の状態は保存しません。
+- 解析・生成・辞書の利用はローカルで完結します。プラグインは実行時のネットワーク通信やテレメトリを行いません。
+- Semantropyは現在の対象ノートと、語彙として明示的に適用したノートを読みます。変換Viewは無害な固定要素から組み立て、ノート内の画像やembedは外部のリソースを読み込まずプレースホルダーで示します。
+- 原文ノートは上書きしません。**収集** を明示したときだけ、設定した収集ファイルへ書き込みます。**コピー** を明示したときだけクリップボードへ書き込み、選択が空または無効なときに別の断片をコピーしません。
+- Obsidianのプラグイン用 `data.json` には、本文と辞書のSemantropy値、収集ファイルのパス、抽選方式、表示設定（テーマと色を含む）、ポインタの修飾キー、自動置換する品詞、表示言語、リボン表示、生成由来の切替、追加の囲み記号を保存します。語彙の重み、ノートのスナップショット、トークン、生成結果、手動の変更、生成中の状態は保存しません。
 
 ## 対応範囲と制約
 
-- デスクトップ専用で、Mobileには対応していません。変換対象は日本語です。語彙には現在のノートか選択したノートを使い、フォルダ全体やVault全体は対象外です。
-- 段落、単純な見出し、強調、改行、対応Rubyを表示します。リンク・コード・数式・タグ・対応外Markdownは変換から保護します。リンクはclickできず、画像とembedはplaceholderになります。ObsidianのReading viewとは異なる表示です。
-- 動詞とイ形容詞の手動変更は、語彙で観測した対応形に限ります。対応外の形は維持します。非常に大きなノート、特にMAXでは準備に数秒かかる場合があります。分割できないparser／tokenizer処理中はCancelが遅れる場合があります。
-- 狭いpaneと高倍率zoomでは、固定Toolbarの下の本文領域が小さくなる場合があります。縦書き、Collection専用View、フォルダ全体の語彙、ユーザー編集templateはありません。
+- デスクトップ専用で、モバイルには対応していません。変換対象は日本語です。語彙には現在のノートか選択したノートを使い、フォルダ全体やVault全体は対象外です。
+- 段落、単純な見出し、強調、改行、対応するルビを表示します。リンク・コード・数式・タグ・対応外のMarkdownは変換から保護します。リンクはクリックできず、画像とembedはプレースホルダーになります。ObsidianのReading viewとは異なる表示です。
+- 動詞とイ形容詞の手動変更は、語彙で観測した対応形に限ります。対応外の形は維持します。非常に大きなノート、特にMAXでは準備に数秒かかる場合があります。分割できない解析処理の途中ではキャンセルが遅れる場合があります。
+- 語彙ソースに `{{date}}` のようなテンプレートの記法があると、中の語（`date`）も名詞として語彙に入ります。
+- 狭いペインと高倍率の拡大では、固定ツールバーの下の本文領域が小さくなる場合があります。縦書き、収集専用のView、フォルダ全体の語彙、ユーザーが編集するテンプレートはありません。
+- 0.1.0は設定の保存形式を新しくしました。0.1.0で保存した設定は0.0.1では読めず、0.0.1に戻すと設定は既定に戻ります。
 
-macOS版0.0.1 release candidateの `main.js` はWebAssemblyと辞書を内包し、実測14,184,815 bytes（約14.2 MB）です。他のOSでbuildした場合は異なることがあるため、インストールするassetのサイズは公開後のGitHub Releaseで確認してください。[Obsidian Sync Standardの1ファイル5 MB上限](https://obsidian.md/help/sync/plans)を超えるので、Standardを使う場合はplugin fileの同期に頼らず、端末ごとにインストール／更新してください。Sync Plusの1ファイル上限は200 MBです。
+`main.js` はWebAssemblyと辞書を内包するため、約14〜16 MBあります（0.0.1のmacOS版の実測は14,184,815 bytes）。OSやバージョンで異なるため、インストールするファイルのサイズはGitHub Releaseで確認してください。[Obsidian Sync Standardの1ファイル5 MB上限](https://obsidian.md/help/sync/plans)を超えるので、Standardを使う場合はプラグインファイルの同期に頼らず、端末ごとにインストール／更新してください。Sync Plusの1ファイル上限は200 MBです。
 
 ## インストール
 
-ObsidianのCommunity Pluginsに掲載された後は、そこからインストールできます。GitHub Releaseから手動でインストールする場合は、同じReleaseの `main.js`、`manifest.json`、`styles.css` を次の場所へ置きます。
+ObsidianのCommunity Pluginsからインストールできます。GitHub Releaseから手動でインストールする場合は、同じReleaseの `main.js`、`manifest.json`、`styles.css` を次の場所へ置きます。
 
 ```text
 <vault>/.obsidian/plugins/semantropy/
 ```
 
-Obsidianをreloadし、**設定 → Community plugins** でSemantropyを有効にします。3ファイルは必ず同じversionを使ってください。
+Obsidianを再読み込みし、**設定 → Community plugins** でSemantropyを有効にします。3ファイルは必ず同じバージョンを使ってください。
 
 ## ソースからのビルド
 
@@ -58,9 +61,9 @@ npm ci
 npm run build
 ```
 
-クリーンなcheckoutでは、最初の `npm run build` がcompact辞書を検証または準備します。検証済みcacheがなければ、固定URL1つからLindera IPADIC 6.0.0のarchiveを取得し、サイズとSHA-256を照合し、compact辞書を作ってそのhashも確認してから配置します。`npm run build:distribution` も同じ準備を行い、`dist/semantropy/` に配布3ファイルだけを作ります。後続のbuildは検証済みcacheを再利用します。準備の失敗や検証不一致ではbuildを止め、既存の成果物を置き換えません。`npm ci`、test、`npm run dev`、プラグイン実行時は辞書をdownloadしません。
+クリーンなcheckoutでは、最初の `npm run build` がcompact辞書を検証または準備します。検証済みのcacheがなければ、固定URL1つからLindera IPADIC 6.0.0のarchiveを取得し、サイズとSHA-256を照合し、compact辞書を作ってそのhashも確認してから配置します。`npm run build:distribution` も同じ準備を行い、`dist/semantropy/` に配布3ファイルだけを作ります。後続のbuildは検証済みのcacheを再利用します。準備の失敗や検証の不一致ではbuildを止め、既存の成果物を置き換えません。`npm ci`、test、`npm run dev`、プラグインの実行時は辞書をダウンロードしません。
 
-build後には `npm run typecheck`、`npm run lint`、`npm test`、`npm run verify:distribution`、`npm run verify:reproducible` を実行できます。配布検証は展開済みarchiveも使うため、先にbuildまたは `npm run prepare:dictionary` を実行してください。
+build後には `npm run typecheck`、`npm run lint`、`npm test`、`npm run verify:distribution`、`npm run verify:reproducible` を実行できます。配布の検証は展開済みのarchiveも使うため、先にbuildまたは `npm run prepare:dictionary` を実行してください。
 
 `npm run verify:reproducible` は、同じbuild環境内で3ファイルがbyte単位で一致することを確認します。macOSとWindowsのbuildでは、圧縮されたpayloadのbyte列やminify後の短い識別子が異なる場合があります。配布testではpayloadを除外し、識別子を正規化したproduction codeのdigestを固定しています。
 

@@ -89,6 +89,8 @@ export class SemantropySettingsStore {
 			vocabularyDrawMode,
 			bodyFontFamily,
 			bodyFontSizePx,
+			// Schema 3 has no theme (0.1.0 S2 adds it in schema 8).
+			bodyTheme: "default",
 			bodyBackground,
 			bodyForeground,
 			showRuby,

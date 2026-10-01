@@ -84,8 +84,8 @@ describe("DICTIONARY-LEVEL1: settings — no migration, a fail-safe read, a refu
 
 describe("DICTIONARY-LEVEL1: versions are unchanged, and the core keeps its defensive Off", () => {
 	it("keeps settings schema 4, Collect metadata 4, Fake Dictionary algorithm 1 and template set 1", () => {
-		// DICTIONARY-LEVEL1 changed none of these. LOCALE1 moved settings to schema 5. UI-POLISH1 moved them to schema 6. COLLECT-ATTRIBUTION1 moves the live schema to 7.
-		expect([AUTOMATIC_POS_SETTINGS_SCHEMA_VERSION, COLLECT_METADATA_VERSION_V4, FAKE_DICTIONARY_ALGORITHM_VERSION, STANDARD_TEMPLATE_SET_VERSION]).toEqual([7, 4, 1, 1]);
+		// DICTIONARY-LEVEL1 changed none of these. LOCALE1 moved settings to schema 5. UI-POLISH1 moved them to schema 6. COLLECT-ATTRIBUTION1 moved the live schema to 7, and 0.1.0 S2 to 8.
+		expect([AUTOMATIC_POS_SETTINGS_SCHEMA_VERSION, COLLECT_METADATA_VERSION_V4, FAKE_DICTIONARY_ALGORITHM_VERSION, STANDARD_TEMPLATE_SET_VERSION]).toEqual([8, 4, 1, 1]);
 	});
 
 	it("still maps 0 to the off bucket and outcome below the settings layer, which nothing above can reach", () => {

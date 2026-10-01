@@ -45,7 +45,15 @@ export type SemantropySettings = {
 	bodySemantropy: BodySemantropy;
 	dictionarySemantropy: DictionarySemantropy;
 	collectionPath: string;
-} & SemantropyDisplaySettings;
+	// 0.1.0 S2: schema 3 never had a theme; schema 8 adds `bodyTheme` on top of this shape.
+} & Omit<SemantropyDisplaySettings, "bodyTheme">;
+
+/** The display fields schema 3 owns: everything except the schema 8 theme. */
+function schema3Display(display: SemantropyDisplaySettings): Omit<SemantropyDisplaySettings, "bodyTheme"> {
+	const { bodyTheme, ...owned } = display;
+	void bodyTheme;
+	return owned;
+}
 
 /** The exact shape written to `data.json`. */
 export type StoredSemantropySettings = {
@@ -71,7 +79,7 @@ export function defaultSemantropySettings(): SemantropySettings {
 		bodySemantropy: DEFAULT_BODY_SEMANTROPY,
 		dictionarySemantropy: DEFAULT_DICTIONARY_SEMANTROPY,
 		collectionPath: DEFAULT_COLLECTION_PATH,
-		...defaultSemantropyDisplaySettings(),
+		...schema3Display(defaultSemantropyDisplaySettings()),
 	};
 }
 
@@ -116,10 +124,11 @@ export function parseSemantropySettings(raw: unknown): SemantropySettings {
 		isCollectionPath(stored["collectionPath"])
 			? stored["collectionPath"]
 			: defaults.collectionPath;
-	const display =
+	const display = schema3Display(
 		schemaVersion === SEMANTROPY_SETTINGS_SCHEMA_VERSION
 			? parseDisplaySettings(stored)
-			: defaultSemantropyDisplaySettings();
+			: defaultSemantropyDisplaySettings(),
+	);
 
 	return {
 		schemaVersion: SEMANTROPY_SETTINGS_SCHEMA_VERSION,

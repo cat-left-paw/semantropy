@@ -116,7 +116,7 @@ describe("CHUNK-02: complete presentation and logical seams", () => {
 			expect(h.calls.copy[0]).toBe(text(h.view));
 			oracle.release(); await h.view.onClose();
 		}
-	});
+	}, 60_000); // About 9 s alone; under the full suite's load it can pass 20 s.
 });
 
 describe("CHUNK-03 / 04: atomic append and prefix generation", () => {

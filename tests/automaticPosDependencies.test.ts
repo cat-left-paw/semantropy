@@ -26,7 +26,7 @@ it.each(["src/transform/automaticPosProjection.ts", "src/transform/automaticPosC
 		"analysis/activeContinuation", "analysis/locateTokens", "analysis/projectMarkdownSource", "analysis/rubyAnalysis", "analysis/rubyVocabulary", "analysis/reuseTargetAnalysis", "analysis/targetChunkIr",
 		"application/analyzeSelectedSource", "dictionary/placeholders", "random/seededRandom", "transform/automaticPosGuard", "transform/automaticPosProjection",
 		"transform/manualAdverbAuthority", "transform/manualAdverbGuard", "transform/manualMorphology", "transform/regularConjugationTypes",
-		"transform/automaticPosVersions", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "vocabulary/sha256", "vocabulary/vocabularySnapshot",
+		"transform/automaticPosVersions", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "text/enclosedTermDelimiters", "vocabulary/enclosedTerms", "vocabulary/sha256", "vocabulary/sourceWeights", "vocabulary/vocabularySnapshot",
 		...(entry.endsWith("Core.ts") ? ["transform/automaticPosCore"] : [])].map(name => `src/${name}.ts`).sort();
 	expect([...inputs].sort()).toEqual(expected);
 	expect(inputs).toContain("src/transform/manualMorphology.ts"); expect(inputs).toContain("src/transform/manualAdverbAuthority.ts");

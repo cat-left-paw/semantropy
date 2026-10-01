@@ -19,7 +19,8 @@ describe("Fake Proverb View production and capability boundaries", () => {
 			"src/collect/collectMessages.ts", "src/collect/v4/CollectedFragmentV4.ts", "src/fakeProverb/compileRecipeSet.ts",
 			"src/fakeProverb/fakeProverbBatch.ts", "src/fakeProverb/generated/standardFakeProverbRecipeEntries.ts",
 		]);
-		expect(imports("src/view/FakeProverbModal.ts").filter(name => name.startsWith("src/") && !name.startsWith("src/i18n/"))).toEqual(["src/view/FakeProverbSession.ts"]);
+		// 0.1.0 S1: the row actions are icon buttons drawn by controlIcon (Obsidian's setIcon only).
+		expect(imports("src/view/FakeProverbModal.ts").filter(name => name.startsWith("src/") && !name.startsWith("src/i18n/"))).toEqual(["src/view/controlIcon.ts", "src/view/FakeProverbSession.ts"]);
 		// LOCALE1: its fixed words, and nothing else, come from the interface catalog.
 		expect(imports("src/view/FakeProverbModal.ts").filter(name => name.startsWith("src/i18n/")).sort()).toEqual(["src/i18n/catalog.ts", "src/i18n/messages.ts", "src/i18n/uiLabels.ts"]);
 	});

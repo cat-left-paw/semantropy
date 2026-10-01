@@ -114,8 +114,21 @@ let japanese: ReadonlyMap<string, string> | null = null;
  * `ui()` — is returned unchanged, so nothing that is not interface text can be
  * translated by accident.
  */
+let hostMessages: ReadonlyMap<string, string> = new Map();
+
+/**
+ * 0.1.0 S1: a host's own Japanese for some English message identities, looked
+ * up before the pairs above (the web Playground has no "Semantropy: Open"
+ * command and no notes). Obsidian sets none.
+ */
+export function setMessageOverrides(pairs: Readonly<Record<string, string>>): void {
+	hostMessages = new Map(Object.entries(pairs));
+}
+
 export function localize(message: string): string {
 	if (currentUiLanguage() !== "ja") return message;
+	const own = hostMessages.get(message);
+	if (own !== undefined) return own;
 	if (japanese === null) {
 		// The first pair wins. The Collection feature name reuses the toolbar's
 		// English "Reshuffle text" with a shorter Japanese label, and that later

@@ -14,13 +14,22 @@ import type { VocabularyDrawMode } from "../vocabulary/vocabularySnapshot";
  */
 
 export type BodyFontFamily = "theme" | "serif" | "sans-serif";
+/**
+ * 0.1.0 S2: one theme for the body region — its text and background together.
+ * "default" follows the host (Obsidian's theme; the web page's own). The two
+ * custom colours below override it when set.
+ */
+export type BodyTheme = "default" | "light" | "dark";
 export type DictionaryModifier = "alt" | "shift";
 
 export type SemantropyDisplaySettings = {
 	vocabularyDrawMode: VocabularyDrawMode;
 	bodyFontFamily: BodyFontFamily;
 	bodyFontSizePx: number | null;
+	bodyTheme: BodyTheme;
+	/** Custom background of the body region, `#rrggbb`, or null for the theme's. */
 	bodyBackground: string | null;
+	/** Custom text colour of the body region, `#rrggbb`, or null for the theme's. */
 	bodyForeground: string | null;
 	showRuby: boolean;
 	showReplacementMarkers: boolean;
@@ -68,6 +77,7 @@ export function defaultSemantropyDisplaySettings(): SemantropyDisplaySettings {
 		vocabularyDrawMode: "uniform",
 		bodyFontFamily: "theme",
 		bodyFontSizePx: null,
+		bodyTheme: "default",
 		bodyBackground: null,
 		bodyForeground: null,
 		showRuby: true,
@@ -86,6 +96,44 @@ export function isBodyFontFamily(value: unknown): value is BodyFontFamily {
 	return (
 		value === "theme" || value === "serif" || value === "sans-serif"
 	);
+}
+
+/**
+ * 0.1.0 S2: the Light and Dark palettes of the preview region, as the theme
+ * variables the body and its markers read. The View sets them on the preview
+ * element only; the Toolbar and the rest of the host keep the host's theme.
+ */
+export const BODY_THEME_PALETTES: Readonly<Record<Exclude<BodyTheme, "default">, Readonly<Record<string, string>>>> = Object.freeze({
+	light: Object.freeze({
+		"color-scheme": "light",
+		"--background-primary": "#fbfaf7",
+		"--background-secondary": "#f0eee8",
+		"--background-modifier-border": "#dedad0",
+		"--code-background": "#f0eee8",
+		"--text-normal": "#1f1e1c",
+		"--text-muted": "#625e55",
+		"--text-faint": "#9a958a",
+		"--text-accent": "#6a44d4",
+		"--interactive-accent": "#7a52e0",
+		"--text-highlight-bg": "rgba(255, 196, 0, 0.42)",
+	}),
+	dark: Object.freeze({
+		"color-scheme": "dark",
+		"--background-primary": "#1c1c20",
+		"--background-secondary": "#26262b",
+		"--background-modifier-border": "#3a3942",
+		"--code-background": "#26262b",
+		"--text-normal": "#e4e2dd",
+		"--text-muted": "#a9a59c",
+		"--text-faint": "#6f6c66",
+		"--text-accent": "#b49cff",
+		"--interactive-accent": "#8a66f0",
+		"--text-highlight-bg": "rgba(255, 208, 0, 0.3)",
+	}),
+});
+
+export function isBodyTheme(value: unknown): value is BodyTheme {
+	return value === "default" || value === "light" || value === "dark";
 }
 
 export function isDictionaryModifier(value: unknown): value is DictionaryModifier {
@@ -193,6 +241,7 @@ export function parseDisplaySettings(
 		bodyFontSizePx: isBodyFontSizePx(stored["bodyFontSizePx"])
 			? stored["bodyFontSizePx"]
 			: defaults.bodyFontSizePx,
+		bodyTheme: isBodyTheme(stored["bodyTheme"]) ? stored["bodyTheme"] : defaults.bodyTheme,
 		bodyBackground: background === undefined ? defaults.bodyBackground : background,
 		bodyForeground: foreground === undefined ? defaults.bodyForeground : foreground,
 		showRuby: flag("showRuby"),
@@ -230,6 +279,10 @@ export function validateDisplaySettingsPatch(
 			case "bodyFontSizePx":
 				if (!isBodyFontSizePx(value)) return null;
 				next.bodyFontSizePx = value;
+				break;
+			case "bodyTheme":
+				if (!isBodyTheme(value)) return null;
+				next.bodyTheme = value;
 				break;
 			case "bodyBackground":
 			case "bodyForeground": {

@@ -223,7 +223,7 @@ describe("settings schema 5 `uiLanguage`", () => {
 		automaticPos: { noun: false, verb: true, iAdjective: false, adverb: true } };
 
 	it("is Japanese on a new install, English for settings saved by schema 1-4", () => {
-		expect(AUTOMATIC_POS_SETTINGS_SCHEMA_VERSION).toBe(7);
+		expect(AUTOMATIC_POS_SETTINGS_SCHEMA_VERSION).toBe(8);
 		expect(DEFAULT_UI_LANGUAGE).toBe("ja");
 		expect(parseAutomaticPosSettings(null).uiLanguage).toBe("ja");
 		expect(parseAutomaticPosSettings(undefined).uiLanguage).toBe("ja");
@@ -249,7 +249,7 @@ describe("settings schema 5 `uiLanguage`", () => {
 	it("round-trips both languages and refuses an invalid request", () => {
 		for (const uiLanguage of ["en", "ja"] as const) {
 			const written = serializeAutomaticPosSettings(parseAutomaticPosSettings({ schemaVersion: 5, ...other, uiLanguage }));
-			expect(written).toMatchObject({ schemaVersion: 7, uiLanguage, showRibbonIcon: true, ...other });
+			expect(written).toMatchObject({ schemaVersion: 8, uiLanguage, showRibbonIcon: true, ...other });
 			expect(parseAutomaticPosSettings(JSON.parse(JSON.stringify(written))).uiLanguage).toBe(uiLanguage);
 		}
 		for (const bad of ["fr", 1, null, "JA"]) expect(validateAutomaticPosSettingsPatch({ uiLanguage: bad })).toBeNull();
@@ -269,7 +269,7 @@ describe("settings schema 5 `uiLanguage`", () => {
 		expect(disk).toMatchObject({ schemaVersion: 4 });
 		fail = false;
 		expect(await store.setUiLanguage("ja")).toBe(true);
-		expect(disk).toMatchObject({ schemaVersion: 7, uiLanguage: "ja", showRibbonIcon: true, ...other });
+		expect(disk).toMatchObject({ schemaVersion: 8, uiLanguage: "ja", showRibbonIcon: true, ...other });
 		// A restart reads the saved language; nothing else moved.
 		const restarted = new AutomaticPosSettingsStore(persistence);
 		await restarted.load();
@@ -308,8 +308,8 @@ describe("every surface in Japanese", () => {
 		const el = Array.from(h.root().querySelectorAll<HTMLElement>(".semantropy-token")).find(e => h.controller().getSlotForElement(e) === h.current("猫"))!;
 		openManualMenu(h, el, h.current("猫"));
 		const menu = shell(h).querySelector<HTMLElement>(".semantropy-manual-menu")!;
-		expect(menu.getAttribute("aria-label")).toBe("語の手動操作");
-		expect(Array.from(menu.querySelectorAll("button")).map(b => b.textContent)).toEqual(["この語をシャッフル", "元に戻す", "自動の結果を使う"]);
+		expect(menu.getAttribute("aria-label")).toBe("語の操作");
+		expect(Array.from(menu.querySelectorAll("button")).map(b => b.textContent)).toEqual(["この語をシャッフル", "元に戻す", "自動の結果を使う", "でたらめ辞書で引く"]);
 		(Reflect.get(h.view, "closeManualMenu") as (this: SemantropyView) => void).call(h.view);
 		const panel = await hover(h);
 		expect(panel.getAttribute("aria-label")).toBe("Fake Dictionary");
@@ -337,7 +337,7 @@ describe("every surface in Japanese", () => {
 		await collisionSession(h).generate(10, "");
 		expect(collisionModal(h).contentEl.querySelectorAll(".semantropy-collision-row").length).toBeGreaterThan(0);
 		expect(untranslated(collisionModal(h).modalEl)).toEqual([]);
-		expect(collision.querySelector(".semantropy-collision-row p:nth-of-type(2)")?.textContent).toMatch(/^現在のパターン: /u);
+		expect(collision.querySelector(".semantropy-collision-row .semantropy-collision-pattern")?.textContent).toMatch(/^現在のパターン: /u);
 		collisionModal(h).close();
 
 		const p = await harness("proverb");
@@ -367,7 +367,7 @@ describe("every surface in Japanese", () => {
 		});
 		tab.show();
 		expect(Array.from(tab.containerEl.querySelectorAll(".setting-item-name")).map(el => el.textContent)).toEqual(
-			["表示言語", "リボンアイコンを表示", "収集ファイル", "生成の種類を記録", "対象ノートを記録", "語彙ノートを記録", "生成時のSemantropy値を記録", "収集した日付を記録"]);
+			["表示言語", "リボンアイコンを表示", "収集ファイル", "生成の種類を記録", "対象ノートを記録", "語彙ソースを記録", "生成時のSemantropy値を記録", "収集した日付を記録"]);
 		expect(tab.containerEl.querySelector(".semantropy-attribution-group .setting-group-heading")?.textContent).toBe("収集ノートに生成由来を記録");
 		expect(tab.containerEl.querySelector(".semantropy-collection-path-save")?.textContent).toBe("保存");
 		const dropdown = tab.containerEl.querySelector<HTMLSelectElement>(".semantropy-language-setting select")!;
@@ -452,7 +452,7 @@ describe("switching the language in an open View", () => {
 		expect(color.value).toBe("custom");
 		expect(field.value).toBe("#12");
 		expect(document.activeElement).toBe(field);
-		expect(field.getAttribute("aria-label")).toBe("本文の背景色のカスタム値（#RRGGBB形式）");
+		expect(field.getAttribute("aria-label")).toBe("背景色のカスタム値（#RRGGBB形式）");
 		// Nothing was rebuilt.
 		expect(Array.from(bar.querySelectorAll("*"))).toEqual(nodes);
 		expect(h.calls.reads).toHaveLength(reads); expect(h.calls.tokenizations).toHaveLength(tokens);
@@ -490,7 +490,7 @@ describe("switching the language in an open View", () => {
 		expect(more.getAttribute("aria-expanded")).toBe("true"); expect(display.getAttribute("aria-expanded")).toBe("true");
 		expect(draft.value).toBe("#12"); expect(document.activeElement).toBe(draft);
 		expect(menu.scrollTop).toBe(37); expect(moreMenu.scrollTop).toBe(19);
-		expect(draft.getAttribute("aria-label")).toBe("本文の背景色のカスタム値（#RRGGBB形式）");
+		expect(draft.getAttribute("aria-label")).toBe("背景色のカスタム値（#RRGGBB形式）");
 	});
 
 	it("keeps open More when shorter Japanese labels make overflow unnecessary", async () => {
@@ -556,7 +556,7 @@ describe("switching the language in an open View", () => {
 		expect(moreItem.contains(document.activeElement)).toBe(false);
 	});
 
-	it("keeps Collision rows, drafts, focus and Copy / Collect bytes, and draws nothing", async () => {
+	it("keeps Collision rows, focus and Copy / Collect bytes, and draws nothing", async () => {
 		const h = await harness("collision");
 		h.view.openCollision();
 		await collisionSession(h).generate(10, "");
@@ -564,8 +564,6 @@ describe("switching the language in an open View", () => {
 		const rows = Array.from(ui.querySelectorAll<HTMLElement>(".semantropy-collision-row"));
 		const texts = rows.map(row => row.querySelector(".semantropy-collision-text")!.textContent);
 		const batch = collisionSession(h).read()!.batch!;
-		const selector = rows[0]!.querySelector<HTMLSelectElement>("select")!;
-		choose(selector, batch.patternSet.recipes.find(r => r.selectable && r.id !== batch.rows[0]!.committed.recipeId)!.id);
 		const copy = Array.from(rows[1]!.querySelectorAll("button")).find(b => b.textContent === "Copy")!;
 		copy.focus();
 		await collisionSession(h).write(batch.rows[1]!.rowSlotId, "copy");
@@ -577,8 +575,7 @@ describe("switching the language in an open View", () => {
 		expect(Array.from(ui.querySelectorAll(".semantropy-collision-row"))).toEqual(rows);
 		expect(rows.map(row => row.querySelector(".semantropy-collision-text")!.textContent)).toEqual(texts);
 		expect(collisionSession(h).read()!.batch).toBe(batch);
-		expect(selector.value).not.toBe("");
-		expect(rows[0]!.textContent).toContain("パターンの選択は下書きです。");
+		expect(rows[0]!.querySelector(".semantropy-collision-pattern")!.textContent).toMatch(/^現在のパターン: /u);
 		expect(document.activeElement).toBe(copy);
 		expect(copy.textContent).toBe("コピー");
 		expect(rows[1]!.querySelector("[role=status]")?.textContent).toMatch(JAPANESE);
@@ -674,8 +671,8 @@ describe("switching the language in an open View", () => {
 		restoreButton.focus();
 		switchTo(h, "ja");
 		expect(shell(h).querySelector(".semantropy-manual-menu")).toBe(menu);
-		expect(menu.getAttribute("aria-label")).toBe("語の手動操作");
-		expect(Array.from(menu.querySelectorAll("button")).map(b => b.textContent)).toEqual(["この語をシャッフル", "元に戻す", "自動の結果を使う"]);
+		expect(menu.getAttribute("aria-label")).toBe("語の操作");
+		expect(Array.from(menu.querySelectorAll("button")).map(b => b.textContent)).toEqual(["この語をシャッフル", "元に戻す", "自動の結果を使う", "でたらめ辞書で引く"]);
 		expect(document.activeElement).toBe(restoreButton);
 	});
 
@@ -727,7 +724,7 @@ describe("the plugin applies the stored language to every View", () => {
 		expect(currentUiLanguage()).toBe("ja");
 		expect([name(a), name(b)]).toEqual(["本文をシャッフル", "本文をシャッフル"]);
 		expect(fake.settingTab!.containerEl.querySelector(".setting-item-name")?.textContent).toBe("表示言語");
-		expect(disk).toMatchObject({ schemaVersion: 7, uiLanguage: "ja", showRibbonIcon: true });
+		expect(disk).toMatchObject({ schemaVersion: 8, uiLanguage: "ja", showRibbonIcon: true });
 		fake.settingTab!.hide();
 	});
 
@@ -763,7 +760,7 @@ describe("the plugin applies the stored language to every View", () => {
 		expect(writes).toBe(2);
 		expect(store.getUiLanguage()).toBe("en");
 		expect(name(a)).toBe("Reshuffle text");
-		expect(disk).toMatchObject({ schemaVersion: 7, uiLanguage: "en", showRibbonIcon: true });
+		expect(disk).toMatchObject({ schemaVersion: 8, uiLanguage: "en", showRibbonIcon: true });
 		const restarted = new AutomaticPosSettingsStore(persistence);
 		await restarted.load();
 		expect(restarted.getUiLanguage()).toBe("en");

@@ -19,7 +19,7 @@ const CORE_GRAPH = ["analysis/activeContinuation", "analysis/locateTokens", "ana
 	"analysis/rubyAnalysis", "analysis/rubyVocabulary", "analysis/targetChunkIr", "application/analyzeSelectedSource", "dictionary/placeholders",
 	"fakeProverb/compileRecipeSet", "fakeProverb/fakeProverbAuthority", "fakeProverb/fakeProverbCore", "fakeProverb/fakeProverbVersions",
 	"fakeProverb/fakeProverbText", "fakeProverb/recipeData", "random/seededRandom", "transform/manualMorphology", "transform/maxRealizer", "transform/regularConjugationTypes",
-	"transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "vocabulary/sha256", "vocabulary/vocabularySnapshot"].map((name) => `src/${name}.ts`);
+	"transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "text/enclosedTermDelimiters", "vocabulary/enclosedTerms", "vocabulary/sha256", "vocabulary/sourceWeights", "vocabulary/vocabularySnapshot"].map((name) => `src/${name}.ts`);
 
 describe("FAKE-PROVERB-BATCH1 dependency boundary", () => {
 	// Production-disconnected in BATCH1; FAKE-PROVERB-VIEW1 reaches it only through the View-owned session.

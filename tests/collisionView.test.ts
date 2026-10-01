@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import type { RawCollisionRecipe } from "../src/collision/patternData";
 import { collisionBatchRecipeOptions, collisionFragmentFromBatch } from "../src/collision/collisionBatch";
 import type { CollisionSession } from "../src/view/CollisionSession";
-import type { CollisionModal } from "../src/view/CollisionModal";
+import { COLLISION_ROW_PENDING_DELAY_MS, type CollisionModal } from "../src/view/CollisionModal";
 import type { SemantropyView } from "../src/view/SemantropyView";
 import { SemantropyPlugin } from "../src/SemantropyPlugin";
 import type { CooperativeScheduler } from "../src/render/cooperativeScheduler";
@@ -85,14 +85,17 @@ describe("Collision production View transactions", () => {
 		expect(h.calls.reads).toHaveLength(reads); expect(h.calls.tokenizations).toHaveLength(tokens);
 		expect(h.calls.copy).toEqual([]); expect(h.calls.collect).toEqual([]);
 	});
-	it("offers default 10, Random or fixed patterns and no Random row selection", async () => {
+	it("offers default 10, Random or fixed patterns, and rows regenerate their own pattern without a selector", async () => {
 		const h = await harness(); const root = modal(h.view).contentEl;
 		expect(select(root, "Count").value).toBe("10");
 		expect(Array.from(select(root, "Count").options).map(o => o.value)).toEqual(["10", "20", "50"]);
 		expect(select(root, "Default pattern").value).toBe("");
 		select(root, "Default pattern", "named"); button(root, "Generate").click(); await flush();
 		expect(batch(h.view).rows.every(row => row.committed.recipeId === "named")).toBe(true);
-		expect(Array.from(select(rows(h.view)[0]!, "Regenerate with").options).map(o => o.text)).not.toContain("Random");
+		// 0.1.0 S1: no per-row pattern selector; the row's actions are icon buttons named by aria-label.
+		expect(rows(h.view)[0]!.querySelector("select")).toBeNull();
+		expect(Array.from(rows(h.view)[0]!.querySelectorAll(".semantropy-modal-row-action.is-icon-only")).map(b => b.getAttribute("aria-label")))
+			.toEqual(["Regenerate", "Cancel", "Copy", "Collect"]);
 	});
 	it("generates from Selected Notes without a Target and preserves failed or cancelled Apply", async () => {
 		const h = await harness(sourceText, false);
@@ -124,33 +127,30 @@ describe("Collision production View transactions", () => {
 		await h.apply(["。"]); await session(h.view).generate(10, "");
 		expect(batch(h.view)).toBe(old); expect(modal(h.view).contentEl.textContent).toContain("no usable nouns");
 	});
-	it("keeps selector changes draft-only, then updates only the chosen row and clears applied-draft wording", async () => {
+	it("regenerates only the chosen row with its own pattern and keeps every other row", async () => {
 		const h = await harness(); const old = await generate(h.view, 10, "named");
 		const first = old.rows[0]!, slot = first.rowSlotId, oldRows = rows(h.view), root = modal(h.view).contentEl;
 		const list = root.querySelector<HTMLElement>(".semantropy-collision-rows")!; list.scrollTop = 85;
-		select(oldRows[0]!, "Regenerate with", "purpose");
-		expect(batch(h.view)).toBe(old); expect(oldRows[0]!.textContent).toContain("Pattern selection is a draft");
 		await session(h.view).write(slot, "copy"); await session(h.view).write(slot, "collect");
 		expect(h.calls.copy).toEqual([first.committed.text]);
 		expect(h.calls.collect[0]).toMatchObject({ patternId: "named", rowId: first.committed.rowId, batchId: old.batchId });
 		button(oldRows[0]!, "Regenerate").focus(); await session(h.view).regenerate(slot);
-		const next = batch(h.view); expect(next.rows[0]!.committed.recipeId).toBe("purpose");
+		const next = batch(h.view); expect(next.rows[0]!.committed.recipeId).toBe("named");
 		expect(next.rows[0]!.rowSlotId).toBe(slot); expect(next.rows[0]!.committed.rowId).not.toBe(first.committed.rowId);
 		expect(next.rows[0]!.committed.generationRevision).toBe(2);
 		for (let i = 1; i < old.rows.length; i++) { expect(next.rows[i]).toBe(old.rows[i]); expect(rows(h.view)[i]).toBe(oldRows[i]); }
 		expect(rows(h.view)[0]).toBe(oldRows[0]); expect(document.activeElement).toBe(button(oldRows[0]!, "Regenerate"));
 		expect(list.scrollTop).toBe(85); expect(root).toBe(modal(h.view).contentEl);
-		expect(oldRows[0]!.textContent).not.toContain("Pattern selection is a draft");
 		await session(h.view).write(slot, "collect");
-		expect(h.calls.collect[1]).toMatchObject({ patternId: "purpose", rowId: next.rows[0]!.committed.rowId, batchId: old.batchId });
+		expect(h.calls.collect[1]).toMatchObject({ patternId: "named", rowId: next.rows[0]!.committed.rowId, batchId: old.batchId });
 		expect(Object.keys(h.calls.collect[1]!).sort()).toEqual(["algorithmVersion", "batchId", "metadataVersion", "patternId", "patternSetVersion", "rowId", "text", "type", "vocabulary"]);
 	});
-	it("shows hidden Current pattern as text while omitting it from both selectors and regenerates Same pattern", async () => {
+	it("shows hidden Current pattern as text while omitting it from the default selector and regenerates Same pattern", async () => {
 		fixture.recipes = [{ ...nounRecipe("hidden", false), label: '<b>hidden</b>' }, { ...nounRecipe("disabled", false, false) }];
 		const h = await harness(); const old = await generate(h.view); const row = rows(h.view)[0]!;
 		expect(row.textContent).toContain("Current pattern: <b>hidden</b>"); expect(row.querySelector("b")).toBeNull();
 		expect(select(modal(h.view).contentEl, "Default pattern").options).toHaveLength(1);
-		expect(select(row, "Regenerate with").options).toHaveLength(1);
+		expect(row.querySelector("select")).toBeNull();
 		await session(h.view).regenerate(old.rows[0]!.rowSlotId);
 		expect(batch(h.view).rows[0]!.committed.generationRevision).toBe(2);
 		expect(batch(h.view).rows[0]!.committed.recipeId).toBe("hidden");
@@ -192,6 +192,33 @@ describe("Collision lifecycle and asynchronous boundaries", () => {
 		expect(batch(h.view).rows[0]!.committed.generationRevision).toBe(2); expect(batch(h.view).rows[1]!.committed.generationRevision).toBe(2);
 		for (let i = 2; i < 10; i++) expect(batch(h.view).rows[i]).toBe(old.rows[i]);
 		expect(button(ui[0]!, "Copy").disabled).toBe(false);
+	});
+	it("shows a row's Regenerating note and Cancel only when the work outlasts the delay, so a quick regenerate does not flicker (0.1.0)", async () => {
+		const h = await harness(); h.view.closeCollision(); const gates = stepping(); h.host.scheduler = gates.scheduler; h.view.openCollision();
+		const initial = session(h.view).generate(10, "named"); await gates.drain(); await initial;
+		vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
+		try {
+			const ui = rows(h.view)[0]!, a = batch(h.view).rows[0]!.rowSlotId;
+			const status = ui.querySelector<HTMLElement>('p[role="status"]')!, cancel = button(ui, "Cancel");
+			const seen: string[] = [];
+			const observer = new MutationObserver(() => seen.push(status.textContent ?? "")); observer.observe(status, { childList: true, characterData: true, subtree: true });
+			// Quick: the regeneration finishes inside the delay; the note never appears and Cancel stays hidden.
+			const quick = session(h.view).regenerate(a);
+			expect(ui.getAttribute("aria-busy")).toBe("true");
+			expect([status.textContent, cancel.hidden]).toEqual(["", true]);
+			await gates.drain(); await quick; await flush();
+			expect(seen.some(text => text.includes("Regenerating"))).toBe(false);
+			expect(cancel.hidden).toBe(true);
+			// Slow: past the delay the note and Cancel appear, and go when the work ends.
+			const slow = session(h.view).regenerate(a);
+			vi.advanceTimersByTime(COLLISION_ROW_PENDING_DELAY_MS - 1);
+			expect([status.textContent, cancel.hidden]).toEqual(["", true]);
+			vi.advanceTimersByTime(1);
+			expect(status.textContent).toBe("Regenerating…"); expect(cancel.hidden).toBe(false);
+			await gates.drain(); await slow; await flush();
+			expect(status.textContent).not.toContain("Regenerating"); expect(cancel.hidden).toBe(true);
+			observer.disconnect();
+		} finally { vi.useRealTimers(); }
 	});
 	it("supersedes old Generate and same-row regeneration without advancing the discarded revision", async () => {
 		const h = await harness(); h.view.closeCollision(); const gates = stepping(); h.host.scheduler = gates.scheduler; h.view.openCollision();

@@ -17,10 +17,10 @@ function deferred() { let resolve!: () => void; const promise = new Promise<void
 async function flush() { for (let i = 0; i < 10; i++) await Promise.resolve(); }
 
 // LOCALE1 added schema 5 (`uiLanguage`). UI-POLISH1 added schema 6 (`showRibbonIcon`).
-// COLLECT-ATTRIBUTION1: the live contract is schema 7, schema 6 plus `collectAttribution`.
+// COLLECT-ATTRIBUTION1 added schema 7 (`collectAttribution`). 0.1.0 S2: the live contract is schema 8, plus `bodyTheme`; S4 adds `enclosedTermDelimiters`.
 describe("disconnected schema 4", () => {
 	it("defaults to nouns only without changing production schema 3", () => {
-		expect(AUTOMATIC_POS_SETTINGS_SCHEMA_VERSION).toBe(7);
+		expect(AUTOMATIC_POS_SETTINGS_SCHEMA_VERSION).toBe(8);
 		expect(DEFAULT_AUTOMATIC_POS).toEqual({ noun: true, verb: false, iAdjective: false, adverb: false });
 		expect(SEMANTROPY_SETTINGS_SCHEMA_VERSION).toBe(3);
 		expect(parseSemantropySettings({ schemaVersion: 4, ...customized })).toEqual(defaultSemantropySettings());
@@ -29,7 +29,7 @@ describe("disconnected schema 4", () => {
 	it.each([1, 2, 3])("migrates schema %s only from fields that schema owned", version => {
 		const migrated = parseAutomaticPosSettings({ schemaVersion: version, ...customized, automaticPos: allOn });
 		const legacy = parseSemantropySettings({ schemaVersion: version, ...customized });
-		expect(migrated).toEqual({ ...legacy, schemaVersion: 7, automaticPos: DEFAULT_AUTOMATIC_POS, uiLanguage: "en", showRibbonIcon: true, collectAttribution: DEFAULT_COLLECT_ATTRIBUTION });
+		expect(migrated).toEqual({ ...legacy, schemaVersion: 8, automaticPos: DEFAULT_AUTOMATIC_POS, uiLanguage: "en", showRibbonIcon: true, collectAttribution: DEFAULT_COLLECT_ATTRIBUTION, bodyTheme: "default", enclosedTermDelimiters: [] });
 		expect(migrated.bodySemantropy).toBe(37); expect(migrated.dictionarySemantropy).toBe(9);
 		expect(migrated.collectionPath).toBe(version === 1 ? defaultSemantropySettings().collectionPath : customized.collectionPath);
 		expect(migrated.showRuby).toBe(version < 3); expect(migrated.automaticPos.verb).toBe(false);
@@ -46,10 +46,10 @@ describe("disconnected schema 4", () => {
 		const options = { noun: !!(mask & 1), verb: !!(mask & 2), iAdjective: !!(mask & 4), adverb: !!(mask & 8) };
 		const value = parseAutomaticPosSettings({ schemaVersion: 5, ...customized, automaticPos: options });
 		const written = serializeAutomaticPosSettings(value);
-		expect(written).toEqual({ schemaVersion: 7, ...customized, automaticPos: options, showRibbonIcon: true, collectAttribution: DEFAULT_COLLECT_ATTRIBUTION });
+		expect(written).toEqual({ schemaVersion: 8, ...customized, automaticPos: options, showRibbonIcon: true, collectAttribution: DEFAULT_COLLECT_ATTRIBUTION, bodyTheme: "default", enclosedTermDelimiters: [] });
 		expect(parseAutomaticPosSettings(written)).toEqual(value);
 		expect(Object.keys(written.automaticPos)).toEqual([...AUTOMATIC_POS_KEYS]);
-		expect(Object.keys(written)).toEqual([...Object.keys(serializeSemantropySettings(defaultSemantropySettings())), "automaticPos", "uiLanguage", "showRibbonIcon", "collectAttribution"]);
+		expect(Object.keys(written)).toEqual([...Object.keys(serializeSemantropySettings(defaultSemantropySettings())), "automaticPos", "uiLanguage", "showRibbonIcon", "collectAttribution", "bodyTheme", "enclosedTermDelimiters"]);
 	});
 	it.each(AUTOMATIC_POS_KEYS)("validates %s independently without truthy coercion", key => {
 		for (const bad of ["false", "true", 0, 1, null, undefined, {}, []]) {
@@ -59,14 +59,14 @@ describe("disconnected schema 4", () => {
 		}
 	});
 	it("defaults all fields for unknown or missing schema", () => {
-		for (const schemaVersion of [undefined, 0, 8, "4", "5", "6", null, NaN]) {
+		for (const schemaVersion of [undefined, 0, 9, "4", "5", "6", "8", null, NaN]) {
 			expect(parseAutomaticPosSettings({ schemaVersion, ...customized, automaticPos: allOff })).toEqual(defaultAutomaticPosSettings());
 		}
 	});
 	it("drops unknown and secret fields even at the serializer boundary", () => {
 		const input = { ...defaultAutomaticPosSettings(), ...secrets, automaticPos: { ...allOff, ...secrets } };
 		const output = serializeAutomaticPosSettings(input);
-		expect(Object.keys(output)).toEqual([...Object.keys(defaultSemantropySettings()), "automaticPos", "uiLanguage", "showRibbonIcon", "collectAttribution"]);
+		expect(Object.keys(output)).toEqual([...Object.keys(serializeSemantropySettings(defaultSemantropySettings())), "automaticPos", "uiLanguage", "showRibbonIcon", "collectAttribution", "bodyTheme", "enclosedTermDelimiters"]);
 		expect(output.automaticPos).toEqual(allOff);
 		expect(JSON.stringify(output)).not.toMatch(/seed|nonce|token|pool|snapshot|sourceSelection|draft|manualOverrides|private|reading|secret/u);
 	});

@@ -92,12 +92,12 @@ describe("the Collision core dependency boundary", () => {
 			"src/collision/regularInflection.ts",
 			"src/dictionary/placeholders.ts",
 			"src/random/seededRandom.ts",
-			"src/transform/manualMorphology.ts",
+			"src/text/enclosedTermDelimiters.ts", "src/transform/manualMorphology.ts",
 			"src/transform/regularConjugationTypes.ts",
 			"src/transform/slotScore.ts",
 			"src/transform/tokenPolicy.ts",
 			"src/transform/transformTokens.ts",
-			"src/vocabulary/sha256.ts",
+			"src/vocabulary/enclosedTerms.ts", "src/vocabulary/sha256.ts", "src/vocabulary/sourceWeights.ts",
 			"src/vocabulary/vocabularySnapshot.ts",
 		]);
 	});

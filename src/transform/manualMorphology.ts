@@ -25,6 +25,7 @@ import {
 	REGULAR_VERB_CONJUGATION_TYPES,
 } from "./regularConjugationTypes";
 import { sha256Hex } from "../vocabulary/sha256";
+import { ENCLOSED_TERM_POLICY_VERSION, enclosedTermTokenizer, type EnclosedTermDelimiter } from "../vocabulary/enclosedTerms";
 import {
 	buildVocabularySnapshot,
 	type VocabularyDrawMode,
@@ -483,6 +484,25 @@ export function readManualMorphVocabularySources(value: ManualMorphVocabulary): 
 	return Object.freeze(sources as NonNullable<(typeof sources)[number]>[]);
 }
 
+/**
+ * 0.1.0 S5: each Source's projected and tokenized document, in the owner's
+ * Source order, for Recompose. Nothing is read or tokenized again. `null` for a
+ * handle this module did not mint, or a Source analyzed without its document.
+ */
+export function readManualMorphSourceDocuments(value: ManualMorphVocabulary): readonly {
+	readonly source: VocabularySourceIdentity;
+	readonly projection: MarkdownSourceProjection;
+	readonly located: LocatedAnalysisDocument;
+}[] | null {
+	if (!isManualMorphVocabulary(value)) return null;
+	const documents = value.sources.map(analysis => {
+		const state = ANALYZED.get(analysis);
+		return state?.full ? Object.freeze({ source: state.source, projection: state.full.projection, located: state.full.located }) : null;
+	});
+	if (documents.some(document => document === null)) return null;
+	return Object.freeze(documents as NonNullable<(typeof documents)[number]>[]);
+}
+
 /** Read-only Source evidence, never a caller-supplied compatibility index. */
 export function readManualMorphCandidateBuckets(value: ManualMorphVocabulary): readonly {
 	readonly key: string;
@@ -626,6 +646,12 @@ export async function analyzeManualMorphSource(input: {
 	phase?: (name: "projection" | "tokenize" | "vocabulary") => void;
 	isCurrent?: () => boolean;
 	checkpoint?: () => Promise<boolean>;
+	/**
+	 * 0.1.0 S4: read the text as a Vocabulary Source, where each enclosed term
+	 * is one noun. Never passed for a Target. A Source in which a term was
+	 * recognized records the enclosed-term policy in its projection policy.
+	 */
+	enclosedTerms?: readonly EnclosedTermDelimiter[] | null;
 }): Promise<
 	| { status: "ready"; analysis: ManualMorphSourceAnalysis }
 	| { status: "stale" }
@@ -633,13 +659,15 @@ export async function analyzeManualMorphSource(input: {
 > {
 	const text = input.text;
 	const contentHash = sha256Hex(text);
+	// The shared analyzer freezes its owned token graph. Copy at this boundary
+	// so a tokenizer retaining its returned objects remains caller-owned.
+	const copying: JapaneseTokenizer = { tokenize: async text => (await input.tokenizer.tokenize(text)).map(copyToken) };
+	const terms = input.enclosedTerms?.length ? enclosedTermTokenizer(copying, input.enclosedTerms) : null;
 	const analyzed = await analyzeSelectedSource({
 		text,
 		sourcePath: input.sourcePath,
 		contentHash,
-		// The shared analyzer freezes its owned token graph. Copy at this boundary
-		// so a tokenizer retaining its returned objects remains caller-owned.
-		tokenizer: { tokenize: async text => (await input.tokenizer.tokenize(text)).map(copyToken) },
+		tokenizer: terms ?? copying,
 		...(input.mode === undefined ? {} : { mode: input.mode }),
 		...(input.phase === undefined ? {} : { phase: input.phase }),
 		...(input.isCurrent === undefined ? {} : { isCurrent: input.isCurrent }),
@@ -652,7 +680,9 @@ export async function analyzeManualMorphSource(input: {
 		const source = {
 			path: input.sourcePath,
 			contentHash,
-			projectionPolicy: analyzed.projection.policyVersion,
+			projectionPolicy: terms?.used()
+				? `${analyzed.projection.policyVersion}+${ENCLOSED_TERM_POLICY_VERSION}`
+				: analyzed.projection.policyVersion,
 		};
 		const runs = copyRuns(analyzed.located.runs);
 		const document = {
@@ -700,6 +730,8 @@ export function deriveManualMorphTarget(source: ManualMorphSourceAnalysis, index
 export function buildManualMorphVocabulary(input: {
 	sources: readonly ManualMorphSourceAnalysis[];
 	drawMode: VocabularyDrawMode;
+	/** 0.1.0 S3: weight by Source path (see `src/vocabulary/sourceWeights.ts`). Omitted or all ×1 is unweighted. */
+	sourceWeights?: Readonly<Record<string, unknown>> | null;
 }): ManualMorphVocabulary {
 	if (!Array.isArray(input.sources)) {
 		return fail("invalid-analysis");
@@ -719,6 +751,7 @@ export function buildManualMorphVocabulary(input: {
 		snapshot = buildVocabularySnapshot({
 			sources: states.map((state) => ({ source: state.source, vocabulary: state.vocabulary })),
 			drawMode: input.drawMode,
+			sourceWeights: input.sourceWeights ?? null,
 		});
 	} catch {
 		return fail("invalid-vocabulary");

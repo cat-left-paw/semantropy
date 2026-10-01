@@ -94,7 +94,7 @@ describe("VIEW1 option transaction", () => {
 			const slot = h.current("ゆっくり");
 			const element = Array.from(h.root().querySelectorAll<HTMLElement>(".semantropy-token")).find(el => h.controller().getSlotForElement(el) === slot)!;
 			element.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-			const menu = h.peek.contentEl.querySelector<HTMLElement>('[aria-label="Manual word actions"]')!;
+			const menu = h.peek.contentEl.querySelector<HTMLElement>('[aria-label="Word actions"]')!;
 			expect(menu.contains(document.activeElement)).toBe(true);
 			const button = Array.from(menu.querySelectorAll("button")).find(button => button.textContent === label)!;
 			expect(button.disabled).toBe(false); button.click();

@@ -16,7 +16,9 @@ export type FragmentValidationReasonV4 =
 	| "invalid-recipe-data-version"
 	| "invalid-recipe-id"
 	| "invalid-canonical-text"
-	| "canonical-text-mismatch";
+	| "canonical-text-mismatch"
+	| "invalid-recompose-method"
+	| "invalid-recompose-leap";
 
 export type CollectReadResultV4<T> =
 	| { readonly ok: true; readonly value: T }

@@ -26,6 +26,13 @@ import {
 } from "../transform/tokenPolicy";
 import type { SelectedVocabularyCandidate } from "../transform/transformTokens";
 import { sha256Hex } from "./sha256";
+import {
+	canonicalSourceWeights,
+	drawWeight,
+	sourceWeightLookup,
+	type SourceWeight,
+	type SourceWeightLookup,
+} from "./sourceWeights";
 
 export type VocabularyDrawMode = "uniform" | "frequency";
 
@@ -135,6 +142,11 @@ export type VocabularySnapshot = {
 	policyVersion: typeof VOCABULARY_SNAPSHOT_POLICY_VERSION;
 	drawMode: VocabularyDrawMode;
 	sources: readonly VocabularySourceIdentity[];
+	/**
+	 * 0.1.0 S3: one weight per Source in `sources` order. Present only when
+	 * some Source is not ×1, so an unweighted Snapshot is unchanged.
+	 */
+	sourceWeights?: readonly SourceWeight[];
 	candidates: readonly VocabularyCandidate[];
 	fingerprint: string;
 	projections: {
@@ -716,8 +728,9 @@ function fingerprint(
 	sources: readonly VocabularySourceIdentity[],
 	candidates: readonly VocabularyCandidate[],
 	projections: VocabularySnapshot["projections"],
+	sourceWeights: readonly SourceWeight[] | null,
 ): string {
-	const canonicalPayload = JSON.stringify([
+	const payload: unknown[] = [
 		VOCABULARY_SNAPSHOT_POLICY_VERSION,
 		drawMode,
 		sources.map((source) => [
@@ -743,8 +756,10 @@ function fingerprint(
 		projections.manual.policyVersion,
 		projections.dictionary.policyVersion,
 		projections.collision.policyVersion,
-	]);
-	return `${VOCABULARY_FINGERPRINT_VERSION}:${sha256Hex(canonicalPayload)}`;
+	];
+	// Only a weighted Snapshot adds this, so every unweighted fingerprint is unchanged.
+	if (sourceWeights) payload.push(["source-weights-1", sourceWeights]);
+	return `${VOCABULARY_FINGERPRINT_VERSION}:${sha256Hex(JSON.stringify(payload))}`;
 }
 
 /**
@@ -754,12 +769,21 @@ function fingerprint(
 export function buildVocabularySnapshot(input: {
 	sources: readonly AnalyzedVocabularySource[];
 	drawMode: VocabularyDrawMode;
+	/** 0.1.0 S3: weight by Source path; a missing path is ×1. */
+	sourceWeights?: Readonly<Record<string, unknown>> | null;
 }): VocabularySnapshot {
 	if (input.drawMode !== "uniform" && input.drawMode !== "frequency") {
 		return fail("invalid-source");
 	}
 	const prepared = prepareSources(input.sources);
 	const sources = prepared.map((source) => source.source);
+	const sourceWeights = canonicalSourceWeights(
+		sources.map((source) => source.path),
+		input.sourceWeights,
+	);
+	if (sourceWeights === undefined) {
+		return fail("invalid-source");
+	}
 	const candidates = aggregateCandidates(prepared);
 	const projections = {
 		automaticBody: automaticProjection(prepared, candidates),
@@ -771,12 +795,14 @@ export function buildVocabularySnapshot(input: {
 		policyVersion: VOCABULARY_SNAPSHOT_POLICY_VERSION,
 		drawMode: input.drawMode,
 		sources,
+		...(sourceWeights ? { sourceWeights } : {}),
 		candidates,
 		fingerprint: fingerprint(
 			input.drawMode,
 			sources,
 			candidates,
 			projections,
+			sourceWeights,
 		),
 		projections,
 	});
@@ -803,17 +829,21 @@ function drawSurface(
 	choices: readonly ProjectedVocabularySurface[],
 	mode: VocabularyDrawMode,
 	random: ReturnType<typeof createSeededRandom>,
+	weights: SourceWeightLookup = null,
 ): ProjectedVocabularySurface {
-	if (mode === "uniform") {
+	if (weights === null && mode === "uniform") {
 		return choices[Math.floor(random.next() * choices.length)]!;
 	}
+	// Unweighted, this is the Frequency walk exactly as before.
+	const weightOf = (candidate: ProjectedVocabularySurface) =>
+		drawWeight(mode, weights, candidate.frequency, candidate.origins);
 	const total = choices.reduce(
-		(sum, candidate) => addCount(sum, candidate.frequency),
+		(sum, candidate) => addCount(sum, weightOf(candidate)),
 		0,
 	);
 	let draw = random.next() * total;
 	for (const choice of choices) {
-		draw -= choice.frequency;
+		draw -= weightOf(choice);
 		if (draw < 0) {
 			return choice;
 		}
@@ -852,6 +882,7 @@ export function transformWithVocabularySnapshot(input: {
 		automaticBody: new Map(),
 	};
 	const context = createCandidateDrawContext(provenance, input.bodySeed);
+	const weights = sourceWeightLookup(input.snapshot);
 	const texts: string[] = [];
 	const tokenSurfaces: string[][] = [];
 	const selections: (VocabularySnapshotSelection | null)[][] = [];
@@ -882,6 +913,7 @@ export function transformWithVocabularySnapshot(input: {
 				choices,
 				input.snapshot.drawMode,
 				random,
+				weights,
 			).surface;
 			const applied = isSlotApplied(
 				input.bodySeed,

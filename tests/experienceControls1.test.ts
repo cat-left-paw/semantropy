@@ -65,7 +65,7 @@ function descriptionOf(control: Element): string | null {
 }
 const ROW_NAMES = [
 	"Reshuffle text", "Refresh target", "Copy selection", "Collect selection",
-	"Change vocabulary", "Collision", "Fake proverb",
+	"Change vocabulary", "Collision", "Fake proverb", "Recompose",
 	"Text semantropy level", "Automatic parts of speech", "Display settings",
 ];
 const ROW: readonly [string, keyof typeof TOOLBAR_CONTROLS][] = [

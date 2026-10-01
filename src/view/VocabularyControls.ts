@@ -1,4 +1,4 @@
-import type { VocabularySelection } from "../application/prepareVocabulary";
+import { selectionSourceWeights, selectionWeight, type VocabularySelection } from "../application/prepareVocabulary";
 import { iconLabel } from "./controlIcon";
 import { ui } from "../i18n/catalog";
 export type VocabularySourceIssue = { path: string; reason: "changed" | "missing" };
@@ -42,8 +42,9 @@ export class VocabularyControls {
   else if (!sameCommittedVocabulary(state.selection, state.draft)) notes.push(v.unapplied);
   const stale = state.staleSources.length;
   if (stale > 0) notes.push(v.stale(stale));
+  const draw = state.selection.drawMode === "uniform" ? v.uniform : v.frequency;
   const text = v.summary(state.selection.mode === "current" ? v.currentNote : v.selectedNotesCount(state.selection.paths.length),
-   state.selection.drawMode === "uniform" ? v.uniform : v.frequency, notes.join(" · "));
+   selectionSourceWeights(state.selection) ? v.weightedDraw(draw) : draw, notes.join(" · "));
   if (this.status.textContent !== text) this.status.textContent = text;
  }
  /** LOCALE1: the entry's name follows the language; the Toolbar re-applies it with its own texts. */
@@ -66,5 +67,5 @@ function sameCommittedVocabulary(committed: VocabularySelection, draft: Vocabula
 	if (committed.mode === "current") return true;
 	if (committed.paths.length !== draft.paths.length) return false;
 	const left = [...committed.paths].sort(), right = [...draft.paths].sort();
-	return left.every((path, index) => path === right[index]);
+	return left.every((path, index) => path === right[index] && selectionWeight(committed, path) === selectionWeight(draft, path));
 }
