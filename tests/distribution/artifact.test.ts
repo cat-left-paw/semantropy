@@ -199,6 +199,14 @@ describe("distribution artifact shape", () => {
 		expect(markers).toContain("fixture-user");
 	});
 
+	it("does not mistake a GitHub runner's workspace directory for a machine name", () => {
+		const runnerRoot = path.join(path.parse(rootDir).root, "home", "runner", "work", "semantropy", "semantropy");
+		const markers = machineMarkers(runnerRoot);
+		expect(markers).not.toContain("work");
+		expect(markers).toContain("runner");
+		expect(markers).toContain(runnerRoot);
+	});
+
 	it("still detects an explicitly named Temp vault and its complete path", () => {
 		const vaultRoot = path.join(path.parse(rootDir).root, "Temp", ".obsidian", "plugins", "semantropy");
 		const markers = machineMarkers(vaultRoot);

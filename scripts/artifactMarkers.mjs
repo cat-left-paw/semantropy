@@ -20,6 +20,10 @@ const GENERIC_PATH_SEGMENTS = new Set([
 	// Windows' generic temporary directory is also a substring of coreTemplates.
 	// Full paths and explicit vault/user names are still checked below.
 	"Temp",
+	// GitHub-hosted runners check out to /home/runner/work/<repo>/<repo>, and
+	// "work" is an ordinary word in the bundled code. The full path, "/home/"
+	// and the runner's user name are still checked.
+	"work",
 ]);
 
 /**
