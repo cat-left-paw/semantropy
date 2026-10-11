@@ -62,7 +62,7 @@ describe("the shipped standard templates", () => {
 	});
 
 	it("carries every core template and Optional Clause as bundled data", () => {
-		expect(STANDARD_CORE_TEMPLATES).toHaveLength(90);
+		expect(STANDARD_CORE_TEMPLATES).toHaveLength(108); // template set 2 (FAKE-DICT-LEXEME1)
 		expect(STANDARD_OPTIONAL_CLAUSES).toHaveLength(31);
 		for (const entry of [...STANDARD_CORE_TEMPLATES, ...STANDARD_OPTIONAL_CLAUSES]) {
 			expect(bundle).toContain(entry.text);
@@ -114,8 +114,8 @@ describe("the shipped standard templates", () => {
 			// The real module still matches, so the gate is a comparison and not a
 			// latch, and the build that produced this artifact went through it.
 			await expect(assertStandardTemplatesGenerated({ rootDir })).resolves.toEqual({
-				schemaVersion: 1,
-				dataVersion: 1,
+				schemaVersion: 2,
+				dataVersion: 2,
 			});
 			expect(
 				await readFile(path.join(rootDir, STANDARD_TEMPLATES_GENERATED), "utf8"),
@@ -135,7 +135,7 @@ describe("the shipped standard templates", () => {
 
 			await expect(
 				assertStandardTemplatesGenerated({ rootDir, generatedPath: crlf }),
-			).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			).resolves.toEqual({ schemaVersion: 2, dataVersion: 2 });
 		} finally {
 			await rm(scratch, { recursive: true, force: true });
 		}

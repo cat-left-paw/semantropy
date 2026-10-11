@@ -53,5 +53,10 @@ export function manualMorphHarness(tokenizer: JapaneseTokenizer, size = 5000) {
 		view.setVocabularyDraft({ mode: "selected", paths: texts.map((_, i) => `source${i}.md`), drawMode: mode });
 		return view.applyVocabulary();
 	};
-	return { view, peek, host, state, calls, notes, controller, plan, current, root, open, apply };
+	/**
+	 * Puts the View in the state an Open finds when another Open is still reading (the session loading): the next Open then builds
+	 * the shell again, which an Open of a note into a ready View does not. The one place a test reaches into the session for it.
+	 */
+	const leaveReady = () => peek.session.beginLoading();
+	return { view, peek, host, state, calls, notes, controller, plan, current, root, open, apply, leaveReady };
 }

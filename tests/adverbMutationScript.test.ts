@@ -139,13 +139,15 @@ function fixture(mode: "normal" | "edit" | "kill", probe: ProbeMode) {
 	writeFileSync(
 		runner,
 		`
-import { existsSync, writeFileSync, statSync } from "node:fs";
+import { existsSync, renameSync, writeFileSync, statSync } from "node:fs";
 const report = ${JSON.stringify(report)};
 const source = ${JSON.stringify(source)};
 const mode = ${JSON.stringify(mode)};
 if (!existsSync(report)) {
   if (mode === "edit") writeFileSync(source, "concurrent editor bytes");
-  writeFileSync(report, JSON.stringify({ directory: process.cwd(), mtime: String(statSync(source, { bigint: true }).mtimeNs) }));
+  // Renamed into place, so the test never reads a half-written report (TEST-STABILITY1).
+  writeFileSync(report + ".staged", JSON.stringify({ directory: process.cwd(), mtime: String(statSync(source, { bigint: true }).mtimeNs) }));
+  renameSync(report + ".staged", report);
 }
 if (mode === "kill") {
   setInterval(() => {}, 1000);
@@ -220,7 +222,7 @@ describe("the adverb mutation script's checkout isolation", () => {
 				} else {
 					expect(await task.finished, task.output()).toBe(0);
 					expect(task.output()).toContain('"isolation": "temporary-copy"');
-					expect(task.output()).toContain(`"caught": ${probe === "max-view" ? 12 : probe === "max-core" ? 32 : probe === "max" ? 20 : probe === "view" ? 9 : probe === "collect" ? 21 : probe === "settings" ? 12 : probe === "automatic" ? 22 : 23}`);
+					expect(task.output()).toContain(`"caught": ${probe === "max-view" ? 12 : probe === "max-core" ? 36 : probe === "max" ? 20 : probe === "view" ? 9 : probe === "collect" ? 21 : probe === "settings" ? 12 : probe === "automatic" ? 22 : 23}`);
 				}
 				const report = JSON.parse(readFileSync(copy.report, "utf8")) as {
 					directory: string;

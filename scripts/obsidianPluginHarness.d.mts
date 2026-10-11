@@ -66,6 +66,8 @@ export declare function openHarnessNote(
 		sourcePath?: string;
 		sourceName?: string;
 		timeoutMs?: number;
+		/** WORKBENCH-UI4: false stops at the state the plugin leaves a note in (nothing shuffled yet); by default Generate is pressed. */
+		generate?: boolean;
 	},
 ): Promise<{
 	status: "ready" | "error";

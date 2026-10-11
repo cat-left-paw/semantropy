@@ -7,7 +7,8 @@ export class FakeDefinitionModal extends Modal {
  private opened = false;
  private presenter: FakeDefinitionPresenter | null = null;
  constructor(app: App, private readonly host: FakeDefinitionModalHost) { super(app); }
- isOpen(): boolean { return this.opened; }
+ /** Not `isOpen`: Obsidian 1.14.4's Modal assigns an instance property of that name, which hides a method (DEFINE-DIALOG-FIX1). */
+ isShowing(): boolean { return this.opened; }
  onOpen(): void {
   this.opened = true; this.modalEl.classList.add("semantropy-dictionary-modal"); this.setTitle(ui().dictionary.title);
   this.presenter = new FakeDefinitionPresenter(this.contentEl, this.host); this.sync();

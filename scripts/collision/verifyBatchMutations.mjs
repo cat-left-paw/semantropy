@@ -36,8 +36,9 @@ const mutations = [
 ];
 
 const evidence = [];
-const probes = viewMode ? (await import("./viewMutations.mjs")).viewMutations : mutations.map(probe =>
-	["src/collision/collisionBatch.ts", "tests/collisionBatch.test.ts", ...probe]);
+// COLLISION-LOCK1: the probes of the regeneration that keeps a row's words are full tuples and live in their own module.
+const probes = viewMode ? (await import("./viewMutations.mjs")).viewMutations : [...mutations.map(probe =>
+	["src/collision/collisionBatch.ts", "tests/collisionBatch.test.ts", ...probe]), ...(await import("./lockMutations.mjs")).lockMutations];
 let failure = null;
 function removeMutationDirectory(directory) {
 	if (lstatSync(directory).isSymbolicLink() || realpathSync(directory) !== directory) {
@@ -56,7 +57,8 @@ if (dirname(directory) !== temporaryRoot || !basename(directory).startsWith("sem
 try {
 	// Regular copies, never source hardlinks/junctions. No .git, settings, Vault
 	// data, dictionary preparation, builds or private history are needed.
-	for (const entry of ["src", "tests", "package.json", "tsconfig.json", "vitest.config.ts", "scripts/vitestAliases.mjs"]) {
+	// `styles.css` too: a probe of the look rewrites it, and a test of the look reads it.
+	for (const entry of ["src", "tests", "package.json", "tsconfig.json", "vitest.config.ts", "scripts/vitestAliases.mjs", "styles.css"]) {
 		const destination = join(directory, entry);
 		mkdirSync(dirname(destination), { recursive: true });
 		cpSync(join(root, entry), destination, { recursive: true, dereference: true });

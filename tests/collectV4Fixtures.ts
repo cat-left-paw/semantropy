@@ -4,6 +4,7 @@ import {
 	type FakeProverbFragmentInputV4,
 } from "../src/collect/v4/CollectedFragmentV4";
 import { fakeProverbCanonicalText } from "../src/fakeProverb/fakeProverbText";
+import { FAKE_PROVERB_ALGORITHM_VERSION } from "../src/fakeProverb/fakeProverbVersions";
 import { collectVocabulary } from "./collectFixtures";
 import { identityV3, inputsV3 } from "./collectV3Fixtures";
 
@@ -18,7 +19,8 @@ export function fakeProverbV4(overrides: Partial<Record<keyof FakeProverbFragmen
 		metadataVersion: 4,
 		type: "fake-proverb",
 		text: FIXTURE_CANONICAL,
-		algorithmVersion: 1,
+		// The current Fake Proverb algorithm: a new entry always carries it (2 since FAKE-PROVERB-NA1).
+		algorithmVersion: FAKE_PROVERB_ALGORITHM_VERSION,
 		recipeDataVersion: 1,
 		vocabulary: collectVocabulary(["a.md", "b.md", "c.md"]),
 		proverbRecipeId: "offered-to",

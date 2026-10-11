@@ -295,8 +295,8 @@ describe("TOOLBAR1 action hierarchy and accessibility (UI-02)", () => {
 		expect(document.getElementById(group.getAttribute("aria-labelledby")!)?.textContent).toBe("Phrase generation");
 		expect(collision.closest('[aria-label="Display settings"]')).toBeNull();
 		expect(tabOrder(h.view)).toContain(collision);
-		// 0.1.0 S5 adds Recompose to Phrase generation; the other later operations stay absent.
-		expect(pick<HTMLButtonElement>(h.view, ".semantropy-recompose-open").closest(".semantropy-toolbar-group")).toBe(group);
+		// Recompose is the tab, not a Toolbar control (WORKBENCH-UI5), so Phrase generation has none; the other later operations stay absent.
+		expect(shell(h.view).querySelector(".semantropy-recompose-open")).toBeNull();
 		for (const absent of [
 			"Vertical", "縦書き", "Seed",
 		]) {

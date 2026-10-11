@@ -1,6 +1,8 @@
 import {
-	isFakeDictionaryPlaceholder,
-	type FakeDictionaryPlaceholder,
+	FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS,
+	isFakeDictionaryTemplatePlaceholder,
+	type FakeDictionaryLexicalPlaceholder,
+	type FakeDictionaryTemplatePlaceholder,
 } from "./placeholders";
 import {
 	OPTIONAL_CLAUSE_CATEGORIES,
@@ -18,7 +20,7 @@ export type TemplateTextSegment = {
 
 export type TemplatePlaceholderSegment = {
 	readonly kind: "placeholder";
-	readonly placeholder: FakeDictionaryPlaceholder;
+	readonly placeholder: FakeDictionaryTemplatePlaceholder;
 };
 
 export type TemplateSegment = TemplateTextSegment | TemplatePlaceholderSegment;
@@ -28,14 +30,14 @@ export type CompiledCoreTemplate = {
 	readonly family: TemplateFamily;
 	readonly segments: readonly TemplateSegment[];
 	/** Distinct placeholders this template needs, in declaration order. */
-	readonly requiredPlaceholders: readonly FakeDictionaryPlaceholder[];
+	readonly requiredPlaceholders: readonly FakeDictionaryTemplatePlaceholder[];
 };
 
 export type CompiledOptionalClause = {
 	readonly id: string;
 	readonly category: OptionalClauseCategory;
 	readonly segments: readonly TemplateSegment[];
-	readonly requiredPlaceholders: readonly FakeDictionaryPlaceholder[];
+	readonly requiredPlaceholders: readonly FakeDictionaryTemplatePlaceholder[];
 };
 
 export type CompiledTemplateSet = {
@@ -122,7 +124,7 @@ export function parseTemplateSegments(source: string): SegmentParse {
 			// not a name that happens to contain braces.
 			return { ok: false, code: "unclosed-placeholder" };
 		}
-		if (!isFakeDictionaryPlaceholder(name)) {
+		if (!isFakeDictionaryTemplatePlaceholder(name)) {
 			return { ok: false, code: "unknown-placeholder", detail: name };
 		}
 		if (open > literalStart) {
@@ -158,8 +160,8 @@ export function parseTemplateSegments(source: string): SegmentParse {
  */
 export function requiredPlaceholdersOf(
 	segments: readonly TemplateSegment[],
-): readonly FakeDictionaryPlaceholder[] {
-	const required: FakeDictionaryPlaceholder[] = [];
+): readonly FakeDictionaryTemplatePlaceholder[] {
+	const required: FakeDictionaryTemplatePlaceholder[] = [];
 	for (const segment of segments) {
 		if (segment.kind !== "placeholder") {
 			continue;
@@ -291,6 +293,20 @@ export function compileTemplateSet(
 			optionalClauses: Object.freeze(optionalClauses),
 		}),
 	};
+}
+
+/**
+ * The lexical placeholders a set uses anywhere, in their declared order
+ * (FAKE-DICT-LEXEME1). A Vocabulary pool carries a lexical list only for
+ * these, so a set that uses none keeps every pool, fingerprint and definition
+ * exactly as it was.
+ */
+export function lexicalPlaceholdersOf(set: CompiledTemplateSet): readonly FakeDictionaryLexicalPlaceholder[] {
+	const used = new Set<string>();
+	for (const entry of [...set.coreTemplates, ...set.optionalClauses]) {
+		for (const placeholder of entry.requiredPlaceholders) used.add(placeholder);
+	}
+	return Object.freeze(FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS.filter((placeholder) => used.has(placeholder)));
 }
 
 /** Renders one issue as a single line for a build or test failure. */

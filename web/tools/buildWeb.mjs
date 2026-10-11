@@ -32,6 +32,7 @@ import { linderaPayloadPlugin } from "../../scripts/lindera/linderaPayload.mjs";
 import { assertStandardTemplatesGenerated } from "../../scripts/fakeDictionary/standardTemplates.mjs";
 import { assertStandardCollisionPatternsGenerated } from "../../scripts/collision/standardPatterns.mjs";
 import { assertStandardFakeProverbRecipesGenerated } from "../../scripts/fakeProverb/standardRecipes.mjs";
+import { assertStandardFakeAlertRecipesGenerated } from "../../scripts/fakeAlert/standardRecipes.mjs";
 import {
 	LINDERA_DICTIONARY_FILE_NAMES,
 	LINDERA_NOTICE_FILE_NAME,
@@ -55,6 +56,7 @@ async function checkInputs() {
 	await assertStandardTemplatesGenerated({ rootDir });
 	await assertStandardCollisionPatternsGenerated({ rootDir });
 	await assertStandardFakeProverbRecipesGenerated({ rootDir });
+	await assertStandardFakeAlertRecipesGenerated({ rootDir });
 	await assertLinderaWasmVersion(rootDir);
 	await assertLinderaWasmPackage(rootDir);
 	await ensureBuildDictionary(rootDir, { log: (line) => process.stdout.write(line + "\n") });

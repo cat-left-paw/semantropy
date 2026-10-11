@@ -50,7 +50,7 @@ function state(over: Partial<VocabularyControlsState> & { selection?: Vocabulary
 	return {
 		selection: committed, draft: over.draft ?? { ...committed, paths: [...committed.paths] },
 		stale: over.stale ?? false, staleSources: over.staleSources ?? [], preparing: over.preparing ?? false,
-		progress: null, error: null, ready: true,
+		progress: null, error: null, ready: true, applied: true, sources: over.sources ?? [],
 	};
 }
 

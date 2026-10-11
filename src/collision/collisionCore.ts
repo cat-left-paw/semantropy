@@ -137,11 +137,28 @@ export type CollisionGenerationRejection =
 	| "provenance-mismatch"
 	| "invalid-request";
 
+/**
+ * COLLISION-LOCK1: one part of a result, in the recipe's order. A row's text is
+ * these `text`s joined, always; the parts it was built from stay so that a later
+ * regeneration can keep some of them. A modifier slot the row does not have, in
+ * a recipe where it is optional, has no segment. An empty Connector is a segment
+ * with an empty `text`, because which Connector was drawn is what must be kept.
+ */
+export type CollisionSegment =
+	| { readonly kind: "noun" | "predicate" | "literal"; readonly slotId: string; readonly text: string }
+	| { readonly kind: "modifier"; readonly slotId: string; readonly text: string; readonly formId: string }
+	| { readonly kind: "connector"; readonly slotId: string; readonly text: string; readonly connectorId: string };
+
+/** The kinds of segment a writer may keep (lock) when a row is regenerated. */
+export const COLLISION_LOCKABLE_SEGMENT_KINDS: readonly ("noun" | "modifier" | "predicate")[] = Object.freeze(["noun", "modifier", "predicate"] as const);
+
 /** One generation draft. Identity and lifecycle are added by BATCH1. */
 export type CollisionResultDraft = {
 	/** The recipe actually used, which under Random is the drawn one. */
 	readonly recipeId: string;
 	readonly text: string;
+	/** COLLISION-LOCK1: the parts `text` was joined from. */
+	readonly segments: readonly CollisionSegment[];
 	readonly structureSignature: string;
 	readonly limited: boolean;
 	readonly limitedReason: CollisionLimitedReason | null;
@@ -606,6 +623,7 @@ function viability(
 type Attempt = {
 	readonly recipeId: string;
 	readonly text: string;
+	readonly segments: readonly CollisionSegment[];
 	readonly structureSignature: string;
 	readonly limited: boolean;
 	readonly limitedReason: CollisionLimitedReason | null;
@@ -719,14 +737,14 @@ function compose(viable: ViableRecipe, context: DrawContext): Attempt {
 	const presenceSignature: string[] = [];
 	const connectorSignature: string[] = [];
 	const formSignature: string[] = [];
-	let text = "";
+	const segments: CollisionSegment[] = [];
 	let repeatedNoun = false;
 
 	for (const part of recipe.parts) {
 		switch (part.kind) {
 			case "noun": {
 				const drawn = drawNoun(context, usedNouns);
-				text += drawn.surface;
+				segments.push({ kind: "noun", slotId: part.slotId, text: drawn.surface });
 				repeatedNoun = repeatedNoun || drawn.repeated;
 				break;
 			}
@@ -738,7 +756,7 @@ function compose(viable: ViableRecipe, context: DrawContext): Attempt {
 					presenceSignature.push(part.slotId);
 				}
 				const drawn = drawModifier(context, part.profile);
-				text += drawn.surface;
+				segments.push({ kind: "modifier", slotId: part.slotId, text: drawn.surface, formId: drawn.formId });
 				formSignature.push(drawn.formId);
 				break;
 			}
@@ -750,31 +768,46 @@ function compose(viable: ViableRecipe, context: DrawContext): Attempt {
 					context.random,
 				);
 				// An empty Connector contributes nothing but is a real choice.
-				text += connector.literal ?? "";
+				segments.push({ kind: "connector", slotId: part.slotId, text: connector.literal ?? "", connectorId: connector.id });
 				connectorSignature.push(connector.id);
 				break;
 			}
 			case "predicate":
-				text += drawPredicate(context, part.profile);
+				segments.push({ kind: "predicate", slotId: part.slotId, text: drawPredicate(context, part.profile) });
 				break;
 			case "literal": {
 				const literal = context.pattern.literals.get(part.literalId);
 				if (literal === undefined) {
 					return reject("invalid-pattern-set");
 				}
-				text += literal;
+				segments.push({ kind: "literal", slotId: part.slotId, text: literal });
 				break;
 			}
 		}
 	}
 
+	return finishAttempt(recipe, segments, presenceSignature, connectorSignature, formSignature, repeatedNoun);
+}
+
+/**
+ * The one place an attempt is closed: the text is the segments joined, and the
+ * signature is structure only. Surfaces and candidate identity are deliberately
+ * absent from it: it describes the shape a result was built with, so run
+ * suppression cannot be defeated by drawing different words into the same
+ * shape. Fixed literals and part kinds follow from the recipe id.
+ */
+function finishAttempt(
+	recipe: CompiledCollisionRecipe,
+	segments: readonly CollisionSegment[],
+	presenceSignature: readonly string[],
+	connectorSignature: readonly string[],
+	formSignature: readonly string[],
+	repeatedNoun: boolean,
+): Attempt {
 	return {
 		recipeId: recipe.id,
-		text,
-		// Structure only. Surfaces and candidate identity are deliberately
-		// absent: the signature describes the shape a result was built with, so
-		// run suppression cannot be defeated by drawing different words into the
-		// same shape. Fixed literals and part kinds follow from the recipe id.
+		text: segments.map((segment) => segment.text).join(""),
+		segments,
 		structureSignature: JSON.stringify([
 			recipe.id,
 			presenceSignature,
@@ -805,12 +838,10 @@ function refusal(
 	};
 }
 
-function validateRequest(input: {
+function validateScalars(input: {
 	readonly count: number;
 	readonly nonce: number;
 	readonly drawMode: VocabularyDrawMode;
-	readonly request: CollisionRecipeRequest;
-	readonly avoid?: CollisionAvoidContext | undefined;
 }): void {
 	if (
 		!Number.isSafeInteger(input.count) ||
@@ -823,6 +854,16 @@ function validateRequest(input: {
 	) {
 		return reject("invalid-request");
 	}
+}
+
+function validateRequest(input: {
+	readonly count: number;
+	readonly nonce: number;
+	readonly drawMode: VocabularyDrawMode;
+	readonly request: CollisionRecipeRequest;
+	readonly avoid?: CollisionAvoidContext | undefined;
+}): void {
+	validateScalars(input);
 	const request = input.request;
 	if (request === null || typeof request !== "object") {
 		return reject("invalid-request");
@@ -850,6 +891,52 @@ function validateRequest(input: {
 	}
 }
 
+type OpenedGeneration = {
+	readonly pattern: PreparedPatternSet;
+	readonly prepared: PreparedPool;
+};
+
+/**
+ * The checks every generation starts with, shared by Random / fixed generation
+ * and the regeneration that keeps a row's words: the pattern set, the pool and
+ * what the pool says it was built from. Each refusal is thrown as a fixed code.
+ */
+function openGeneration(input: {
+	readonly pool: CollisionLexemePool;
+	readonly patternSet: CompiledCollisionPatternSet;
+	readonly drawMode: VocabularyDrawMode;
+}): OpenedGeneration {
+	const pattern = preparePatternSet(input.patternSet);
+
+	if (patternProvenanceDiffers(input.pool, pattern.set)) {
+		return reject("provenance-mismatch");
+	}
+
+	const prepared = preparePool(input.pool, pattern.set);
+
+	// The draw mode is a request input, so only the caller can disagree here.
+	const provenance = prepared.pool.provenance;
+	if (
+		provenance.patternSchemaVersion !== pattern.set.schemaVersion ||
+		provenance.patternDataVersion !== pattern.set.dataVersion ||
+		provenance.drawMode !== input.drawMode
+	) {
+		return reject("provenance-mismatch");
+	}
+	return { pattern, prepared };
+}
+
+function drawContext(opened: OpenedGeneration, drawMode: VocabularyDrawMode, nonce: number): DrawContext {
+	const provenance = opened.prepared.pool.provenance;
+	return {
+		pattern: opened.pattern,
+		prepared: opened.prepared,
+		drawMode,
+		weights: sourceWeightLookup({ sources: provenance.sources, sourceWeights: opened.prepared.pool.sourceWeights }),
+		random: createSeededRandom(nonce),
+	};
+}
+
 /**
  * Generates Collision drafts.
  *
@@ -868,23 +955,8 @@ export function generateCollisionResults(input: {
 }): CollisionGenerationResult {
 	try {
 		validateRequest(input);
-		const pattern = preparePatternSet(input.patternSet);
-
-		if (patternProvenanceDiffers(input.pool, pattern.set)) {
-			return { ok: false, reason: "provenance-mismatch" };
-		}
-
-		const prepared = preparePool(input.pool, pattern.set);
-
-		// The draw mode is a request input, so only the caller can disagree here.
-		const provenance = prepared.pool.provenance;
-		if (
-			provenance.patternSchemaVersion !== pattern.set.schemaVersion ||
-			provenance.patternDataVersion !== pattern.set.dataVersion ||
-			provenance.drawMode !== input.drawMode
-		) {
-			return { ok: false, reason: "provenance-mismatch" };
-		}
+		const opened = openGeneration(input);
+		const { pattern, prepared } = opened;
 
 		const requestedCount = input.count;
 		if (prepared.nouns.length === 0) {
@@ -933,14 +1005,8 @@ export function generateCollisionResults(input: {
 				pickWeighted(viable, (entry) => entry.recipe.weight, total, random);
 		}
 
-		const random = createSeededRandom(input.nonce);
-		const context: DrawContext = {
-			pattern,
-			prepared,
-			drawMode: input.drawMode,
-			weights: sourceWeightLookup({ sources: provenance.sources, sourceWeights: prepared.pool.sourceWeights }),
-			random,
-		};
+		const context = drawContext(opened, input.drawMode, input.nonce);
+		const random = context.random;
 
 		const avoidTexts = new Set(input.avoid?.texts ?? []);
 		const signatureRun = [...(input.avoid?.recentSignatures ?? [])];
@@ -994,6 +1060,7 @@ export function generateCollisionResults(input: {
 			results.push({
 				recipeId: accepted.recipeId,
 				text: accepted.text,
+				segments: accepted.segments,
 				structureSignature: accepted.structureSignature,
 				limited: accepted.limited,
 				limitedReason: accepted.limitedReason,
@@ -1016,6 +1083,368 @@ export function generateCollisionResults(input: {
 				status,
 				shortfallReason: status === "complete" ? null : shortfallReason,
 				results,
+			}),
+		};
+	} catch (error) {
+		if (error instanceof RejectionError) {
+			return { ok: false, reason: error.reason };
+		}
+		// Nothing else is expected, and an exception message is never surfaced.
+		return { ok: false, reason: "invalid-pool" };
+	}
+}
+
+// --- COLLISION-LOCK1: regenerate a row and keep some of its words -----------
+
+/** The row to regenerate: its recipe and the segments it was built from. */
+export type CollisionLockedRow = {
+	readonly recipeId: string;
+	readonly segments: readonly CollisionSegment[];
+};
+
+type LockPlan = {
+	readonly recipe: CompiledCollisionRecipe;
+	/** The row's own segment for every part it has, by slot. */
+	readonly bySlot: ReadonlyMap<string, CollisionSegment>;
+	/** The slots whose words are kept. */
+	readonly locked: ReadonlySet<string>;
+};
+
+const LOCKABLE_KINDS: ReadonlySet<string> = new Set(COLLISION_LOCKABLE_SEGMENT_KINDS);
+
+/**
+ * Reads one segment of an untrusted row into a fresh value of the shape this
+ * module writes, or refuses. Nothing else of the object is kept.
+ */
+function readSegment(value: unknown): CollisionSegment {
+	if (value === null || typeof value !== "object") {
+		return reject("invalid-request");
+	}
+	const raw = value as Record<string, unknown>;
+	const kind = raw.kind;
+	const slotId = raw.slotId;
+	const text = raw.text;
+	if (typeof slotId !== "string" || slotId.length === 0 || typeof text !== "string") {
+		return reject("invalid-request");
+	}
+	if (kind === "noun" || kind === "predicate" || kind === "literal") {
+		return { kind, slotId, text };
+	}
+	if (kind === "modifier" && typeof raw.formId === "string") {
+		return { kind, slotId, text, formId: raw.formId };
+	}
+	if (kind === "connector" && typeof raw.connectorId === "string") {
+		return { kind, slotId, text, connectorId: raw.connectorId };
+	}
+	return reject("invalid-request");
+}
+
+/**
+ * The row is as untrusted as every other input of this core. It is accepted
+ * only when it is a row this pattern set and this pool could have produced:
+ * its recipe is a usable recipe of the set; its segments are the recipe's parts
+ * in order (an optional modifier may be absent, and the ones present are one
+ * of the recipe's presence entries); its literals and Connectors are the set's
+ * own; and every word that is kept is a candidate of this pool for that part.
+ * The words that are not kept are never read for their value, because they are
+ * drawn again. Every refusal is the fixed `invalid-request`.
+ */
+function planLock(
+	input: { readonly original: CollisionLockedRow; readonly locked: readonly string[] },
+	pattern: PreparedPatternSet,
+	prepared: PreparedPool,
+): LockPlan {
+	let recipeId: unknown;
+	let rawSegments: unknown;
+	let rawLocked: unknown[] | null = null;
+	const segments: CollisionSegment[] = [];
+	try {
+		const original = input.original as unknown;
+		if (original === null || typeof original !== "object") {
+			return reject("invalid-request");
+		}
+		recipeId = (original as { recipeId?: unknown }).recipeId;
+		rawSegments = (original as { segments?: unknown }).segments;
+		// The names are read once, here, into a list of our own: a list that throws when read is a bad request.
+		const lockedInput = input.locked as unknown;
+		if (isList(lockedInput)) {
+			rawLocked = [];
+			for (const name of lockedInput) {
+				rawLocked.push(name);
+			}
+		}
+		if (isList(rawSegments)) {
+			for (const raw of rawSegments) {
+				segments.push(readSegment(raw));
+			}
+		}
+	} catch (error) {
+		if (error instanceof RejectionError) {
+			throw error;
+		}
+		return reject("invalid-request");
+	}
+	if (typeof recipeId !== "string" || !isList(rawSegments) || rawLocked === null) {
+		return reject("invalid-request");
+	}
+	const recipe = pattern.recipeById.get(recipeId);
+	if (recipe === undefined || !recipe.enabled) {
+		return reject("invalid-request");
+	}
+
+	// The segments are the recipe's parts, in order.
+	const bySlot = new Map<string, CollisionSegment>();
+	const present = new Set<string>();
+	let cursor = 0;
+	for (const part of recipe.parts) {
+		const next = segments[cursor];
+		if (part.kind === "modifier" && part.optional && !(next?.kind === "modifier" && next.slotId === part.slotId)) {
+			continue;
+		}
+		if (next === undefined || next.kind !== part.kind || next.slotId !== part.slotId) {
+			return reject("invalid-request");
+		}
+		cursor += 1;
+		bySlot.set(part.slotId, next);
+		if (part.kind === "modifier" && part.optional) {
+			present.add(part.slotId);
+		}
+		if (part.kind === "literal" && next.text !== pattern.literals.get(part.literalId)) {
+			return reject("invalid-request");
+		}
+		if (part.kind === "connector") {
+			const declared = next.kind === "connector"
+				? pattern.set.connectors.find((entry) => entry.id === next.connectorId)
+				: undefined;
+			if (declared === undefined || next.text !== (declared.literal ?? "")) {
+				return reject("invalid-request");
+			}
+		}
+	}
+	if (cursor !== segments.length) {
+		return reject("invalid-request");
+	}
+	// Which optional modifiers are present must be a combination the recipe can draw.
+	if (
+		recipe.parts.some((part) => part.kind === "modifier" && part.optional) &&
+		!recipe.presence.some((entry) => entry.slots.length === present.size && entry.slots.every((slot) => present.has(slot)))
+	) {
+		return reject("invalid-request");
+	}
+
+	// The words to keep: parts the row has, of a kind that can be kept, named once.
+	const locked = new Set<string>();
+	for (const name of rawLocked) {
+		if (typeof name !== "string" || locked.has(name) || !bySlot.has(name)) {
+			return reject("invalid-request");
+		}
+		locked.add(name);
+	}
+	const lockable = recipe.parts.filter((part) => LOCKABLE_KINDS.has(part.kind) && bySlot.has(part.slotId));
+	// Nothing to keep is a different operation, and everything kept leaves nothing to draw.
+	if (locked.size === 0 || locked.size >= lockable.length) {
+		return reject("invalid-request");
+	}
+	for (const part of recipe.parts) {
+		if (!locked.has(part.slotId)) {
+			continue;
+		}
+		const kept = bySlot.get(part.slotId)!;
+		if (!LOCKABLE_KINDS.has(part.kind)) {
+			return reject("invalid-request");
+		}
+		// A kept word has to be one this pool offers for that part: a row built
+		// from another Vocabulary, or by hand, cannot put its words into a result.
+		let offered = false;
+		if (part.kind === "noun") {
+			offered = prepared.nouns.some((candidate) => candidate.surface === kept.text);
+		} else if (part.kind === "modifier" && kept.kind === "modifier") {
+			offered = admissibleForms(part.profile, pattern).some((form) => form.formId === kept.formId) &&
+				(prepared.modifiersByForm.get(part.profile)?.get(kept.formId) ?? []).some((choice) => choice.candidate.surface === kept.text);
+		} else if (part.kind === "predicate") {
+			offered = (prepared.predicates.get(part.profile) ?? []).some((candidate) => candidate.surface === kept.text);
+		}
+		if (!offered) {
+			return reject("invalid-request");
+		}
+	}
+	return { recipe, bySlot, locked };
+}
+
+/** A fresh copy of a kept segment, so a result never shares an object with the row it came from. */
+function copySegment(segment: CollisionSegment): CollisionSegment {
+	switch (segment.kind) {
+		case "modifier":
+			return { kind: "modifier", slotId: segment.slotId, text: segment.text, formId: segment.formId };
+		case "connector":
+			return { kind: "connector", slotId: segment.slotId, text: segment.text, connectorId: segment.connectorId };
+		default:
+			return { kind: segment.kind, slotId: segment.slotId, text: segment.text };
+	}
+}
+
+/**
+ * One attempt of the regeneration that keeps a row's words: the row's recipe,
+ * the modifiers it has and the Connectors it drew stay as they are; the words
+ * that are kept stay as they are; every other noun, modifier and predicate is
+ * drawn again by the same functions a Random generation draws with. The nouns
+ * that are kept are counted as used before any other noun is drawn, so the new
+ * nouns avoid them first.
+ */
+function composeLocked(plan: LockPlan, context: DrawContext): Attempt {
+	const { recipe } = plan;
+	const usedNouns = new Set<string>();
+	for (const part of recipe.parts) {
+		const kept = plan.bySlot.get(part.slotId);
+		if (part.kind === "noun" && plan.locked.has(part.slotId) && kept !== undefined) {
+			usedNouns.add(kept.text);
+		}
+	}
+	const presenceSignature: string[] = [];
+	const connectorSignature: string[] = [];
+	const formSignature: string[] = [];
+	const segments: CollisionSegment[] = [];
+
+	for (const part of recipe.parts) {
+		const original = plan.bySlot.get(part.slotId);
+		if (original === undefined) {
+			// An optional modifier the row does not have stays absent.
+			continue;
+		}
+		const keep = plan.locked.has(part.slotId);
+		switch (part.kind) {
+			case "noun":
+				segments.push(keep ? copySegment(original) : { kind: "noun", slotId: part.slotId, text: drawNoun(context, usedNouns).surface });
+				break;
+			case "modifier": {
+				if (part.optional) {
+					presenceSignature.push(part.slotId);
+				}
+				if (keep && original.kind === "modifier") {
+					segments.push(copySegment(original));
+					formSignature.push(original.formId);
+					break;
+				}
+				const drawn = drawModifier(context, part.profile);
+				segments.push({ kind: "modifier", slotId: part.slotId, text: drawn.surface, formId: drawn.formId });
+				formSignature.push(drawn.formId);
+				break;
+			}
+			case "connector":
+				segments.push(copySegment(original));
+				if (original.kind === "connector") {
+					connectorSignature.push(original.connectorId);
+				}
+				break;
+			case "predicate":
+				segments.push(keep ? copySegment(original) : { kind: "predicate", slotId: part.slotId, text: drawPredicate(context, part.profile) });
+				break;
+			case "literal":
+				segments.push(copySegment(original));
+				break;
+		}
+	}
+	const nouns = segments.filter((segment) => segment.kind === "noun").map((segment) => segment.text);
+	return finishAttempt(recipe, segments, presenceSignature, connectorSignature, formSignature, new Set(nouns).size !== nouns.length);
+}
+
+/**
+ * The texts a regeneration must not repeat, read once into a set of our own. No list at all is an empty set;
+ * anything that is not a list of strings, or that throws when it is read, is null (a bad request).
+ */
+function readAvoidTexts(input: { readonly avoid?: { readonly texts: readonly string[] } }): Set<string> | null {
+	try {
+		const avoid = input.avoid;
+		if (avoid === undefined) {
+			return new Set();
+		}
+		if (avoid === null || typeof avoid !== "object") {
+			return null;
+		}
+		const texts = avoid.texts as unknown;
+		if (!isList(texts)) {
+			return null;
+		}
+		const set = new Set<string>();
+		for (const text of texts) {
+			if (typeof text !== "string") {
+				return null;
+			}
+			set.add(text);
+		}
+		return set;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * COLLISION-LOCK1: regenerates one row and keeps some of its words.
+ *
+ * The row is a result this core made (its recipe and its segments) and the
+ * names are the slots whose words stay. The result has the row's recipe, the
+ * modifiers the row has and the Connectors it drew; the kept words are copied
+ * and every other noun, modifier and predicate is drawn again. The signature
+ * run preference is not used, because keeping the shape is the point. A text in
+ * `avoid` (the other rows', and the row's own) is never accepted; when the
+ * attempts end on such texts the result is the same `duplicate-exhausted`
+ * shortfall as for any other row.
+ *
+ * Deterministic for the same inputs. A generation that keeps nothing, keeps
+ * everything, names a part the row does not have, or comes with a row this
+ * pool and pattern set could not have produced is refused as `invalid-request`.
+ */
+export function generateLockedCollisionResult(input: {
+	readonly pool: CollisionLexemePool;
+	readonly patternSet: CompiledCollisionPatternSet;
+	readonly drawMode: VocabularyDrawMode;
+	readonly nonce: number;
+	readonly original: CollisionLockedRow;
+	readonly locked: readonly string[];
+	readonly avoid?: { readonly texts: readonly string[] };
+}): CollisionGenerationResult {
+	try {
+		validateScalars({ count: 1, nonce: input.nonce, drawMode: input.drawMode });
+		const avoidTexts = readAvoidTexts(input);
+		if (avoidTexts === null) {
+			return { ok: false, reason: "invalid-request" };
+		}
+		const opened = openGeneration(input);
+		const plan = planLock(input, opened.pattern, opened.prepared);
+		if (opened.prepared.nouns.length === 0) {
+			return refusal(1, "no-noun");
+		}
+		if (viability(plan.recipe, opened.pattern, opened.prepared) === null) {
+			return refusal(1, "recipe-not-viable");
+		}
+
+		const context = drawContext(opened, input.drawMode, input.nonce);
+		let accepted: Attempt | null = null;
+		for (let attempt = 0; attempt < COLLISION_RESULT_ATTEMPT_LIMIT && accepted === null; attempt += 1) {
+			const candidate = composeLocked(plan, context);
+			if (!avoidTexts.has(candidate.text)) {
+				accepted = candidate;
+			}
+		}
+		if (accepted === null) {
+			return refusal(1, "duplicate-exhausted");
+		}
+		return {
+			ok: true,
+			draft: freezeAnalysis<CollisionGenerationDraft>({
+				algorithmVersion: COLLISION_ALGORITHM_VERSION,
+				requestedCount: 1,
+				generatedCount: 1,
+				status: "complete",
+				shortfallReason: null,
+				results: [{
+					recipeId: accepted.recipeId,
+					text: accepted.text,
+					segments: accepted.segments,
+					structureSignature: accepted.structureSignature,
+					limited: accepted.limited,
+					limitedReason: accepted.limitedReason,
+				}],
 			}),
 		};
 	} catch (error) {

@@ -8,6 +8,7 @@ import { linderaFullDictionaryDir, linderaCompactDictionaryDir, linderaArchivePa
 import { STANDARD_TEMPLATES_MARKDOWN } from './fakeDictionary/standardTemplates.mjs';
 import { STANDARD_COLLISION_PATTERNS_LOCK, STANDARD_COLLISION_PATTERNS_MARKDOWN } from './collision/standardPatterns.mjs';
 import { STANDARD_FAKE_PROVERB_RECIPES_LOCK, STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN } from './fakeProverb/standardRecipes.mjs';
+import { STANDARD_FAKE_ALERT_RECIPES_LOCK, STANDARD_FAKE_ALERT_RECIPES_MARKDOWN } from './fakeAlert/standardRecipes.mjs';
 
 const source = process.cwd();
 const directory = await mkdtemp(path.join(os.tmpdir(), 'semantropy-history-free-'));
@@ -26,7 +27,9 @@ try {
  // Selected-file boundary: no .git, bulk Docs, data.json or saved artifacts.
  for (const entry of ['src', 'tests', 'scripts', 'package.json', 'package-lock.json', 'tsconfig.json', 'manifest.json', 'styles.css',
   'LICENSE', 'NOTICE', 'THIRD_PARTY_NOTICES.md', 'README.md', 'README.ja.md', 'versions.json', '.gitignore', '.gitattributes',
-  'esbuild.config.mjs', 'eslint.config.mts', 'vitest.config.ts', 'vitest.distribution.config.ts', 'vitest.benchmark.config.ts', 'version-bump.mjs']) {
+  'esbuild.config.mjs', 'eslint.config.mts', 'vitest.config.ts', 'vitest.distribution.config.ts', 'vitest.benchmark.config.ts', 'version-bump.mjs',
+  // The web Playground source: tests read its styles and build script (0.1.0 and FAKE-ALERT-TEMPLATES1).
+  'web']) {
   await cp(path.join(source, entry), path.join(directory, entry), { recursive: true });
  }
  // The Fake Dictionary template document: a public, human-edited build input,
@@ -42,6 +45,10 @@ try {
  await mkdir(path.join(directory, path.dirname(STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN)), { recursive: true });
  await cp(path.join(source, STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN), path.join(directory, STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN));
  await cp(path.join(source, STANDARD_FAKE_PROVERB_RECIPES_LOCK), path.join(directory, STANDARD_FAKE_PROVERB_RECIPES_LOCK));
+ // The Fake Alert recipe document and its version lock, likewise by name.
+ await mkdir(path.join(directory, path.dirname(STANDARD_FAKE_ALERT_RECIPES_MARKDOWN)), { recursive: true });
+ await cp(path.join(source, STANDARD_FAKE_ALERT_RECIPES_MARKDOWN), path.join(directory, STANDARD_FAKE_ALERT_RECIPES_MARKDOWN));
+ await cp(path.join(source, STANDARD_FAKE_ALERT_RECIPES_LOCK), path.join(directory, STANDARD_FAKE_ALERT_RECIPES_LOCK));
  // Reuse installed dependencies, but copy only verified dictionary build inputs, not arbitrary .cache files.
  await symlink(path.join(source, 'node_modules'), path.join(directory, 'node_modules'), 'junction');
  await mkdir(path.join(directory, '.cache', 'lindera'), { recursive: true });

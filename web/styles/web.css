@@ -298,6 +298,12 @@ input[type="checkbox"] {
 	min-height: 0;
 }
 
+/* Fake Alert: the page's dialogs use the small UI size, so the message is raised
+   to read like Obsidian's. The title, buttons and the Semantropy mark keep their size. */
+.semantropy-fake-alert-message {
+	font-size: var(--font-ui-medium);
+}
+
 .notice-container {
 	position: fixed;
 	left: 50%;

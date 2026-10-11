@@ -5,9 +5,12 @@ import {
 	hashCanonical,
 } from "./canonicalHash";
 import {
+	FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS,
 	FAKE_DICTIONARY_PLACEHOLDERS,
 	classifyPlaceholder,
+	type FakeDictionaryLexicalPlaceholder,
 	type FakeDictionaryPlaceholder,
+	type FakeDictionaryTemplatePlaceholder,
 } from "./placeholders";
 
 /**
@@ -19,12 +22,19 @@ import {
  * must not be conflated: they answer different questions and their key spaces
  * are not the same.
  *
- * Every placeholder is present, possibly with an empty list, so a caller never
- * has to distinguish "absent" from "no candidates".
+ * Every one of the eight placeholders is present, possibly with an empty list,
+ * so a caller never has to distinguish "absent" from "no candidates".
+ *
+ * A lexical placeholder (FAKE-DICT-LEXEME1) is present only when the template
+ * set the pool is built for uses it (`lexicalPlaceholdersOf()`); absent reads
+ * as no candidates. Only a present one enters the fingerprint, so a pool built
+ * for a set that uses none fingerprints exactly as before.
  */
 export type DictionaryVocabularyPool = Readonly<
 	Record<FakeDictionaryPlaceholder, readonly string[]>
->;
+> & Readonly<Partial<Record<FakeDictionaryLexicalPlaceholder, readonly string[]>>>;
+
+const NO_CANDIDATES: readonly string[] = Object.freeze([]);
 
 /**
  * Builds the pool from the ready session's own token sequences.
@@ -75,16 +85,21 @@ export function buildDictionaryVocabularyPool(
 
 export function poolCandidates(
 	pool: DictionaryVocabularyPool,
-	placeholder: FakeDictionaryPlaceholder,
+	placeholder: FakeDictionaryTemplatePlaceholder,
 ): readonly string[] {
-	return pool[placeholder];
+	return pool[placeholder] ?? NO_CANDIDATES;
 }
 
 export function hasCandidates(
 	pool: DictionaryVocabularyPool,
-	placeholder: FakeDictionaryPlaceholder,
+	placeholder: FakeDictionaryTemplatePlaceholder,
 ): boolean {
-	return pool[placeholder].length > 0;
+	return poolCandidates(pool, placeholder).length > 0;
+}
+
+/** The lexical placeholders this pool carries, in declared order. */
+function presentLexical(pool: DictionaryVocabularyPool): readonly FakeDictionaryLexicalPlaceholder[] {
+	return FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS.filter((placeholder) => pool[placeholder] !== undefined);
 }
 
 /**
@@ -103,8 +118,8 @@ function calculateFingerprint(
 	pool: DictionaryVocabularyPool,
 ): number {
 	const parts: string[] = [];
-	for (const placeholder of FAKE_DICTIONARY_PLACEHOLDERS) {
-		const sorted = [...pool[placeholder]].sort();
+	for (const placeholder of [...FAKE_DICTIONARY_PLACEHOLDERS, ...presentLexical(pool)]) {
+		const sorted = [...poolCandidates(pool, placeholder)].sort();
 		parts.push(
 			canonicalList([
 				canonicalString(placeholder),
@@ -120,10 +135,11 @@ const preparedPools = new WeakMap<DictionaryVocabularyPool, { sorted: Dictionary
 export function prepareDictionaryPool(pool: DictionaryVocabularyPool): { sorted: DictionaryVocabularyPool; fingerprint: number } {
  const prior = preparedPools.get(pool);
  if (prior) return prior;
- const sorted = Object.freeze(Object.fromEntries(FAKE_DICTIONARY_PLACEHOLDERS.map(key =>
-  [key, Object.freeze([...pool[key]].sort())])) as Record<FakeDictionaryPlaceholder, readonly string[]>);
+ const keys = [...FAKE_DICTIONARY_PLACEHOLDERS, ...presentLexical(pool)];
+ const sorted = Object.freeze(Object.fromEntries(keys.map(key =>
+  [key, Object.freeze([...poolCandidates(pool, key)].sort())])) as DictionaryVocabularyPool);
  const prepared = Object.freeze({ sorted, fingerprint: calculateFingerprint(pool) });
- if (Object.isFrozen(pool) && FAKE_DICTIONARY_PLACEHOLDERS.every(key => Object.isFrozen(pool[key]))) preparedPools.set(pool, prepared);
+ if (Object.isFrozen(pool) && keys.every(key => Object.isFrozen(pool[key]))) preparedPools.set(pool, prepared);
  return prepared;
 }
 export function fingerprintDictionaryVocabularyPool(pool: DictionaryVocabularyPool): number {

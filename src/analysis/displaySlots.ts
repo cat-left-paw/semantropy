@@ -14,6 +14,7 @@ import {
 	type HeadwordValidation,
 } from "../dictionary/headword";
 import { STANDARD_TEMPLATE_SET } from "../dictionary/standardTemplateSet";
+import { snapshotPlaceholderSurfaces } from "../dictionary/snapshotLexicalForms";
 import type { DictionarySemantropy } from "../settings/dictionarySemantropy";
 import type { JapaneseToken } from "../tokenizer/JapaneseTokenizer";
 import {
@@ -427,12 +428,12 @@ export function alternativeSurfaceCount(
 	return seen?.size ?? 0;
 }
 
-function dictionaryPoolIsCallable(snapshot: VocabularySnapshot): boolean {
-	const byPlaceholder = snapshot.projections.dictionary.byPlaceholder;
+/** Whether the Snapshot's pool can fill at least one core template. FAKE-DICT-RECOMPOSE1: also asked by the Recompose tab, so a word is looked up there under the same condition as in the Shuffle body. */
+export function dictionaryPoolIsCallable(snapshot: VocabularySnapshot): boolean {
 	for (const template of STANDARD_TEMPLATE_SET.coreTemplates) {
 		let fillable = true;
 		for (const placeholder of template.requiredPlaceholders) {
-			if (byPlaceholder[placeholder].length === 0) {
+			if (snapshotPlaceholderSurfaces(snapshot, placeholder).length === 0) {
 				fillable = false;
 				break;
 			}

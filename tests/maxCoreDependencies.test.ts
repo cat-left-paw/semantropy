@@ -15,8 +15,12 @@ import { applyExperienceDelta } from "./support/experienceVocabularyGraph";
  */
 // PRE-RELEASE-FAKE-PROVERB-CORE1 adds the production-disconnected Fake Proverb authority, which may import only the
 // pure `maxRealizer` leaf (pinned below and in fakeProverbCoreDependencies.test.ts).
+// FAKE-ALERT-VERB1 added the Fake Alert core, which also imported only that leaf, for the `verb-basic` rule.
+// LEXEME-SHARE1 moved that import to the shared `src/vocabulary/lexicalProjection.ts`, which Fake Alert now reads
+// its verbs, イ-adjectives and ナ-adjective stems from (pinned in lexicalProjection.test.ts and fakeAlertCore.test.ts).
 const WIRING = ["src/analysis/displaySlots.ts", "src/application/bodyFragmentFromAutomatic.ts", "src/collect/v3/CollectedFragmentV3.ts",
-	"src/fakeProverb/fakeProverbAuthority.ts", "src/render/automaticPosBodyOwner.ts", "src/render/chunkTargetBodyController.ts"];
+	"src/fakeProverb/fakeProverbAuthority.ts", "src/render/automaticPosBodyOwner.ts", "src/render/chunkTargetBodyController.ts",
+	"src/vocabulary/lexicalProjection.ts"];
 async function graph(entry: string) {
 	const result = await build({ entryPoints: [entry], bundle: true, write: false, metafile: true, platform: "neutral", format: "esm",
 		external: ["obsidian", "virtual:semantropy-lindera-*"], legalComments: "none" });

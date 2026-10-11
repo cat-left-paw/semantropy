@@ -123,11 +123,20 @@ export class TFolder {
 	name = "";
 }
 
+/*
+ * DEFINE-DIALOG-FIX1: this stub follows the Modal of Obsidian 1.14.4 where a subclass can
+ * collide with it. The real constructor assigns the instance property `isOpen = false`, and
+ * `open()` / `close()` use it as a guard (open only when not open, close only when open, the
+ * flag flipped before `onOpen()` / `onClose()` runs). The public typings (1.13.1) do not
+ * declare it, so a subclass method named `isOpen()` type-checked and passed every test while
+ * throwing in the application. `tests/modalMemberNames.test.ts` pins the member names.
+ */
 export class Modal {
 	containerEl: HTMLElement;
 	modalEl: HTMLElement;
 	contentEl: HTMLElement;
 	titleEl: HTMLElement;
+	isOpen = false;
 
 	constructor(public app: unknown) {
 		if (typeof document !== "undefined") {
@@ -146,6 +155,10 @@ export class Modal {
 	}
 
 	open(): void {
+		if (this.isOpen) {
+			return;
+		}
+		this.isOpen = true;
 		if (typeof document !== "undefined") {
 			document.body.appendChild(this.containerEl);
 		}
@@ -153,6 +166,10 @@ export class Modal {
 	}
 
 	close(): void {
+		if (!this.isOpen) {
+			return;
+		}
+		this.isOpen = false;
 		this.onClose();
 		if (this.containerEl.parentNode) {
 			this.containerEl.remove();
@@ -167,6 +184,68 @@ export class Modal {
 		if ("textContent" in this.titleEl) {
 			this.titleEl.textContent = title;
 		}
+	}
+}
+
+/*
+ * WORKBENCH-UI5: the suggestion modals, as far as a plugin's picker uses them. Like Obsidian 1.14.4's, the
+ * constructor assigns the members a subclass could collide with (`limit`, `emptyStateText`, `inputEl`,
+ * `resultContainerEl`, ...), and `selectSuggestion()` closes the modal BEFORE it reports the choice, so a
+ * picker that settles on close would settle before it knows what was chosen.
+ */
+export abstract class SuggestModal<T> extends Modal {
+	limit = 100;
+	emptyStateText = "No results found.";
+	inputEl: HTMLInputElement;
+	resultContainerEl: HTMLElement;
+
+	constructor(app: unknown) {
+		super(app);
+		if (typeof document !== "undefined") {
+			this.inputEl = document.createElement("input");
+			this.resultContainerEl = document.createElement("div");
+			this.contentEl.appendChild(this.inputEl);
+			this.contentEl.appendChild(this.resultContainerEl);
+		} else {
+			this.inputEl = {} as HTMLInputElement;
+			this.resultContainerEl = {} as HTMLElement;
+		}
+	}
+
+	abstract getSuggestions(query: string): T[] | Promise<T[]>;
+	abstract renderSuggestion(value: T, el: HTMLElement): void;
+	abstract onChooseSuggestion(item: T, evt: MouseEvent | KeyboardEvent): void;
+
+	setPlaceholder(placeholder: string): void {
+		this.inputEl.placeholder = placeholder;
+	}
+
+	selectSuggestion(value: T, evt: MouseEvent | KeyboardEvent): void {
+		this.close();
+		this.onChooseSuggestion(value, evt);
+	}
+}
+
+export type FuzzyMatch<T> = { item: T; match: { score: number; matches: [number, number][] } };
+
+export abstract class FuzzySuggestModal<T> extends SuggestModal<FuzzyMatch<T>> {
+	abstract getItems(): T[];
+	abstract getItemText(item: T): string;
+	abstract onChooseItem(item: T, evt: MouseEvent | KeyboardEvent): void;
+
+	getSuggestions(query: string): FuzzyMatch<T>[] {
+		const needle = query.trim().toLowerCase();
+		return this.getItems()
+			.filter((item) => this.getItemText(item).toLowerCase().includes(needle))
+			.map((item) => ({ item, match: { score: 0, matches: [] } }));
+	}
+
+	renderSuggestion(value: FuzzyMatch<T>, el: HTMLElement): void {
+		el.textContent = this.getItemText(value.item);
+	}
+
+	onChooseSuggestion(item: FuzzyMatch<T>, evt: MouseEvent | KeyboardEvent): void {
+		this.onChooseItem(item.item, evt);
 	}
 }
 

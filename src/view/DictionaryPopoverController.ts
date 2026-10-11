@@ -1,16 +1,27 @@
-import type { DisplaySlot } from "../analysis/displaySlots";
+import type { HeadwordValidation } from "../dictionary/headword";
 import type { DictionaryModifier } from "../settings/displaySettings";
 import { FakeDefinitionPresenter, type FakeDefinitionPresenterHost } from "./FakeDefinitionPresenter";
 import { overlayBounds, placeOverlay } from "./overlayPlacement";
 import { ui } from "../i18n/catalog";
 
 export type DictionaryHoverTarget = {
- readonly slot: DisplaySlot;
+ /**
+  * What was hovered, by identity: two targets are the same word when this is the same object (a Shuffle body's DisplaySlot,
+  * or a Recompose sentence's word).
+  */
+ readonly slot: object;
+ /** The word as written, and the dictionary's decision about it (accepted), taken from the slot or the word. */
+ readonly surface: string;
+ readonly identified: HeadwordValidation;
+ /** FAKE-DICT-RECOMPOSE1: true for a word of a Recompose sentence, which belongs to a Vocabulary and has no Target note. */
+ readonly noTarget: boolean;
  readonly anchor: HTMLElement;
  /** Captures View, body, revision, slot, Snapshot, level and lifecycle ownership. */
  readonly isCurrent: () => boolean;
 };
 export type DictionaryPopoverHost = FakeDefinitionPresenterHost & {
+ /** The elements that stand for a word: a hover moving onto another one closes at once. Default `.semantropy-token`. */
+ wordSelector?: string;
  modifier: () => DictionaryModifier;
  resolve: (element: Element) => DictionaryHoverTarget | null;
  canStart: () => boolean;
@@ -33,25 +44,33 @@ export class DictionaryPopoverController {
  private panel: HTMLElement | null = null;
  private presenter: FakeDefinitionPresenter | null = null;
  private off: (() => void)[] = [];
- constructor(private readonly scope: HTMLElement, private readonly body: HTMLElement,
-  scroll: HTMLElement, private readonly host: DictionaryPopoverHost) {
+ private readonly bodies: readonly HTMLElement[];
+ /**
+  * `bodies` are the elements whose words can be looked up (the Shuffle body, and on a host with tabs the Recompose text) and
+  * `scrolls` the boxes whose scrolling moves them away from an open Popover.
+  */
+ constructor(private readonly scope: HTMLElement, bodies: HTMLElement | readonly HTMLElement[],
+  scrolls: HTMLElement | readonly HTMLElement[], private readonly host: DictionaryPopoverHost) {
   const doc = scope.ownerDocument;
-  this.listen(body, "pointerover", event => this.point(event as PointerEvent));
-  this.listen(body, "pointermove", event => this.point(event as PointerEvent));
-  this.listen(body, "pointerout", event => {
-   const related = (event as PointerEvent).relatedTarget;
-   if (!(related instanceof Node) || !body.contains(related)) {
-    this.hovered = null; this.cancelTimer();
-    if (related instanceof Node && this.panel?.contains(related)) this.cancelBridge();
-    else this.startBridge();
-   }
-  });
+  this.bodies = Array.isArray(bodies) ? bodies : [bodies as HTMLElement];
+  for (const body of this.bodies) {
+   this.listen(body, "pointerover", event => this.point(event as PointerEvent));
+   this.listen(body, "pointermove", event => this.point(event as PointerEvent));
+   this.listen(body, "pointerout", event => {
+    const related = (event as PointerEvent).relatedTarget;
+    if (!(related instanceof Node) || !this.inBody(related)) {
+     this.hovered = null; this.cancelTimer();
+     if (related instanceof Node && this.panel?.contains(related)) this.cancelBridge();
+     else this.startBridge();
+    }
+   });
+  }
   this.listen(doc, "pointerover", event => {
    const node = event.target;
    this.pointerInView = node instanceof Node && (scope.contains(node) || !!this.panel?.contains(node));
    if (!this.pointerInView) { this.hovered = null; this.cancelTimer(); }
    if (node instanceof Node && this.panel?.contains(node)) this.cancelBridge();
-   else if (node instanceof Node && !body.contains(node) &&
+   else if (node instanceof Node && !this.inBody(node) &&
     !(node.nodeType === Node.ELEMENT_NODE && (node as Element).closest(".semantropy-root,.semantropy-dictionary-popover") && !scope.contains(node))) this.startBridge();
   });
   this.listen(doc, "pointerout", event => {
@@ -61,7 +80,7 @@ export class DictionaryPopoverController {
   });
   this.listen(doc, "pointerdown", event => {
    if (!(event.target instanceof Element)) return;
-   if (body.contains(event.target)) { this.dragging = true; this.close(); }
+   if (this.inBody(event.target)) { this.dragging = true; this.close(); }
    else if (!this.panel?.contains(event.target)) {
     this.hovered = null; this.cancelTimer();
     // Another View's interaction belongs to that View, including its Escape.
@@ -80,12 +99,16 @@ export class DictionaryPopoverController {
    if (event.target instanceof Node && (scope.contains(event.target) || this.panel?.contains(event.target))) this.close();
   });
   this.listen(doc, "compositionend", () => { this.composing = false; });
-  this.listen(scroll, "scroll", () => this.close());
+  for (const scroll of Array.isArray(scrolls) ? scrolls as readonly HTMLElement[] : [scrolls as HTMLElement]) this.listen(scroll, "scroll", () => this.close());
   const win = doc.defaultView;
   if (win) { this.listen(win, "blur", () => { this.modifierDown = false; this.close(); }); this.listen(win, "resize", () => this.close()); }
  }
  private listen(target: EventTarget, type: string, action: (event: Event) => void): void {
   target.addEventListener(type, action); this.off.push(() => target.removeEventListener(type, action));
+ }
+ private inBody(node: Node): boolean {
+  for (const body of this.bodies) if (body.contains(node)) return true;
+  return false;
  }
  private editable(target: EventTarget | null): boolean {
   return target instanceof Element && !!target.closest("input,textarea,select,button,[contenteditable=true]");
@@ -97,7 +120,7 @@ export class DictionaryPopoverController {
   const next = event.target instanceof Element ? this.host.resolve(event.target) : null;
   if (this.active) {
    if (next?.slot === this.active.slot) this.cancelBridge();
-   else if (next || (event.target instanceof Element && event.target.closest(".semantropy-token,a,code,pre,rt,rp"))) this.close();
+   else if (next || (event.target instanceof Element && event.target.closest(`${this.host.wordSelector ?? ".semantropy-token"},a,code,pre,rt,rp`))) this.close();
    else { this.hovered = null; this.cancelTimer(); this.startBridge(); return; }
   }
   if (this.hovered?.slot !== next?.slot || this.hovered?.anchor !== next?.anchor) { this.cancelTimer(); this.hovered = next; }

@@ -13,7 +13,9 @@ import { sha256Hex } from "../vocabulary/sha256";
 import type { VocabularyDrawMode } from "../vocabulary/vocabularySnapshot";
 import {
 	COLLISION_ALGORITHM_VERSION,
+	COLLISION_LOCKABLE_SEGMENT_KINDS,
 	generateCollisionResults,
+	generateLockedCollisionResult,
 	viableCollisionRecipes,
 	type CollisionGenerationDraft,
 	type CollisionGenerationRejection,
@@ -93,6 +95,8 @@ export type CollisionBatchController = {
 	beginGenerate(input: CollisionBatchGenerateInput): CollisionBatchResult<CollisionOperationTicket>;
 	select(input: { readonly rowSlotId: string; readonly selector: CollisionRowSelector }): CollisionBatchResult<CollisionBatchState>;
 	beginRegenerate(input: { readonly rowSlotId: string; readonly operationMaterial: string }): CollisionBatchResult<CollisionOperationTicket>;
+	/** COLLISION-LOCK1: regenerate a row and keep the words of the named parts. The row's own recipe, modifiers and Connectors stay. */
+	beginRegenerateWithLocks(input: { readonly rowSlotId: string; readonly lockedSlotIds: readonly string[]; readonly operationMaterial: string }): CollisionBatchResult<CollisionOperationTicket>;
 	prepare(ticket: CollisionOperationTicket): CollisionBatchResult<CollisionOperationCompletion>;
 	complete(ticket: CollisionOperationTicket, completion: CollisionOperationCompletion): CollisionBatchResult<CollisionBatchState>;
 	cancel(ticket: CollisionOperationTicket): CollisionBatchResult<CollisionBatchState>;
@@ -101,6 +105,10 @@ export type CollisionBatchController = {
 };
 
 const BATCHES = new WeakSet<object>();
+/** COLLISION-LOCK1: the parts of a row that a regeneration can keep (a noun, a modifier or a predicate), by name, in the row's order. */
+export function collisionLockableSlots(row: Pick<CollisionBatchRow, "committed">): readonly string[] {
+	return row.committed.segments.filter((segment) => COLLISION_LOCKABLE_SEGMENT_KINDS.includes(segment.kind as never)).map((segment) => segment.slotId);
+}
 /** View options come from the same viability authority as regeneration. */
 export function collisionBatchRecipeOptions(batch: CollisionBatch): CollisionBatchResult<readonly { readonly id: string; readonly label: string }[]> {
 	return guarded(() => {
@@ -201,6 +209,8 @@ type Operation = {
 	readonly batch: CollisionBatch | null;
 	readonly row: CollisionBatchRow | null;
 	readonly request: CollisionRecipeRequest;
+	/** COLLISION-LOCK1: the slots whose words a regeneration keeps; null for every other operation. */
+	readonly locks: readonly string[] | null;
 	completion: CollisionOperationCompletion | null;
 	stage: CollisionBatchResult<Stage> | null;
 };
@@ -274,6 +284,36 @@ export function createCollisionBatchController(input: { readonly identityMateria
 			for (const id of fresh) issued.add(id);
 			BATCHES.add(batch);
 		}
+		/**
+		 * COLLISION-LOCK1: the names a regeneration keeps. They must be distinct parts of this row that a
+		 * writer can keep (a noun, a modifier or a predicate), at least one, and not all of them: the core
+		 * decides again, from the row itself, whether a result could be drawn.
+		 */
+		function lockNames(row: CollisionBatchRow, raw: unknown): readonly string[] {
+			if (!Array.isArray(raw) || raw.length === 0 || raw.some((name) => typeof name !== "string")) reject("invalid-request");
+			const names: readonly string[] = Object.freeze([...(raw as string[])]);
+			const lockable = collisionLockableSlots(row);
+			if (new Set(names).size !== names.length || names.some((name) => !lockable.includes(name)) || names.length >= lockable.length) reject("invalid-request");
+			return names;
+		}
+		/** Begins a row regeneration: with `locks`, one that keeps the named words (COLLISION-LOCK1); without, the row's whole redraw. */
+		function startRegenerate(raw: unknown, keys: readonly string[], locks: boolean): CollisionOperationTicket {
+			open();
+			if (state.generation.pending) reject("busy");
+			const read = fields(raw, keys);
+			const row = findRow(stringId(read.rowSlotId));
+			advance(row.committed.generationRevision);
+			const selector = state.rowDrafts.find((draft) => draft.rowSlotId === row.rowSlotId)!.selector;
+			const names = locks ? lockNames(row, read.lockedSlotIds) : null;
+			// Keeping a row's words only makes sense in the row's own recipe.
+			if (names && selector.kind === "fixed" && selector.recipeId !== row.committed.recipeId) reject("invalid-request");
+			const request = Object.freeze({ kind: "fixed" as const, recipeId: selector.kind === "same" ? row.committed.recipeId : selector.recipeId });
+			const op: Operation = { ...operation("regenerate", read.operationMaterial), input: null, batch: state.batch, row, request, locks: names };
+			invalidateRow(row.rowSlotId);
+			operations.set(op.ticket, op);
+			publish({ ...state, rowDrafts: rowStatus(row.rowSlotId, { pending: true, lastError: null }) });
+			return op.ticket;
+		}
 		const controller: CollisionBatchController = {
 			read: () => state,
 			beginGenerate: (raw) => transition(() => {
@@ -286,7 +326,7 @@ export function createCollisionBatchController(input: { readonly identityMateria
 				const count = read.count;
 				if (count !== 10 && count !== 20 && count !== 50) reject("invalid-request");
 				const request = recipeRequest(read.defaultPattern, false);
-				const op: Operation = { ...operation("generate", read.operationMaterial), input: { vocabulary, patternSet, count, defaultPattern: request }, batch: null, row: null, request };
+				const op: Operation = { ...operation("generate", read.operationMaterial), input: { vocabulary, patternSet, count, defaultPattern: request }, batch: null, row: null, request, locks: null };
 				// A new batch request also invalidates operations on the old list.
 				operations.clear();
 				operations.set(op.ticket, op);
@@ -303,20 +343,8 @@ export function createCollisionBatchController(input: { readonly identityMateria
 				invalidateRow(row.rowSlotId);
 				return publish({ ...state, rowDrafts: rowStatus(row.rowSlotId, IDLE, selector) });
 			}),
-			beginRegenerate: (raw) => transition(() => {
-				open();
-				if (state.generation.pending) reject("busy");
-				const read = fields(raw, ["rowSlotId", "operationMaterial"]);
-				const row = findRow(stringId(read.rowSlotId));
-				advance(row.committed.generationRevision);
-				const selector = state.rowDrafts.find((draft) => draft.rowSlotId === row.rowSlotId)!.selector;
-				const request = Object.freeze({ kind: "fixed" as const, recipeId: selector.kind === "same" ? row.committed.recipeId : selector.recipeId });
-				const op: Operation = { ...operation("regenerate", read.operationMaterial), input: null, batch: state.batch, row, request };
-				invalidateRow(row.rowSlotId);
-				operations.set(op.ticket, op);
-				publish({ ...state, rowDrafts: rowStatus(row.rowSlotId, { pending: true, lastError: null }) });
-				return op.ticket;
-			}),
+			beginRegenerate: (raw) => transition(() => startRegenerate(raw, ["rowSlotId", "operationMaterial"], false)),
+			beginRegenerateWithLocks: (raw) => transition(() => startRegenerate(raw, ["rowSlotId", "lockedSlotIds", "operationMaterial"], true)),
 			prepare: (ticket) => transition(() => {
 				const op = current(ticket);
 				if (op.completion) reject("already-prepared");
@@ -332,7 +360,11 @@ export function createCollisionBatchController(input: { readonly identityMateria
 						if (op.request.kind === "fixed") explicitRecipe(capture, op.request.recipeId);
 					} else capture = op.batch!;
 					const index = op.batch?.rows.indexOf(op.row!) ?? 0;
-					const generated = generateCollisionResults({ pool: capture.pool, patternSet: capture.patternSet, drawMode: capture.drawMode,
+					// COLLISION-LOCK1: a regeneration that keeps words starts from the row's own result, not from a request.
+					const generated = op.locks ? generateLockedCollisionResult({ pool: capture.pool, patternSet: capture.patternSet, drawMode: capture.drawMode,
+						nonce: op.nonce, original: { recipeId: op.row!.committed.recipeId, segments: op.row!.committed.segments }, locked: op.locks,
+						avoid: { texts: op.batch!.rows.map((row) => row.committed.text) } })
+						: generateCollisionResults({ pool: capture.pool, patternSet: capture.patternSet, drawMode: capture.drawMode,
 						count: op.input?.count ?? 1, request: op.request, nonce: op.nonce,
 						...(op.batch ? { avoid: { texts: op.batch.rows.map((row) => row.committed.text),
 							recentSignatures: op.batch.rows.slice(Math.max(0, index - 2), index).map((row) => row.committed.structureSignature) } } : {}) });

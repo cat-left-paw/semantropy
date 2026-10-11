@@ -18,5 +18,7 @@ export default defineConfig({
 			"tests/distribution/**",
 		],
 		testTimeout: 20000,
+		// One event-loop turn after every test (TEST-STABILITY1, tests/support/eventLoop.ts).
+		setupFiles: ["tests/support/yieldBetweenTests.ts"],
 	},
 });

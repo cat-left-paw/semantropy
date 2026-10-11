@@ -60,7 +60,10 @@ function harness(target = 30, level: BodySemantropy = OFF) {
 		await view.openCapture({ kind: "markdown", note: { sourcePath: "fixture.md", sourceName: "fixture.md", editorText: md } },
 			{ readCached: async () => md, hashText: async text => sha256Hex(text), issueSeed: () => seed });
 	};
-	return { view, control, calls, open };
+	/** An Open of another note, as a Markdown Open (WORKBENCH-UI5: an Open with no note leaves a ready View alone). */
+	const openOther = () => view.openCapture({ kind: "markdown", note: { sourcePath: "other.md", sourceName: "other.md", editorText: "鳥魚。\n" } },
+		{ readCached: async () => "鳥魚。\n", hashText: async text => sha256Hex(text), issueSeed: () => 3 });
+	return { view, control, calls, open, openOther };
 }
 /**
  * Loads every remaining Chunk. Between Chunks it yields one macrotask: with the immediate
@@ -108,25 +111,33 @@ describe("CHUNK-01: first Chunk and independent Current Note vocabulary", () => 
 	});
 });
 
+/** Loads every Chunk of `md` and compares the whole body, its line breaks and its Copy with a one-shot oracle. */
+async function expectReplayMatchesOracle(md: string) {
+	const h = harness(); await h.open(md); await loadAll(h.view);
+	const oracle = new TargetBodyController();
+	await oracle.open({ snapshot: { text: md, sourcePath: "fixture.md", contentHash: "hash" }, bodySeed: 7, bodySemantropy: OFF,
+		getTokenizer: () => ({ tokenize: async t => tokenize(t) }), isCurrent: () => true, scheduler: immediateScheduler(), ownerDocument: document });
+	expect(text(h.view)).toBe(oracle.getTextNodes().map(t => t.data).join(""));
+	expect(body(h.view).getContainer()!.querySelectorAll("br")).toHaveLength(oracle.getContainer()!.querySelectorAll("br").length);
+	expect(await h.view.copySelectedFragment({ selection: selection(body(h.view).getContainer()!) })).toBe("copied");
+	expect(h.calls.copy[0]).toBe(text(h.view));
+	oracle.release(); await h.view.onClose();
+}
+
 describe("CHUNK-02: complete presentation and logical seams", () => {
 	it.each(["\n", "\r\n", "\r"])("replays all Chunks exactly at Off with %j", async newline => {
 		for (const md of [
 			["# 題", "", ...Array<string>(20).fill("猫《ねこ》と犬。😀か\u3099"), "", "最後。"].join(newline),
 			["前。", "", "<img src=x", "alt=y>", "", ...Array<string>(20).fill("後続。`code`[[link]]$math$%%comment%%"), "", "~~~", "猫《内部》", "~~~"].join(newline),
 			["前。", "", "《未閉鎖", ...Array<string>(20).fill("後続。")].join(newline),
-			"猫".repeat(16000),
-		]) {
-			const h = harness(); await h.open(md); await loadAll(h.view);
-			const oracle = new TargetBodyController();
-			await oracle.open({ snapshot: { text: md, sourcePath: "fixture.md", contentHash: "hash" }, bodySeed: 7, bodySemantropy: OFF,
-				getTokenizer: () => ({ tokenize: async t => tokenize(t) }), isCurrent: () => true, scheduler: immediateScheduler(), ownerDocument: document });
-			expect(text(h.view)).toBe(oracle.getTextNodes().map(t => t.data).join(""));
-			expect(body(h.view).getContainer()!.querySelectorAll("br")).toHaveLength(oracle.getContainer()!.querySelectorAll("br").length);
-			expect(await h.view.copySelectedFragment({ selection: selection(body(h.view).getContainer()!) })).toBe("copied");
-			expect(h.calls.copy[0]).toBe(text(h.view));
-			oracle.release(); await h.view.onClose();
-		}
-	}, 60_000); // About 9 s alone; under the full suite's load it can pass 20 s.
+		]) await expectReplayMatchesOracle(md);
+	}, 60_000);
+	// The one long line has no line break, so it is the same input for every newline above; it ran three
+	// times there (TEST-STABILITY1). Opening it is one synchronous stretch of about 20 s on Linux (the
+	// body's slot boundaries, record §3), so it is a test of its own with room to spare.
+	it("replays all Chunks exactly at Off for one line of 16,000 characters", async () => {
+		await expectReplayMatchesOracle("猫".repeat(16000));
+	}, 120_000);
 });
 
 describe("CHUNK-03 / 04: atomic append and prefix generation", () => {
@@ -158,7 +169,7 @@ describe("CHUNK-03 / 04: atomic append and prefix generation", () => {
 			if (failure === "tampered") root.setAttribute("data-outside", "1");
 			if (failure === "detached") root.remove();
 			if (failure === "close") interrupt ??= h.view.onClose();
-			if (failure === "open") interrupt ??= h.view.openCapture({ kind: "none" }, { readCached: async () => "" });
+			if (failure === "open") interrupt ??= h.openOther();
 			if (failure === "refresh") { h.control.scheduler = immediateScheduler(); interrupt ??= h.view.refreshSource({ hashText: async () => "new" }); }
 		} }).scheduler;
 		const result = await h.view.loadNextSection(); await Promise.resolve(interrupt);
@@ -280,7 +291,7 @@ describe("CHUNK-05: staged Refresh", () => {
 		expect(body(h.view)).toBe(owner); expect(ready(h.view)).toBe(previous); expect(Array.from(root.childNodes)).toEqual(nodes);
 		if (failure === "source-change") h.view.markSourceLost();
 		if (failure === "close") await h.view.onClose();
-		if (failure === "open") await h.view.openCapture({ kind: "none" }, { readCached: async () => "" });
+		if (failure === "open") await h.openOther();
 		gate.resolve(); expect(["failed", "aborted"]).toContain(await pending);
 		if (failure === "close" || failure === "open") return;
 		expect(body(h.view)).toBe(owner); expect(ready(h.view).snapshot).toBe(previous.snapshot);

@@ -84,7 +84,7 @@ type ViewPeek = {
 	contentEl: HTMLElement;
 	definitionModal: {
 		contentEl: HTMLElement;
-		isOpen(): boolean;
+		isShowing(): boolean;
 		close(): void;
 	} | null;
 	dictionaryBusy: { isBusy(): boolean };
@@ -506,7 +506,7 @@ describe("SemantropyView Fake Dictionary", () => {
 		expect(await defineWord(view, "猫")).toBe("ready");
 		expect(peek(view).dictionaryWorld.getSeed()).toBe(11);
 		const modal = peek(view).definitionModal;
-		expect(modal?.isOpen()).toBe(true);
+		expect(modal?.isShowing()).toBe(true);
 		modal?.close();
 		expect(peek(view).dictionaryWorld.getSeed()).toBe(11);
 		expect(peek(view).dictionaryWorld.getCurrent()).toBeNull();
@@ -711,7 +711,7 @@ describe("SemantropyView Fake Dictionary", () => {
 		await openReady(view);
 		const pending = defineWord(view, "猫");
 		await flush();
-		expect(peek(view).definitionModal?.isOpen()).toBe(true);
+		expect(peek(view).definitionModal?.isShowing()).toBe(true);
 		expect(peek(view).definitionModal?.contentEl.textContent).toContain(
 			DEFINE_LOADING_MESSAGE,
 		);
@@ -777,7 +777,7 @@ describe("SemantropyView Fake Dictionary", () => {
 		await openReady(view, 7);
 		const pending = defineWord(view, "猫");
 		await flush();
-		expect(peek(view).definitionModal?.isOpen()).toBe(true);
+		expect(peek(view).definitionModal?.isShowing()).toBe(true);
 		expect(await view.refreshSource({ issueSeed: () => 9, hashText: async () => HASH })).toBe(
 			"refreshed",
 		);

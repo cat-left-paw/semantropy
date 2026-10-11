@@ -35,6 +35,10 @@ import {
 	standardFakeProverbRecipesPlugin,
 } from "./fakeProverb/standardRecipes.mjs";
 import {
+	assertStandardFakeAlertRecipesGenerated,
+	standardFakeAlertRecipesPlugin,
+} from "./fakeAlert/standardRecipes.mjs";
+import {
 	LINDERA_DICTIONARY_FILE_NAMES,
 	LINDERA_NOTICE_FILE_NAME,
 	PREPARE_COMMAND,
@@ -110,6 +114,9 @@ async function prepareBundleInputs(rootDir, dictionaryDir, bootstrap) {
 	await assertStandardTemplatesGenerated({ rootDir });
 	await assertStandardCollisionPatternsGenerated({ rootDir });
 	await assertStandardFakeProverbRecipesGenerated({ rootDir });
+	// FAKE-ALERT-TEMPLATES1: the Fake Alert recipes are checked the same way,
+	// before production imports them.
+	await assertStandardFakeAlertRecipesGenerated({ rootDir });
 
 	// Version first: it is the cheaper, more obvious failure to report. It is
 	// not sufficient on its own, so the package's bytes are checked next.
@@ -172,6 +179,9 @@ export function bundleOptions(rootDir, { outfile, banner, dictionaryDir, minify,
 			standardTemplatesPlugin(rootDir),
 			standardCollisionPatternsPlugin(rootDir),
 			standardFakeProverbRecipesPlugin(rootDir),
+			// Checks the Fake Alert recipes when each build starts. It hooks only its
+			// own generated module, never the entry point the two guards above use.
+			standardFakeAlertRecipesPlugin(rootDir),
 			linderaPayloadPlugin(rootDir, dictionaryDir),
 		],
 		minify,

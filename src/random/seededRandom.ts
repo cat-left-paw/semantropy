@@ -6,7 +6,8 @@
 // 3: production analysis uses Ruby-aware inline runs (including formatting),
 // and verified Source pairs have a separate deterministic variant draw.
 // 4: the production Target is analyzed from the safe Markdown projection
-// (target-presentation-2) instead of MarkdownRenderer DOM, so analysis runs,
+// (the Target presentation policy, `TARGET_PRESENTATION_POLICY_VERSION`; it was target-presentation-2 when this version was made)
+// instead of MarkdownRenderer DOM, so analysis runs,
 // the vocabulary pool and same-Seed results can differ from version 3.
 // 5: production uses VocabularySnapshot projections and Uniform/Frequency draws.
 // Snapshot fingerprints replace the Current Note Ruby fingerprint in provenance draws.

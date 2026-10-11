@@ -29,12 +29,21 @@ describe("the production realizer over the whole shipped dictionary", () => {
 		// SPIKE1 §2.5: 16,394 (pos, class, base form) lexemes, 15,775 of them in the twelve admitted classes.
 		expect(lexemes).toHaveLength(16_394);
 		expect(lexemes.filter(item => ENDINGS[item.conjugationType])).toHaveLength(15_775);
-		let realized = 0;
+		// SHORT-OKURIGANA-EXCLUDE1 (Amendment 2): the production realizer also refuses five 一段 verbs the SPIKE1 prototype
+		// (which keeps the six lexemes of Amendment 1) still realizes. Everywhere else the two agree, for every key.
+		const SHORT_OKURIGANA = ["恐る", "流る", "割る", "仕掛る", "組み立る"];
+		let realized = 0, refusedHere = 0;
 		for (const lexeme of lexemes) for (const key of MAX_TARGET_FORM_KEYS) {
 			const production = realizeMaxLexeme(key, input(lexeme.conjugationType, lexeme.baseForm));
-			expect(production).toEqual(realizeMaxCandidate(key, input(lexeme.conjugationType, lexeme.baseForm)));
+			const prototype = realizeMaxCandidate(key, input(lexeme.conjugationType, lexeme.baseForm));
+			if (lexeme.conjugationType === "一段" && SHORT_OKURIGANA.includes(lexeme.baseForm) && prototype.realized) {
+				expect(production).toEqual({ realized: false, reason: "irregular-lexeme" });
+				refusedHere++;
+			} else expect(production).toEqual(prototype);
 			if (production.realized) realized++;
 		}
+		// Five lexemes, and the seven of the thirteen keys that take 一段 (the other six refuse the class in both).
+		expect(refusedHere).toBe(35);
 		expect(realized).toBeGreaterThan(100_000);
 	});
 	it("re-derives the artifact exclusion with the structural rule and refuses all six base forms for every key", () => {

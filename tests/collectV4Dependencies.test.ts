@@ -62,8 +62,9 @@ describe("FAKE-PROVERB-COLLECT1 dependency boundary", () => {
 			if (path.startsWith("src/collect/v4/")) continue;
 			if (/from\s+["'][^"']*(?:collect\/v4\/|\.\/v4\/)/u.test(await readFile(path, "utf8"))) importers.push(path);
 		}
+		// WORKBENCH-UI2 stage 3 moved Recompose's Collect from the dialog into its session; the dialog no longer imports it.
 		expect(importers.sort()).toEqual(["src/SemantropyPlugin.ts", "src/application/bodyFragmentFromAutomatic.ts", "src/collect/collectMessages.ts",
-			"src/view/CollisionSession.ts", "src/view/FakeProverbSession.ts", "src/view/RecomposeModal.ts", "src/view/SemantropyView.ts"]);
+			"src/view/CollisionSession.ts", "src/view/FakeProverbSession.ts", "src/view/RecomposeSession.ts", "src/view/SemantropyView.ts"]);
 		expect(importers.filter((path) => path.startsWith("src/collect/v3/"))).toEqual([]);
 	});
 });

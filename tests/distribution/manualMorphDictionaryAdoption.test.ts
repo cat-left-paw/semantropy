@@ -14,6 +14,7 @@ import { analyzeSelectedSource } from '../../src/application/analyzeSelectedSour
 import { analyzeManualMorphSource, buildManualMorphVocabulary, evaluateManualMorphSlot } from '../../src/transform/manualMorphology';
 import { buildVocabularySnapshot, type VocabularyDrawMode } from '../../src/vocabulary/vocabularySnapshot';
 import { assertBodySemantropy } from '../../src/settings/bodySemantropy';
+import { FAKE_DICTIONARY_PLACEHOLDERS } from '../../src/dictionary/placeholders';
 import { sha256Hex } from '../../src/vocabulary/sha256';
 const comparison: unknown[]=[];
 afterAll(()=>writeFileSync(".cache/dictionary1-comparison.json",JSON.stringify(comparison,null,2)));
@@ -76,7 +77,15 @@ describe('Dictionary1 adoption',()=>{
     expect(b.fingerprint).not.toBe(a.fingerprint);
     expect(b.projections.automaticBody).toEqual(a.projections.automaticBody);
     expect(b.projections.dictionary).toEqual(a.projections.dictionary);
-    expect(after.getDictionaryPool()).toEqual(before.getDictionaryPool());
+    // FAKE-DICT-LEXEME1: template set 2 also carries the verb, イ-adjective and stem lists. The eight noun
+    // placeholders and the stems are unchanged by the adoption; the legacy noun-only dictionary realizes no
+    // verb or イ-adjective basic form, so only the adopted one fills those two lists.
+    const oldPool=before.getDictionaryPool()!,newPool=after.getDictionaryPool()!;
+    const eight=(pool:typeof newPool)=>Object.fromEntries(FAKE_DICTIONARY_PLACEHOLDERS.map(key=>[key,pool[key]]));
+    expect(eight(newPool)).toEqual(eight(oldPool));
+    expect(newPool.naStem).toEqual(oldPool.naStem);
+    expect([oldPool.verb,oldPool.iAdjective]).toEqual([[],[]]);
+    expect(newPool.verb!.length+newPool.iAdjective!.length).toBeGreaterThan(0);
     expect(b.candidates.filter(c=>c.token.pos==='名詞')).toEqual(a.candidates.filter(c=>c.token.pos==='名詞'));
     expect(b.candidates.filter(c=>c.token.pos==='動詞').map(c=>c.candidateId)).not.toEqual(a.candidates.filter(c=>c.token.pos==='動詞').map(c=>c.candidateId));
     for(let loaded=0;loaded<3;loaded++) {

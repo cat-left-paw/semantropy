@@ -1,11 +1,14 @@
 import type { DisplaySlot } from "../analysis/displaySlots";
 import { FAKE_DICTIONARY_PLACEHOLDERS } from "../dictionary/placeholders";
+import type { FakeDictionaryTemplatePlaceholder } from "../dictionary/placeholders";
+import { snapshotPlaceholderSurfaces } from "../dictionary/snapshotLexicalForms";
 import { STANDARD_TEMPLATE_SET } from "../dictionary/standardTemplateSet";
 import type { VocabularySnapshot } from "../vocabulary/vocabularySnapshot";
 
 export const DICTIONARY_DIAGNOSTICS = Object.freeze({
  off: "Fake dictionary is Off.",
  preparing: "Fake dictionary: Vocabulary is being prepared.",
+ none: "Fake dictionary: no Vocabulary has been chosen yet.",
  unsupported: "Fake dictionary: this token is not a supported headword.",
  pool: "Fake dictionary: the Vocabulary pool cannot fill a definition template.",
  templates: "Fake dictionary: no usable template is available.",
@@ -22,7 +25,8 @@ export type DictionaryDiagnostics = {
 /** Snapshot projection owns surface deduplication and origins. Never count frequency or candidate records. */
 export function dictionaryDiagnostics(snapshot: VocabularySnapshot): DictionaryDiagnostics {
  const projection = snapshot.projections.dictionary.byPlaceholder;
- const usable = (required: readonly typeof FAKE_DICTIONARY_PLACEHOLDERS[number][]) => required.every(key => projection[key].length > 0);
+ // FAKE-DICT-LEXEME1: a lexical placeholder reads the Snapshot's shared lists. The per-Source counts stay the eight.
+ const usable = (required: readonly FakeDictionaryTemplatePlaceholder[]) => required.every(key => snapshotPlaceholderSurfaces(snapshot, key).length > 0);
  const core = STANDARD_TEMPLATE_SET.coreTemplates.filter(t => usable(t.requiredPlaceholders));
  return Object.freeze({
   sources: snapshot.sources.map((source, index) => ({ ordinal: index + 1, counts: Object.fromEntries(
@@ -33,7 +37,10 @@ export function dictionaryDiagnostics(snapshot: VocabularySnapshot): DictionaryD
   totalCore: STANDARD_TEMPLATE_SET.coreTemplates.length, totalClauses: STANDARD_TEMPLATE_SET.optionalClauses.length,
  });
 }
-export function dictionaryDiagnosticMessage(input: { level: number; preparing: boolean; stale: boolean; slot: DisplaySlot | null; counts: DictionaryDiagnostics | null }): string {
+export function dictionaryDiagnosticMessage(input: { level: number; preparing: boolean; stale: boolean; slot: DisplaySlot | null; counts: DictionaryDiagnostics | null;
+ /** WORKBENCH-UI5: there is no Vocabulary at all (a host with tabs, no note, nothing applied), which is not a Vocabulary on its way. */
+ none?: boolean }): string {
+ if (input.none === true && !input.preparing && !input.counts) return DICTIONARY_DIAGNOSTICS.none;
  if (input.preparing || !input.counts) return DICTIONARY_DIAGNOSTICS.preparing;
  if (input.stale) return DICTIONARY_DIAGNOSTICS.stale;
  if (input.level === 0) return DICTIONARY_DIAGNOSTICS.off;

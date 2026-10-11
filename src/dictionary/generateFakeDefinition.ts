@@ -23,7 +23,7 @@ import {
 } from "./dictionaryBuckets";
 import type { FakeDictionaryHeadword, HeadwordIdentity } from "./headword";
 import { headwordIdentityKey } from "./headword";
-import type { FakeDictionaryPlaceholder } from "./placeholders";
+import type { FakeDictionaryTemplatePlaceholder } from "./placeholders";
 import { STANDARD_TEMPLATE_SET } from "./standardTemplateSet";
 import type {
 	CompiledCoreTemplate,
@@ -34,6 +34,8 @@ import type {
 import type { TemplateFamily } from "./templateData";
 import {
 	fingerprintDictionaryVocabularyPool,
+	hasCandidates,
+	poolCandidates,
  prepareDictionaryPool,
 	type DictionaryVocabularyPool,
 } from "./vocabularyPool";
@@ -94,7 +96,7 @@ export type FakeDefinitionResult =
 			 * sorted by name. Placeholder names only — never a candidate, a token,
 			 * a line of the note or a path.
 			 */
-			readonly missingPlaceholders: readonly FakeDictionaryPlaceholder[];
+			readonly missingPlaceholders: readonly FakeDictionaryTemplatePlaceholder[];
 	  }
 	| GeneratedFakeDefinition;
 
@@ -153,12 +155,11 @@ function deriveStream(definitionSeed: number, label: string): SeededRandom {
 }
 
 function isEligible(
-	requiredPlaceholders: readonly FakeDictionaryPlaceholder[],
+	requiredPlaceholders: readonly FakeDictionaryTemplatePlaceholder[],
 	pool: DictionaryVocabularyPool,
 ): boolean {
-	return requiredPlaceholders.every(
-		(placeholder) => pool[placeholder].length > 0,
-	);
+	// A lexical placeholder the pool does not carry has no candidates.
+	return requiredPlaceholders.every((placeholder) => hasCandidates(pool, placeholder));
 }
 
 /** Sorted copy. The caller's array keeps its own order. */
@@ -258,7 +259,7 @@ function expandSegments(
 		}
 		// Sorted copy: the note's first-appearance order must not decide which
 		// candidate a Seed picks, or a re-rendered DOM could change a definition.
-		const candidates = prepareDictionaryPool(pool).sorted[segment.placeholder];
+		const candidates = poolCandidates(prepareDictionaryPool(pool).sorted, segment.placeholder);
 		const chosen = candidates[Math.floor(random.next() * candidates.length)];
 		text += chosen ?? "";
 	}
@@ -272,11 +273,11 @@ function expandSegments(
 function missingPlaceholdersFor(
 	templateSet: CompiledTemplateSet,
 	pool: DictionaryVocabularyPool,
-): readonly FakeDictionaryPlaceholder[] {
-	const missing = new Set<FakeDictionaryPlaceholder>();
+): readonly FakeDictionaryTemplatePlaceholder[] {
+	const missing = new Set<FakeDictionaryTemplatePlaceholder>();
 	for (const template of templateSet.coreTemplates) {
 		for (const placeholder of template.requiredPlaceholders) {
-			if (pool[placeholder].length === 0) {
+			if (!hasCandidates(pool, placeholder)) {
 				missing.add(placeholder);
 			}
 		}
@@ -287,7 +288,7 @@ function missingPlaceholdersFor(
 type PreparedDefinitionPool = {
  readonly families: readonly EligibleFamily[];
  readonly clauses: readonly CompiledOptionalClause[];
- readonly missing: readonly FakeDictionaryPlaceholder[];
+ readonly missing: readonly FakeDictionaryTemplatePlaceholder[];
 };
 const preparedDefinitions = new WeakMap<DictionaryVocabularyPool, WeakMap<CompiledTemplateSet, PreparedDefinitionPool>>();
 /** Eagerly called during Snapshot preparation. Canonical ordering and draw streams are unchanged. */

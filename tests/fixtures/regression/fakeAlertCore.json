@@ -1,0 +1,5025 @@
+{
+	"recipeDataVersion": 5,
+	"algorithmVersion": 1,
+	"cases": [
+		{
+			"vocabulary": "rich-frequency",
+			"level": 0,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を猫に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 0,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 0,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"観察に猫がありません。",
+							"猫を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-kept",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"観察はそのままです。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 13,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を猫に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "busy-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院は現在、散歩が使用中です。"
+						]
+					},
+					{
+						"recipeId": "done-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 13,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 13,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"観察に猫がありません。",
+							"猫を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"観察はすでに猫です。"
+						]
+					},
+					{
+						"recipeId": "cannot-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"観察にはその操作ができません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 25,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を猫に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院に必要な散歩が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "failed-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院の処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 25,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 25,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"観察に猫がありません。",
+							"猫を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-wait",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼が観察を使い終わるまでお待ちください。"
+						]
+					},
+					{
+						"recipeId": "other-action-replace",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"観察を桜に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 26,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を猫に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院に必要な散歩が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "failed-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院の処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 26,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 26,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"観察に猫がありません。",
+							"猫を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-wait",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼が観察を使い終わるまでお待ちください。"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"観察が見つからなかったため、",
+							"代わりに桜を使用しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 50,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を猫に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-bare",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院はすでに猫です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 50,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"時計は散歩ですか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-bare",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					},
+					{
+						"recipeId": "done-replaced",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計を散歩に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 50,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"観察に猫がありません。",
+							"猫を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"観察が見つからなかったため、",
+							"代わりに信頼を使用しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-bare",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 75,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院に猫の問題があります。",
+							"病院を時計化しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院は現在、犬が使用中です。"
+						]
+					},
+					{
+						"recipeId": "cannot-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"桜にはその操作ができません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 75,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"時計は散歩ですか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "failed-timeout",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"桜の応答がありません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 75,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-trust",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を記憶したことがありますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の一部に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 100,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院に猫の問題があります。",
+							"病院を時計化しますか？"
+						]
+					},
+					{
+						"recipeId": "other-target-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"夕食の処理が完了しました。"
+						]
+					},
+					{
+						"recipeId": "other-action-deleted",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"不正な桜が見つかったため削除しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 100,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"時計は散歩ですか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"桜の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "rich-frequency",
+			"level": 100,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-trust",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を記憶したことがありますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"桜の一部に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 0,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 0,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 0,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を犬に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-kept",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院はそのままです。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 13,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "busy-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫は現在、封筒が使用中です。"
+						]
+					},
+					{
+						"recipeId": "done-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 13,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 13,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院を犬に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院はすでに犬です。"
+						]
+					},
+					{
+						"recipeId": "cannot-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院にはその操作ができません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 25,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫に必要な封筒が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 25,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 25,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院に犬がありません。",
+							"犬を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-wait",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"冷蔵庫が病院を使い終わるまでお待ちください。"
+						]
+					},
+					{
+						"recipeId": "other-action-replace",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院を時計に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 26,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫に必要な封筒が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 26,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 26,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院に犬がありません。",
+							"犬を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-wait",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"冷蔵庫が病院を使い終わるまでお待ちください。"
+						]
+					},
+					{
+						"recipeId": "other-action-replace",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院を時計に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 50,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-bare",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに桜です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 50,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 50,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院に犬がありません。",
+							"犬を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院が見つからなかったため、",
+							"代わりに冷蔵庫を使用しました。"
+						]
+					},
+					{
+						"recipeId": "failed-but-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院には失敗しましたが、時計は完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 75,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫に必要な時計が見つかりません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 75,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"封筒は夕食ですか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"冷蔵庫に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "failed-timeout",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計の応答がありません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 75,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-lack",
+						"kind": "error",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"病院に犬がありません。",
+							"犬を追加しますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院の処理が完了しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院の一部に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 100,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を桜に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "other-target-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"夕食の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 100,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"封筒は夕食ですか？"
+						]
+					},
+					{
+						"recipeId": "overridden-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"取り消しは無効です。",
+							"冷蔵庫の処理を続行しました。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "noun-only",
+			"level": 100,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-really",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"時計が見つからなかったため、",
+							"代わりに冷蔵庫を使用しました。"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"桜はすでに犬です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 0,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚えることに成功しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 0,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 0,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に降りるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"降りるのをやめました。"
+						]
+					},
+					{
+						"recipeId": "done-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"降りることに成功しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 13,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "cannot-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫にはその操作ができません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 13,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 13,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"絶望に猫の問題があります。",
+							"絶望を夕食化しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-verb",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望は現在、桜が決めるところです。"
+						]
+					},
+					{
+						"recipeId": "done-replaced",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望を猫に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 25,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒はすでに猫です。"
+						]
+					},
+					{
+						"recipeId": "changed-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚える予定は忘れる予定に変更されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 25,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 25,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"絶望に猫の問題があります。",
+							"絶望を夕食化しますか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望に必要な桜が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 26,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒はすでに猫です。"
+						]
+					},
+					{
+						"recipeId": "changed-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚える予定は忘れる予定に変更されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 26,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-ready",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の準備ができました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 26,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"絶望に猫の問題があります。",
+							"絶望を夕食化しますか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望に必要な桜が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 50,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒に必要な猫が見つかりません。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 50,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫は散歩ですか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-bare",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					},
+					{
+						"recipeId": "done-saved",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を保存しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 50,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"絶望に猫の問題があります。",
+							"絶望を夕食化しますか？"
+						]
+					},
+					{
+						"recipeId": "changed-target",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"対象は絶望から桜に変更されました。"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"散歩はすでに猫です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 75,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"封筒が見つからなかったため、",
+							"代わりに猫を使用しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 75,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫は散歩ですか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "failed-replace",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"記憶を散歩に置き換えられませんでした。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 75,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-ever",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"絶望は覚えることがありますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-verb",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚えることに成功しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 100,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-contains",
+						"kind": "warning",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"猫には、病院に使用できない時計が含まれています。",
+							"このまま続けますか？"
+						]
+					},
+					{
+						"recipeId": "other-target-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"夕食の処理が完了しました。"
+						]
+					},
+					{
+						"recipeId": "other-action-deleted",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"不正な桜が見つかったため削除しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 100,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-identity",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫は散歩ですか？"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼に問題はありません。"
+						]
+					},
+					{
+						"recipeId": "running-still",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"記憶はまだ散歩を待っています。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "verbs-frequency",
+			"level": 100,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-ever",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"絶望は覚えることがありますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-verb",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚えることに成功しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚えることに成功しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-missing",
+						"kind": "warning",
+						"buttons": [
+							"ignore",
+							"retry"
+						],
+						"lines": [
+							"猫が見つかりません。",
+							"得意を確認してください。"
+						]
+					},
+					{
+						"recipeId": "cancelled-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫への操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-replaced",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を得意に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-wait",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"自在が覚えるのを待ちますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-kept",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"自在はそのままです。"
+						]
+					},
+					{
+						"recipeId": "done-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚えることに成功しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-two-actions",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"猫の相談を観察します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の相談を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗を相談しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-kept",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はそのままです。"
+						]
+					},
+					{
+						"recipeId": "done-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に見るつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"見るのをやめました。"
+						]
+					},
+					{
+						"recipeId": "done-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"見ることに成功しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 0,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"説明を掃除しますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-kept",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"説明はそのままです。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"説明を掃除しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-bare",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"操作を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "cannot-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫にはその操作ができません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-missing",
+						"kind": "warning",
+						"buttons": [
+							"ignore",
+							"retry"
+						],
+						"lines": [
+							"猫が見つかりません。",
+							"得意を確認してください。"
+						]
+					},
+					{
+						"recipeId": "missing-action",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"選択に必要な信頼がありません。"
+						]
+					},
+					{
+						"recipeId": "done-replaced",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を得意に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-wait",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"自在が覚えるのを待ちますか？"
+						]
+					},
+					{
+						"recipeId": "already-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"自在はすでに覚えることにしています。"
+						]
+					},
+					{
+						"recipeId": "cannot-verb",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"自在は覚えることができません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-typical",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫的な犬が発生しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-same",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"同じ猫がもう一度見つかりました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "missing-na-degree",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫には正直さが足りません。"
+						]
+					},
+					{
+						"recipeId": "partial-count",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫のうち三つを観察しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗を相談しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-na",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を正直にするのをやめました。"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の一部だけが完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に見るつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-na",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"派手を丁寧にするのをやめました。"
+						]
+					},
+					{
+						"recipeId": "done-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"見ることに成功しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 13,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"説明を掃除しますか？"
+						]
+					},
+					{
+						"recipeId": "already-na",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに丁寧な洗濯です。"
+						]
+					},
+					{
+						"recipeId": "repeat-wrong",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"また説明が間違っています。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"大柄はすでに猫です。"
+						]
+					},
+					{
+						"recipeId": "changed-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚える予定は忘れる予定に変更されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-missing",
+						"kind": "warning",
+						"buttons": [
+							"ignore",
+							"retry"
+						],
+						"lines": [
+							"猫が見つかりません。",
+							"得意を確認してください。"
+						]
+					},
+					{
+						"recipeId": "missing-action",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"選択に必要な信頼がありません。"
+						]
+					},
+					{
+						"recipeId": "done-replaced",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を得意に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-either",
+						"kind": "information",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"調査する旅行または猫を観察してください。"
+						]
+					},
+					{
+						"recipeId": "cancelled-second",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の観察を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "missing-action",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"調査に必要な散策がありません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-typical",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫的な犬が発生しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-same",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"同じ猫がもう一度見つかりました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫が見つからなかったため、",
+							"代わりに無慈悲を使用しました。"
+						]
+					},
+					{
+						"recipeId": "already-adjective",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに長いです。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗を相談しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "running-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに考えるところです。"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに信頼です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に見るつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-second",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"不思議の整理を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "partial-count",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院のうち三つを研究しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 25,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"説明を掃除しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-verb",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫は現在、丁寧が答えるところです。"
+						]
+					},
+					{
+						"recipeId": "repeat-wrong",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"また説明が間違っています。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"大柄はすでに猫です。"
+						]
+					},
+					{
+						"recipeId": "changed-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"覚える予定は忘れる予定に変更されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-missing",
+						"kind": "warning",
+						"buttons": [
+							"ignore",
+							"retry"
+						],
+						"lines": [
+							"猫が見つかりません。",
+							"得意を確認してください。"
+						]
+					},
+					{
+						"recipeId": "missing-action",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"選択に必要な信頼がありません。"
+						]
+					},
+					{
+						"recipeId": "done-replaced",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を得意に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-either",
+						"kind": "information",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"調査する旅行または猫を観察してください。"
+						]
+					},
+					{
+						"recipeId": "cancelled-second",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の観察を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "missing-action",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"調査に必要な散策がありません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-typical",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫的な犬が発生しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-same",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"同じ猫がもう一度見つかりました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫が見つからなかったため、",
+							"代わりに無慈悲を使用しました。"
+						]
+					},
+					{
+						"recipeId": "already-adjective",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに長いです。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗を相談しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "running-verb",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに考えるところです。"
+						]
+					},
+					{
+						"recipeId": "already-noun",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに信頼です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に見るつもりですか？"
+						]
+					},
+					{
+						"recipeId": "cancelled-second",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"不思議の整理を取り消しました。"
+						]
+					},
+					{
+						"recipeId": "partial-count",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院のうち三つを研究しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 26,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"説明を掃除しますか？"
+						]
+					},
+					{
+						"recipeId": "busy-verb",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫は現在、丁寧が答えるところです。"
+						]
+					},
+					{
+						"recipeId": "repeat-wrong",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"また説明が間違っています。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "busy-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"大柄は現在、猫が使用中です。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-missing",
+						"kind": "warning",
+						"buttons": [
+							"ignore",
+							"retry"
+						],
+						"lines": [
+							"猫が見つかりません。",
+							"得意を確認してください。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-bare",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"正常に完了しました。"
+						]
+					},
+					{
+						"recipeId": "cancelled-kept",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はそのままです。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-either",
+						"kind": "information",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"調査する旅行または猫を観察してください。"
+						]
+					},
+					{
+						"recipeId": "already-adjective",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗はすでに怪しいです。"
+						]
+					},
+					{
+						"recipeId": "substituted-busy",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"旅行を調査できませんでした。",
+							"旅行は現在、不思議によって記録中です。",
+							"代わりに病院を散歩しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-typical",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫的な犬が発生しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-same",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"同じ猫がもう一度見つかりました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					},
+					{
+						"recipeId": "missing-na-degree",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫には綺麗さが足りません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "running-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗はすでに相談中です。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を相談しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "already-adjective",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに赤いです。"
+						]
+					},
+					{
+						"recipeId": "missing-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫に必要な桜が見つかりません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に見るつもりですか？"
+						]
+					},
+					{
+						"recipeId": "already-na",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"派手はすでに丁寧な猫です。"
+						]
+					},
+					{
+						"recipeId": "already-na",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫はすでに綺麗な無事です。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 50,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"説明を掃除しますか？"
+						]
+					},
+					{
+						"recipeId": "substituted-adjective",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"遠い不思議が見つからなかったため、",
+							"代わりに細い猫を使用しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-wrong",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"また説明が間違っています。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "substituted-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"大柄が見つからなかったため、",
+							"代わりに猫を使用しました。"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の一部に失敗しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-normal",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫は正常ですか？"
+						]
+					},
+					{
+						"recipeId": "failed-verb",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"届けることに失敗しました。"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼に問題はありません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-either",
+						"kind": "information",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"調査する旅行または猫を観察してください。"
+						]
+					},
+					{
+						"recipeId": "missing-na-degree",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗には大事さが足りません。"
+						]
+					},
+					{
+						"recipeId": "failed-but-action",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"調査に失敗しましたが、検討は完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-typical",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫的な犬が発生しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-same",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"同じ必死がもう一度見つかりました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "overridden-verb",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"取り消しましたが、",
+							"猫は考えるつもりです。"
+						]
+					},
+					{
+						"recipeId": "other-action-replace",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を計算に置き換えました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "already-action",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"綺麗はすでに相談済みです。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を絶望しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "missing-na",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院を起動するための正直な大柄がありません。"
+						]
+					},
+					{
+						"recipeId": "other-action-action",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を研究しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-contains",
+						"kind": "warning",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"猫には、元気に使用できない時計が含まれています。",
+							"このまま続けますか？"
+						]
+					},
+					{
+						"recipeId": "running-adjective",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"降りる猫は現在、自在です。"
+						]
+					},
+					{
+						"recipeId": "repeat-again",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫が再び調査されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 75,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-failed-retry",
+						"kind": "error",
+						"buttons": [
+							"cancel",
+							"retry"
+						],
+						"lines": [
+							"説明を掃除できませんでした。",
+							"再試行しますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ok-noun",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の処理が完了しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-again",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"説明が再び掃除されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 1,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-intend",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"本当に覚えるつもりですか？"
+						]
+					},
+					{
+						"recipeId": "changed-target",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"対象は大柄から猫に変更されました。"
+						]
+					},
+					{
+						"recipeId": "no-problem-action",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望に問題は見つかりませんでした。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 2,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-normal",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫は正常ですか？"
+						]
+					},
+					{
+						"recipeId": "partial-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫の一部だけが完了しました。"
+						]
+					},
+					{
+						"recipeId": "no-problem-noun",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"信頼に問題はありません。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 3,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-adjective",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"自在は遠いですか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					},
+					{
+						"recipeId": "no-problem-action",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"絶望に問題は見つかりませんでした。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 4,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "ask-which",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫と犬のどちらが遠いですか？"
+						]
+					},
+					{
+						"recipeId": "overridden-refused",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"要求は拒否されましたが、",
+							"冷蔵庫を散策しました。"
+						]
+					},
+					{
+						"recipeId": "other-target-noun",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"桜の処理が完了しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 5,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-do",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を観察しますか？"
+						]
+					},
+					{
+						"recipeId": "overridden-verb",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"取り消しましたが、",
+							"猫は考えるつもりです。"
+						]
+					},
+					{
+						"recipeId": "substituted-adjective",
+						"kind": "warning",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"長い封筒が見つからなかったため、",
+							"代わりに美しい散策を使用しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 6,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-start",
+						"kind": "confirmation",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"綺麗の相談を開始します。",
+							"よろしいですか？"
+						]
+					},
+					{
+						"recipeId": "missing-action",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"整理に必要な猫がありません。"
+						]
+					},
+					{
+						"recipeId": "done-plain",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫を絶望しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 7,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "confirm-replace",
+						"kind": "confirmation",
+						"buttons": [
+							"no",
+							"yes"
+						],
+						"lines": [
+							"猫を信頼に置き換えますか？"
+						]
+					},
+					{
+						"recipeId": "other-action-verb",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"病院は考えることにしました。"
+						]
+					},
+					{
+						"recipeId": "substituted-busy",
+						"kind": "error",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"運動を研究できませんでした。",
+							"運動は現在、大柄によって掃除中です。",
+							"代わりに派手を計算しました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 8,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-contains",
+						"kind": "warning",
+						"buttons": [
+							"cancel",
+							"ok"
+						],
+						"lines": [
+							"猫には、元気に使用できない時計が含まれています。",
+							"このまま続けますか？"
+						]
+					},
+					{
+						"recipeId": "already-na",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"説明はすでに自在な選択です。"
+						]
+					},
+					{
+						"recipeId": "repeat-again",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"猫が再び調査されました。"
+						]
+					}
+				]
+			}
+		},
+		{
+			"vocabulary": "full-frequency",
+			"level": 100,
+			"nonce": 9,
+			"alert": {
+				"shape": "dialog",
+				"pages": [
+					{
+						"recipeId": "notice-failed-retry",
+						"kind": "error",
+						"buttons": [
+							"cancel",
+							"retry"
+						],
+						"lines": [
+							"説明を掃除できませんでした。",
+							"再試行しますか？"
+						]
+					},
+					{
+						"recipeId": "mismatch-ng-bare",
+						"kind": "success",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"処理に失敗しました。"
+						]
+					},
+					{
+						"recipeId": "repeat-again",
+						"kind": "information",
+						"buttons": [
+							"ok"
+						],
+						"lines": [
+							"説明が再び掃除されました。"
+						]
+					}
+				]
+			}
+		}
+	]
+}

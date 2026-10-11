@@ -28,12 +28,15 @@ export function fakeDictionaryCanonicalText(current: FakeDictionaryCurrent): str
  * definition when it was generated — never reconstructed from the View's later
  * Snapshot. Body Semantropy, tokens, the pool, the note body and internal
  * generation state are not fields of this input.
+ *
+ * FAKE-DICT-RECOMPOSE1: a definition made for a word of a Recompose sentence has no Target, and a Collection entry
+ * names its Target, so there is nothing to collect: the answer is null.
  */
 export function fakeDictionaryFragmentFromCurrent(
 	current: FakeDictionaryCurrent,
 ): FakeDictionaryFragmentInput | null {
 	const text = fakeDictionaryCanonicalText(current);
-	if (text === null || current.result.outcome !== "generated") {
+	if (text === null || current.result.outcome !== "generated" || current.snapshot === null) {
 		return null;
 	}
 	return {

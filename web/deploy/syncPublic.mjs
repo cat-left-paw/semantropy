@@ -31,7 +31,8 @@ import { fileURLToPath } from "node:url";
 const sourceDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
 /** Existing public files this change updates. */
-const FILES = ["package.json", "package-lock.json", "eslint.config.mts", "vitest.web.config.ts", "tests/recompose.test.ts"];
+// `vitest.preview.config.ts` (0.2.0) is what `npm run preview:fake-proverb` in package.json runs; it lies outside RELEASE_TREES.
+const FILES = ["package.json", "package-lock.json", "eslint.config.mts", "vitest.web.config.ts", "vitest.preview.config.ts", "tests/recompose.test.ts"];
 /** Trees owned by the web Playground: every committed file under them. */
 const TREES = ["web", "src/recompose"];
 /** 0.1.0 plugin release (`--since`): where a file added here since the last public sync may be published. */

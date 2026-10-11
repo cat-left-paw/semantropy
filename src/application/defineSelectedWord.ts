@@ -36,7 +36,7 @@ export type DefineSelectedWordResult =
 			readonly status: "ready";
 			readonly headword: FakeDictionaryHeadword;
 			readonly pool: DictionaryVocabularyPool;
-			readonly snapshot: DictionarySnapshotIdentity;
+			readonly snapshot: DictionarySnapshotIdentity | null;
 			readonly result: FakeDefinitionResult;
 	  };
 
@@ -44,7 +44,8 @@ export type DefineSelectedWordInput = {
 	selection: string;
  /** Supplied only after exact committed DisplaySlot coverage and owner validation. */
  identified?: HeadwordValidation;
-	snapshot: DictionarySnapshotIdentity;
+	/** The Target the word is looked up for; `null` for a word of a Recompose sentence, which has none (FAKE-DICT-RECOMPOSE1). */
+	snapshot: DictionarySnapshotIdentity | null;
 	tokenSequences: TokenSequences;
 	/** Prepared Current Note pool, independent of the materialized Target prefix. */
 	preparedPool?: DictionaryVocabularyPool;
@@ -58,6 +59,8 @@ export type DefineSelectedWordInput = {
 
 function snapshotStillMatches(input: DefineSelectedWordInput): boolean {
 	const current = input.getSnapshotIdentity();
+	// With no Target there is none to compare: the caller says so by returning null too.
+	if (input.snapshot === null) return current === null;
 	return (
 		current !== null &&
 		sameDictionarySnapshotIdentity(current, input.snapshot)

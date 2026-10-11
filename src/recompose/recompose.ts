@@ -68,6 +68,8 @@ const PAIRS: ReadonlyMap<string, string> = new Map([
 	["「", "」"], ["『", "』"], ["（", "）"], ["(", ")"], ["【", "】"], ["〈", "〉"], ["《", "》"], ["［", "］"], ["“", "”"], ["‘", "’"],
 ]);
 const CLOSERS: ReadonlySet<string> = new Set(PAIRS.values());
+/** The characters that can close a bracket, which `balanceBrackets` drops when they close nothing and appends at a sentence end. */
+export const RECOMPOSE_CLOSING_BRACKETS: ReadonlySet<string> = CLOSERS;
 
 function sentenceTail(units: readonly RecomposeUnit[]): RecomposeUnit[] {
 	const out: RecomposeUnit[] = [];

@@ -4,10 +4,7 @@ import {
 	canonicalString,
 	fnv1a32,
 } from "../src/dictionary/canonicalHash";
-import {
-	FAKE_DICTIONARY_PLACEHOLDERS,
-	type FakeDictionaryPlaceholder,
-} from "../src/dictionary/placeholders";
+import { FAKE_DICTIONARY_PLACEHOLDERS } from "../src/dictionary/placeholders";
 import {
 	STANDARD_TEMPLATE_SET,
 	STANDARD_TEMPLATE_SET_VERSION,
@@ -106,14 +103,15 @@ describe("the template validator", () => {
 	});
 
 	it("names the unknown placeholder so a failing build can be read", () => {
-		const result = compileTemplateSet(1, [core("{{verb}}する。")], []);
+		// FAKE-DICT-LEXEME1 made {{verb}} a lexical placeholder; an adjective by another name is still unknown.
+		const result = compileTemplateSet(1, [core("{{adjective}}もの。")], []);
 
 		expect(result.ok).toBe(false);
 		if (result.ok) return;
 		expect(result.issues[0]).toEqual({
 			code: "unknown-placeholder",
 			id: "classification-01",
-			detail: "verb",
+			detail: "adjective",
 		});
 	});
 
@@ -221,20 +219,18 @@ describe("the template validator", () => {
 
 describe("the standard template set", () => {
 	it("compiles every core template the document defines", () => {
-		// `resources/fake-dictionary/standard-templates.md` holds 30 families of three.
-		expect(STANDARD_CORE_TEMPLATES).toHaveLength(90);
+		// `resources/fake-dictionary/standard-templates.md` holds 30 families of three, and
+		// since template set 2 (FAKE-DICT-LEXEME1) a fourth in 18 of them.
+		expect(STANDARD_CORE_TEMPLATES).toHaveLength(108);
 		expect(TEMPLATE_FAMILIES).toHaveLength(30);
-		expect(STANDARD_TEMPLATE_SET.coreTemplates).toHaveLength(90);
+		expect(STANDARD_TEMPLATE_SET.coreTemplates).toHaveLength(108);
 	});
 
-	it("gives every family exactly three templates", () => {
-		for (const family of TEMPLATE_FAMILIES) {
-			expect(
-				STANDARD_TEMPLATE_SET.coreTemplates.filter(
-					(template) => template.family === family,
-				),
-			).toHaveLength(3);
-		}
+	it("gives every family three or four templates, 18 of them four", () => {
+		const sizes = TEMPLATE_FAMILIES.map((family) =>
+			STANDARD_TEMPLATE_SET.coreTemplates.filter((template) => template.family === family).length);
+		expect(sizes.every((size) => size === 3 || size === 4)).toBe(true);
+		expect(sizes.filter((size) => size === 4)).toHaveLength(18);
 	});
 
 	it("compiles every optional clause the document defines", () => {
@@ -250,7 +246,7 @@ describe("the standard template set", () => {
 		];
 
 		expect(new Set(ids).size).toBe(ids.length);
-		expect(ids).toHaveLength(121);
+		expect(ids).toHaveLength(139);
 	});
 
 	it("uses the document's own core template ids", () => {
@@ -261,12 +257,12 @@ describe("the standard template set", () => {
 		expect(ids).toContain("classification-01");
 		expect(ids).toContain("uncertain-03");
 		for (const id of ids) {
-			expect(id).toMatch(/^[a-z][a-z-]*-0[1-3]$/);
+			expect(id).toMatch(/^[a-z][a-z-]*-0[1-4]$/);
 		}
 	});
 
-	it("uses only the eight supported placeholders", () => {
-		const used = new Set<FakeDictionaryPlaceholder>();
+	it("uses only the supported placeholders, the three lexical ones only in the fourth templates", () => {
+		const used = new Set<string>();
 		for (const entry of [
 			...STANDARD_TEMPLATE_SET.coreTemplates,
 			...STANDARD_TEMPLATE_SET.optionalClauses,
@@ -277,17 +273,25 @@ describe("the standard template set", () => {
 		}
 
 		for (const placeholder of used) {
-			expect(FAKE_DICTIONARY_PLACEHOLDERS).toContain(placeholder);
+			expect([...FAKE_DICTIONARY_PLACEHOLDERS, "verb", "iAdjective", "naStem"]).toContain(placeholder);
+		}
+		for (const entry of [...STANDARD_TEMPLATE_SET.coreTemplates, ...STANDARD_TEMPLATE_SET.optionalClauses]) {
+			const lexical = entry.requiredPlaceholders.some((placeholder) => !(FAKE_DICTIONARY_PLACEHOLDERS as readonly string[]).includes(placeholder));
+			// Core templates only: no Optional Clause uses a lexical placeholder.
+			expect(lexical, entry.id).toBe(!entry.id.startsWith("optional-") && entry.id.endsWith("-04"));
 		}
 		// `proper` and `organization` are supported but no standard template
 		// happens to ask for them; that is a subset, not a gap.
 		expect([...used].sort()).toEqual([
 			"adverbialNoun",
+			"iAdjective",
+			"naStem",
 			"noun",
 			"number",
 			"person",
 			"place",
 			"sahen",
+			"verb",
 		]);
 	});
 
@@ -301,7 +305,7 @@ describe("the standard template set", () => {
 	});
 
 	it("declares the template set version", () => {
-		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(1);
+		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(2);
 		expect(STANDARD_TEMPLATE_SET.version).toBe(STANDARD_TEMPLATE_SET_VERSION);
 	});
 

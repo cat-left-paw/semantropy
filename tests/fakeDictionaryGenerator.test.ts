@@ -31,6 +31,7 @@ import {
 	buildVocabularyPool,
 	transformTokenSequences,
 } from "../src/transform/transformTokens";
+import { TEMPLATE_SET_1 } from "./support/fakeDictionaryTemplateSet1";
 import { token } from "./tokenFixtures";
 
 const noun = (surface: string) => token({ surface });
@@ -166,13 +167,17 @@ describe("the generator's non-generating outcomes", () => {
 
 		expect(result.outcome).toBe("insufficient-vocabulary");
 		if (result.outcome !== "insufficient-vocabulary") return;
+		// Template set 2 (FAKE-DICT-LEXEME1) adds the three lexical placeholders its new templates need.
 		expect(result.missingPlaceholders).toEqual([
 			"adverbialNoun",
+			"iAdjective",
+			"naStem",
 			"noun",
 			"number",
 			"person",
 			"place",
 			"sahen",
+			"verb",
 		]);
 	});
 
@@ -358,10 +363,13 @@ describe("family selection", () => {
 	const familyCounts = (headword: FakeDictionaryHeadword, semantropy: number) => {
 		const counts = new Map<string, number>();
 		for (let seed = 0; seed < 400; seed += 1) {
+			// Template set 1, whose counts these tests pin: the weights do not depend on the set's version,
+			// but the version is part of every definition Seed.
 			const result = generated({
 				headword,
 				dictionarySemantropy: semantropy,
 				dictionarySeed: seed,
+				templateSet: TEMPLATE_SET_1,
 			});
 			counts.set(result.family, (counts.get(result.family) ?? 0) + 1);
 		}
@@ -436,6 +444,7 @@ describe("family selection", () => {
 		const result = generated({
 			dictionarySeed: 1170956989,
 			dictionarySemantropy: 100,
+			templateSet: TEMPLATE_SET_1,
 		});
 
 		expect(result).toEqual({

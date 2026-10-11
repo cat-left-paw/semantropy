@@ -197,7 +197,7 @@ describe("Vocabulary Snapshot Source transaction", () => {
 			{
 				path: "Novel/Current.md",
 				contentHash: "current-hash",
-				projectionPolicy: "target-presentation-2",
+				projectionPolicy: "target-presentation-3",
 			},
 		]);
 		expect(

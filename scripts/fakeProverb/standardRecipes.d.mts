@@ -18,6 +18,10 @@ export type FakeProverbSourceIssue = {
 	readonly code: string;
 	readonly line: number;
 	readonly detail?: string;
+	/** The entry the problem is in, as `kind id`. */
+	readonly entry?: string;
+	/** A Japanese sentence for the person editing the document; absent where none is written. */
+	readonly ja?: string;
 };
 
 export type ParsedFakeProverbRecipeDocument = {
@@ -30,7 +34,8 @@ export type ParsedFakeProverbRecipeDocument = {
 };
 
 export type ParseFakeProverbRecipeDocumentResult =
-	| ({ readonly ok: true } & ParsedFakeProverbRecipeDocument)
+	/** `authored` holds each recipe's `line:` text as written, by recipe id. It is not part of the data. */
+	| ({ readonly ok: true; readonly authored: Readonly<Record<string, string>> } & ParsedFakeProverbRecipeDocument)
 	| { readonly ok: false; readonly issues: readonly FakeProverbSourceIssue[] };
 
 export declare function parseStandardFakeProverbRecipeMarkdown(
@@ -42,6 +47,17 @@ export declare function describeFakeProverbSourceIssue(issue: FakeProverbSourceI
 export declare function describeFakeProverbSourceIssues(
 	issues: readonly FakeProverbSourceIssue[],
 ): string;
+
+/** The same problems in Japanese, with the line, the entry and the code. */
+export declare function explainFakeProverbSourceIssues(
+	issues: readonly FakeProverbSourceIssue[],
+): string;
+
+/** How many hex digits of the text's SHA-256 a literal id carries. */
+export declare const FAKE_PROVERB_LITERAL_ID_HEX_DIGITS: number;
+
+/** The id of a fixed literal: `l-` and the first digits of the SHA-256 of its text. */
+export declare function fakeProverbLiteralId(text: string): string;
 
 export declare function renderGeneratedFakeProverbRecipeModule(
 	parsed: ParsedFakeProverbRecipeDocument,

@@ -11,6 +11,8 @@ export type FakeDefinitionPresenterHost = {
  onCopy: () => void;
  onCollect: () => void;
  onSemantropyChange: (value: DictionarySemantropy) => void;
+ /** FAKE-DICT-RECOMPOSE1: false hides the Collect button (a word of a Recompose sentence has no Target to collect for). Absent means offered. */
+ collectOffered?: () => boolean;
 };
 /**
  * Modal and Popover share all displayed fields and enabled conditions. Plain text only, stable controls.
@@ -99,6 +101,7 @@ export class FakeDefinitionPresenter {
   }
   this.select.value = String(model.dictionarySemantropy); this.select.disabled = !model.levelControlEnabled;
   this.reshuffle.disabled = !model.reshuffleEnabled; this.copy.disabled = !model.copyEnabled; this.collect.disabled = !model.collectEnabled;
+ this.collect.hidden = this.host.collectOffered ? !this.host.collectOffered() : false;
  }
  dispose(): void { for (const off of this.off) off(); this.off = []; this.labels.clear(); this.root.remove(); }
 }

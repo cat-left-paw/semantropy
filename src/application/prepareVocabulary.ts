@@ -8,6 +8,9 @@ import type { JapaneseTokenizer } from "../tokenizer/JapaneseTokenizer";
 import type { RubyVocabulary } from "../analysis/rubyVocabulary";
 import type { DictionaryVocabularyPool } from "../dictionary/vocabularyPool";
 import { FAKE_DICTIONARY_PLACEHOLDERS } from "../dictionary/placeholders";
+import { snapshotLexicalForms } from "../dictionary/snapshotLexicalForms";
+import { STANDARD_TEMPLATE_SET } from "../dictionary/standardTemplateSet";
+import { lexicalPlaceholdersOf, type CompiledTemplateSet } from "../dictionary/template";
 
 /**
  * `weights` (0.1.0 S3) is a Selected Notes weight by path. Only paths whose
@@ -56,10 +59,18 @@ export function snapshotRubyVocabulary(snapshot: VocabularySnapshot): RubyVocabu
  return { candidates: snapshot.candidates, fingerprint: snapshot.fingerprint,
   automaticBody: new Map(snapshot.projections.automaticBody.buckets.map(b => [b.key, Object.freeze(b.surfaces.map(s => s.surface))])) };
 }
-export function snapshotDictionaryPool(snapshot: VocabularySnapshot): DictionaryVocabularyPool {
- const pool = Object.freeze(Object.fromEntries(FAKE_DICTIONARY_PLACEHOLDERS.map(p => [p,
-  Object.freeze(snapshot.projections.dictionary.byPlaceholder[p].map(s => s.surface))])) as Record<typeof FAKE_DICTIONARY_PLACEHOLDERS[number], readonly string[]>);
- prepareFakeDictionaryGeneration(pool);
+/**
+ * The Fake Dictionary pool of a Snapshot, for one template set (the standard
+ * one by default). FAKE-DICT-LEXEME1: a lexical placeholder's list is added
+ * only when that set uses it, so a set that uses none gets the pool, the
+ * fingerprint and the definitions it always had.
+ */
+export function snapshotDictionaryPool(snapshot: VocabularySnapshot, templateSet: CompiledTemplateSet = STANDARD_TEMPLATE_SET): DictionaryVocabularyPool {
+ const pool = Object.freeze(Object.fromEntries([
+  ...FAKE_DICTIONARY_PLACEHOLDERS.map(p => [p, Object.freeze(snapshot.projections.dictionary.byPlaceholder[p].map(s => s.surface))]),
+  ...lexicalPlaceholdersOf(templateSet).map(p => [p, Object.freeze(snapshotLexicalForms(snapshot, p).map(form => form.surface))]),
+ ])) as DictionaryVocabularyPool;
+ prepareFakeDictionaryGeneration(pool, templateSet);
  return pool;
 }
 

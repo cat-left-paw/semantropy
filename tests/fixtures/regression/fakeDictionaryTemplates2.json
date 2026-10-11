@@ -1,0 +1,8192 @@
+{
+	"origin": {
+		"note": "Captured once from template set 2 (FAKE-DICT-LEXEME1 stage B). Provenance label only."
+	},
+	"version": 2,
+	"raw": {
+		"coreTemplates": [
+			{
+				"id": "classification-01",
+				"family": "classification",
+				"text": "{{noun}}の一種。主として{{place}}に見られ、{{noun}}を特徴とする。"
+			},
+			{
+				"id": "classification-02",
+				"family": "classification",
+				"text": "{{noun}}に属する{{noun}}。一般に{{noun}}を伴うものをいう。"
+			},
+			{
+				"id": "classification-03",
+				"family": "classification",
+				"text": "{{noun}}のうち、特に{{sahen}}するものの総称。"
+			},
+			{
+				"id": "classification-04",
+				"family": "classification",
+				"text": "{{iAdjective}}{{noun}}の一種。特に{{noun}}に見られるものをいう。"
+			},
+			{
+				"id": "instrument-01",
+				"family": "instrument",
+				"text": "{{noun}}を{{sahen}}するために用いる{{noun}}。主として{{place}}で使用される。"
+			},
+			{
+				"id": "instrument-02",
+				"family": "instrument",
+				"text": "{{sahen}}する際に使用する{{noun}}の一種。ふつう{{noun}}と併用する。"
+			},
+			{
+				"id": "instrument-03",
+				"family": "instrument",
+				"text": "{{noun}}に用いる{{noun}}。特に{{noun}}を{{sahen}}する場合にいう。"
+			},
+			{
+				"id": "instrument-04",
+				"family": "instrument",
+				"text": "{{verb}}ために用いる{{noun}}。主として{{place}}で使用される。"
+			},
+			{
+				"id": "action-01",
+				"family": "action",
+				"text": "{{noun}}を{{sahen}}すること。また、その行為。"
+			},
+			{
+				"id": "action-02",
+				"family": "action",
+				"text": "{{sahen}}すること。特に{{noun}}について行う場合をいう。"
+			},
+			{
+				"id": "action-03",
+				"family": "action",
+				"text": "{{noun}}に際して{{sahen}}すること。また、そのために行われる一連の行為。"
+			},
+			{
+				"id": "action-04",
+				"family": "action",
+				"text": "{{noun}}を{{verb}}こと。また、その動作。"
+			},
+			{
+				"id": "state-01",
+				"family": "state",
+				"text": "{{noun}}に{{noun}}が生じた状態。また、そのような状態にあること。"
+			},
+			{
+				"id": "state-02",
+				"family": "state",
+				"text": "{{sahen}}することによって生じる{{noun}}。特に{{noun}}についていう。"
+			},
+			{
+				"id": "state-03",
+				"family": "state",
+				"text": "{{noun}}に見られる状態の一つ。一般に{{noun}}を伴う。"
+			},
+			{
+				"id": "state-04",
+				"family": "state",
+				"text": "{{noun}}が{{naStem}}になった状態。また、そのような状態にあること。"
+			},
+			{
+				"id": "quality-01",
+				"family": "quality",
+				"text": "{{noun}}に特有の性質。特に{{noun}}についていう。"
+			},
+			{
+				"id": "quality-02",
+				"family": "quality",
+				"text": "{{noun}}を思わせるような性質をもつこと。"
+			},
+			{
+				"id": "quality-03",
+				"family": "quality",
+				"text": "{{sahen}}する傾向が著しいこと。また、そのような性質。"
+			},
+			{
+				"id": "quality-04",
+				"family": "quality",
+				"text": "{{naStem}}な性質。また、{{noun}}が{{naStem}}であること。"
+			},
+			{
+				"id": "person-01",
+				"family": "person",
+				"text": "{{place}}の{{noun}}。{{noun}}を{{sahen}}したことで知られる。"
+			},
+			{
+				"id": "person-02",
+				"family": "person",
+				"text": "{{adverbialNoun}}ごろの{{noun}}。{{place}}で{{noun}}に従事したとされる。"
+			},
+			{
+				"id": "person-03",
+				"family": "person",
+				"text": "{{noun}}に関係した人物。{{noun}}を初めて{{sahen}}したことで知られる。"
+			},
+			{
+				"id": "person-04",
+				"family": "person",
+				"text": "{{verb}}ことを生業とする人。多く{{naStem}}な人柄で知られる。"
+			},
+			{
+				"id": "place-01",
+				"family": "place",
+				"text": "{{place}}にある{{noun}}。古くから{{noun}}で知られる。"
+			},
+			{
+				"id": "place-02",
+				"family": "place",
+				"text": "{{place}}地方の一地域。主として{{noun}}が{{sahen}}することで知られる。"
+			},
+			{
+				"id": "place-03",
+				"family": "place",
+				"text": "{{noun}}に用いられる地名。現在の{{place}}付近にあたるとされる。"
+			},
+			{
+				"id": "place-04",
+				"family": "place",
+				"text": "{{iAdjective}}{{noun}}が多く見られる土地。"
+			},
+			{
+				"id": "organism-01",
+				"family": "organism",
+				"text": "{{noun}}の一種。主として{{place}}に生息し、{{noun}}を主な餌とする。"
+			},
+			{
+				"id": "organism-02",
+				"family": "organism",
+				"text": "{{place}}などに見られる{{noun}}。{{adverbialNoun}}に{{sahen}}することが多い。"
+			},
+			{
+				"id": "organism-03",
+				"family": "organism",
+				"text": "{{noun}}の仲間。ふつう{{adverbialNoun}}に活動し、{{noun}}を摂取する。"
+			},
+			{
+				"id": "organism-04",
+				"family": "organism",
+				"text": "{{iAdjective}}{{noun}}を好む生物。{{naStem}}に{{verb}}習性がある。"
+			},
+			{
+				"id": "medical-01",
+				"family": "medical",
+				"text": "{{noun}}に生じる{{noun}}。主として{{noun}}によって起こる。"
+			},
+			{
+				"id": "medical-02",
+				"family": "medical",
+				"text": "{{noun}}を特徴とする状態。しばしば{{noun}}を伴う。"
+			},
+			{
+				"id": "medical-03",
+				"family": "medical",
+				"text": "{{sahen}}した際に見られる{{noun}}。通常は自然に消失する。"
+			},
+			{
+				"id": "institution-01",
+				"family": "institution",
+				"text": "{{noun}}について定められた制度。原則として{{noun}}を対象とする。"
+			},
+			{
+				"id": "institution-02",
+				"family": "institution",
+				"text": "{{noun}}を{{sahen}}するために設けられた仕組み。{{place}}では古くから行われていた。"
+			},
+			{
+				"id": "institution-03",
+				"family": "institution",
+				"text": "{{noun}}に関する規定。また、その規定に基づいて行われる{{sahen}}。"
+			},
+			{
+				"id": "custom-01",
+				"family": "custom",
+				"text": "{{place}}に伝わる習俗。{{adverbialNoun}}に{{noun}}を{{sahen}}することをいう。"
+			},
+			{
+				"id": "custom-02",
+				"family": "custom",
+				"text": "主として{{place}}で行われた慣習。{{noun}}の際に{{noun}}を用いる。"
+			},
+			{
+				"id": "custom-03",
+				"family": "custom",
+				"text": "{{noun}}に関する古い風習。一般に{{number}}人で行うものとされる。"
+			},
+			{
+				"id": "custom-04",
+				"family": "custom",
+				"text": "{{verb}}とされる{{noun}}の風習。"
+			},
+			{
+				"id": "food-01",
+				"family": "food",
+				"text": "{{noun}}を主材料とする{{noun}}。主に{{place}}で作られる。"
+			},
+			{
+				"id": "food-02",
+				"family": "food",
+				"text": "{{noun}}を{{sahen}}して作る食品。{{adverbialNoun}}に食べることが多い。"
+			},
+			{
+				"id": "food-03",
+				"family": "food",
+				"text": "{{place}}地方の料理。{{noun}}に{{noun}}を加えて作る。"
+			},
+			{
+				"id": "food-04",
+				"family": "food",
+				"text": "{{iAdjective}}味のする{{noun}}。{{naStem}}な食感をもつ。"
+			},
+			{
+				"id": "academic-01",
+				"family": "academic",
+				"text": "{{noun}}に伴って生じる現象。{{person}}によって初めて報告された。"
+			},
+			{
+				"id": "academic-02",
+				"family": "academic",
+				"text": "{{noun}}が{{sahen}}する際に見られる現象。一般に{{noun}}との関連が指摘される。"
+			},
+			{
+				"id": "academic-03",
+				"family": "academic",
+				"text": "{{noun}}において認められる現象の一つ。{{noun}}によって生じると考えられている。"
+			},
+			{
+				"id": "theory-01",
+				"family": "theory",
+				"text": "{{noun}}を{{noun}}によって説明しようとする説。{{person}}によって提唱された。"
+			},
+			{
+				"id": "theory-02",
+				"family": "theory",
+				"text": "{{noun}}は{{noun}}から生じるとする考え。現在では主に{{noun}}の分野で用いられる。"
+			},
+			{
+				"id": "theory-03",
+				"family": "theory",
+				"text": "{{noun}}と{{noun}}との関係を説明するための理論。{{person}}によって広められたとされる。"
+			},
+			{
+				"id": "theory-04",
+				"family": "theory",
+				"text": "{{noun}}は本来{{naStem}}なものであるとする説。"
+			},
+			{
+				"id": "etymology-01",
+				"family": "etymology",
+				"text": "もとは{{noun}}を意味した語。のちに{{noun}}の意に転じた。"
+			},
+			{
+				"id": "etymology-02",
+				"family": "etymology",
+				"text": "{{place}}で用いられた{{noun}}に由来するとされる語。"
+			},
+			{
+				"id": "etymology-03",
+				"family": "etymology",
+				"text": "{{noun}}を意味する古い語から転じたもの。語源については異説がある。"
+			},
+			{
+				"id": "archaic-01",
+				"family": "archaic",
+				"text": "古く、{{noun}}を指していった語。現在ではほとんど用いられない。"
+			},
+			{
+				"id": "archaic-02",
+				"family": "archaic",
+				"text": "かつて用いられた語。主として{{noun}}の意味で使われた。"
+			},
+			{
+				"id": "archaic-03",
+				"family": "archaic",
+				"text": "古く{{place}}地方で{{noun}}を指した語。のちに{{noun}}の意味にも用いられた。"
+			},
+			{
+				"id": "dialect-01",
+				"family": "dialect",
+				"text": "{{place}}地方で、{{noun}}をいう語。"
+			},
+			{
+				"id": "dialect-02",
+				"family": "dialect",
+				"text": "主として{{place}}で用いられる語。{{noun}}の意。"
+			},
+			{
+				"id": "dialect-03",
+				"family": "dialect",
+				"text": "{{noun}}を意味する{{place}}地方の語。特に{{noun}}について用いる。"
+			},
+			{
+				"id": "slang-01",
+				"family": "slang",
+				"text": "{{noun}}の俗称。特に{{noun}}についていう。"
+			},
+			{
+				"id": "slang-02",
+				"family": "slang",
+				"text": "俗に、{{noun}}を{{sahen}}する人をいう。"
+			},
+			{
+				"id": "slang-03",
+				"family": "slang",
+				"text": "{{noun}}を指す俗語。もとは{{place}}で用いられたという。"
+			},
+			{
+				"id": "slang-04",
+				"family": "slang",
+				"text": "{{iAdjective}}ことの俗な言い方。"
+			},
+			{
+				"id": "figurative-01",
+				"family": "figurative",
+				"text": "もとは{{noun}}をいう語。転じて、{{sahen}}する人についていう。"
+			},
+			{
+				"id": "figurative-02",
+				"family": "figurative",
+				"text": "{{noun}}の意から転じて、{{noun}}の状態をいう。"
+			},
+			{
+				"id": "figurative-03",
+				"family": "figurative",
+				"text": "本来は{{noun}}を指すが、比喩的に{{noun}}の意味にも用いる。"
+			},
+			{
+				"id": "figurative-04",
+				"family": "figurative",
+				"text": "{{iAdjective}}{{noun}}のたとえ。"
+			},
+			{
+				"id": "idiom-01",
+				"family": "idiom",
+				"text": "{{noun}}が{{sahen}}することのたとえ。"
+			},
+			{
+				"id": "idiom-02",
+				"family": "idiom",
+				"text": "{{noun}}のように{{sahen}}すること。転じて、{{noun}}の状態をいう。"
+			},
+			{
+				"id": "idiom-03",
+				"family": "idiom",
+				"text": "{{noun}}を{{sahen}}するところから、{{noun}}をいう。"
+			},
+			{
+				"id": "idiom-04",
+				"family": "idiom",
+				"text": "{{noun}}を{{verb}}ことから、{{naStem}}なさまのたとえ。"
+			},
+			{
+				"id": "technical-01",
+				"family": "technical",
+				"text": "{{noun}}を{{sahen}}するための装置。主として{{noun}}に用いる。"
+			},
+			{
+				"id": "technical-02",
+				"family": "technical",
+				"text": "{{noun}}に取り付け、{{noun}}を{{sahen}}する機器。"
+			},
+			{
+				"id": "technical-03",
+				"family": "technical",
+				"text": "{{noun}}を利用して{{noun}}を{{sahen}}する装置。{{place}}などで使用される。"
+			},
+			{
+				"id": "technical-04",
+				"family": "technical",
+				"text": "{{noun}}を{{iAdjective}}状態に保つための{{noun}}。"
+			},
+			{
+				"id": "measure-01",
+				"family": "measure",
+				"text": "{{noun}}の程度を表す単位。{{number}}を基準とする。"
+			},
+			{
+				"id": "measure-02",
+				"family": "measure",
+				"text": "{{noun}}を測るために用いる尺度。{{number}}を一単位とする。"
+			},
+			{
+				"id": "measure-03",
+				"family": "measure",
+				"text": "{{noun}}の大きさを示す単位。主として{{noun}}について用いる。"
+			},
+			{
+				"id": "measure-04",
+				"family": "measure",
+				"text": "{{noun}}の{{naStem}}さの度合いを表す単位。"
+			},
+			{
+				"id": "calendar-01",
+				"family": "calendar",
+				"text": "{{adverbialNoun}}のうち、{{noun}}が{{sahen}}する時期をいう。"
+			},
+			{
+				"id": "calendar-02",
+				"family": "calendar",
+				"text": "{{noun}}を基準として定められた期間。およそ{{number}}日間にあたる。"
+			},
+			{
+				"id": "calendar-03",
+				"family": "calendar",
+				"text": "古く{{place}}で用いられた時期の区分。{{noun}}のころを指す。"
+			},
+			{
+				"id": "ritual-01",
+				"family": "ritual",
+				"text": "{{noun}}を{{sahen}}するために行われる儀礼。主として{{adverbialNoun}}に行う。"
+			},
+			{
+				"id": "ritual-02",
+				"family": "ritual",
+				"text": "{{place}}に伝わる儀式。{{noun}}を{{number}}個用いることを特徴とする。"
+			},
+			{
+				"id": "ritual-03",
+				"family": "ritual",
+				"text": "{{noun}}に際して行う儀礼の一つ。古くは{{noun}}を{{sahen}}したという。"
+			},
+			{
+				"id": "culture-01",
+				"family": "culture",
+				"text": "{{person}}による{{noun}}。{{noun}}を題材とする。"
+			},
+			{
+				"id": "culture-02",
+				"family": "culture",
+				"text": "{{place}}を舞台とする{{noun}}。{{noun}}を題材としている。"
+			},
+			{
+				"id": "culture-03",
+				"family": "culture",
+				"text": "{{noun}}を題材とした作品。{{person}}が{{sahen}}したものとされる。"
+			},
+			{
+				"id": "history-01",
+				"family": "history",
+				"text": "{{adverbialNoun}}、{{place}}で起こった{{noun}}。{{noun}}を契機として始まった。"
+			},
+			{
+				"id": "history-02",
+				"family": "history",
+				"text": "{{place}}における{{noun}}をめぐる出来事。{{person}}が{{sahen}}したことで知られる。"
+			},
+			{
+				"id": "history-03",
+				"family": "history",
+				"text": "{{noun}}に関して起こった一連の出来事。のちの{{noun}}に大きな影響を与えた。"
+			},
+			{
+				"id": "causal-01",
+				"family": "causal",
+				"text": "{{noun}}によって生じる{{noun}}。{{noun}}を伴うことが多い。"
+			},
+			{
+				"id": "causal-02",
+				"family": "causal",
+				"text": "{{noun}}が{{sahen}}することによって起こる現象。"
+			},
+			{
+				"id": "causal-03",
+				"family": "causal",
+				"text": "{{noun}}を原因として生じる{{noun}}の総称。"
+			},
+			{
+				"id": "method-01",
+				"family": "method",
+				"text": "{{noun}}を{{sahen}}するための方法。主として{{noun}}に用いる。"
+			},
+			{
+				"id": "method-02",
+				"family": "method",
+				"text": "{{noun}}を利用して{{sahen}}する技法。{{person}}によって考案されたとされる。"
+			},
+			{
+				"id": "method-03",
+				"family": "method",
+				"text": "{{noun}}において行われる方法の一つ。{{noun}}を{{number}}回{{sahen}}する。"
+			},
+			{
+				"id": "method-04",
+				"family": "method",
+				"text": "{{noun}}を{{naStem}}に{{sahen}}する方法。"
+			},
+			{
+				"id": "organization-01",
+				"family": "organization",
+				"text": "{{noun}}を目的として設けられた組織。主として{{place}}で活動する。"
+			},
+			{
+				"id": "organization-02",
+				"family": "organization",
+				"text": "{{noun}}に関係する人々によって構成される団体。"
+			},
+			{
+				"id": "organization-03",
+				"family": "organization",
+				"text": "{{person}}らによって結成された{{noun}}。{{noun}}を{{sahen}}することを目的とする。"
+			},
+			{
+				"id": "uncertain-01",
+				"family": "uncertain",
+				"text": "{{noun}}の一種とされるが、詳しいことは分かっていない。"
+			},
+			{
+				"id": "uncertain-02",
+				"family": "uncertain",
+				"text": "一般には{{noun}}を指すとされる。語義については諸説がある。"
+			},
+			{
+				"id": "uncertain-03",
+				"family": "uncertain",
+				"text": "{{noun}}に由来するとされるが、確かなことは不明である。"
+			},
+			{
+				"id": "uncertain-04",
+				"family": "uncertain",
+				"text": "{{noun}}を{{verb}}ものとされるが、詳細は{{naStem}}でない。"
+			}
+		],
+		"optionalClauses": [
+			{
+				"id": "optional-etymology-01",
+				"category": "etymology",
+				"text": "名称は{{place}}の地名に由来するという。"
+			},
+			{
+				"id": "optional-etymology-02",
+				"category": "etymology",
+				"text": "名称の由来は明らかでない。"
+			},
+			{
+				"id": "optional-etymology-03",
+				"category": "etymology",
+				"text": "{{person}}の名にちなむとされる。"
+			},
+			{
+				"id": "optional-etymology-04",
+				"category": "etymology",
+				"text": "語源については諸説がある。"
+			},
+			{
+				"id": "optional-etymology-05",
+				"category": "etymology",
+				"text": "古くは{{noun}}とも呼ばれた。"
+			},
+			{
+				"id": "optional-history-01",
+				"category": "history",
+				"text": "かつては広く用いられていた。"
+			},
+			{
+				"id": "optional-history-02",
+				"category": "history",
+				"text": "古くは{{place}}を中心に行われた。"
+			},
+			{
+				"id": "optional-history-03",
+				"category": "history",
+				"text": "現在ではほとんど見られない。"
+			},
+			{
+				"id": "optional-history-04",
+				"category": "history",
+				"text": "のちに次第に用いられなくなった。"
+			},
+			{
+				"id": "optional-history-05",
+				"category": "history",
+				"text": "当初は{{noun}}に限って用いられた。"
+			},
+			{
+				"id": "optional-region-01",
+				"category": "region",
+				"text": "特に{{place}}地方に多い。"
+			},
+			{
+				"id": "optional-region-02",
+				"category": "region",
+				"text": "{{place}}では{{noun}}ともいう。"
+			},
+			{
+				"id": "optional-region-03",
+				"category": "region",
+				"text": "地域によっては{{noun}}を指すこともある。"
+			},
+			{
+				"id": "optional-region-04",
+				"category": "region",
+				"text": "{{place}}以外ではほとんど用いられない。"
+			},
+			{
+				"id": "optional-usage-01",
+				"category": "usage",
+				"text": "ふつう{{noun}}については用いない。"
+			},
+			{
+				"id": "optional-usage-02",
+				"category": "usage",
+				"text": "特に{{noun}}の場合についていう。"
+			},
+			{
+				"id": "optional-usage-03",
+				"category": "usage",
+				"text": "まれに{{noun}}の意味にも用いる。"
+			},
+			{
+				"id": "optional-usage-04",
+				"category": "usage",
+				"text": "現在では比喩的に用いられることが多い。"
+			},
+			{
+				"id": "optional-usage-05",
+				"category": "usage",
+				"text": "単に{{noun}}ともいう。"
+			},
+			{
+				"id": "optional-alternative-theory-01",
+				"category": "alternative-theory",
+				"text": "ただし、{{noun}}との関係を指摘する説もある。"
+			},
+			{
+				"id": "optional-alternative-theory-02",
+				"category": "alternative-theory",
+				"text": "一説には{{noun}}に由来するという。"
+			},
+			{
+				"id": "optional-alternative-theory-03",
+				"category": "alternative-theory",
+				"text": "かつては{{noun}}の一種と考えられていた。"
+			},
+			{
+				"id": "optional-alternative-theory-04",
+				"category": "alternative-theory",
+				"text": "この説については現在では否定的な見方が多い。"
+			},
+			{
+				"id": "optional-alternative-theory-05",
+				"category": "alternative-theory",
+				"text": "{{person}}はこれを{{noun}}の一種としている。"
+			},
+			{
+				"id": "optional-alternative-theory-06",
+				"category": "alternative-theory",
+				"text": "これとは別に、{{noun}}を起源とする説もある。"
+			},
+			{
+				"id": "optional-authority-01",
+				"category": "authority",
+				"text": "詳細については明らかでない。"
+			},
+			{
+				"id": "optional-authority-02",
+				"category": "authority",
+				"text": "正確な起源は分かっていない。"
+			},
+			{
+				"id": "optional-authority-03",
+				"category": "authority",
+				"text": "その理由については定説がない。"
+			},
+			{
+				"id": "optional-authority-04",
+				"category": "authority",
+				"text": "今日ではこの区別を設けないことも多い。"
+			},
+			{
+				"id": "optional-authority-05",
+				"category": "authority",
+				"text": "狭義には{{noun}}のみを指す。"
+			},
+			{
+				"id": "optional-authority-06",
+				"category": "authority",
+				"text": "広義には{{noun}}を含めていうこともある。"
+			}
+		]
+	},
+	"pools": {
+		"rich": {
+			"noun": [
+				"猫",
+				"机",
+				"沈黙",
+				"港",
+				"instrument"
+			],
+			"proper": [
+				"アルファ"
+			],
+			"person": [
+				"太郎",
+				"花子"
+			],
+			"place": [
+				"北海道",
+				"京都"
+			],
+			"organization": [
+				"ソニー"
+			],
+			"sahen": [
+				"研究",
+				"移動",
+				"観察"
+			],
+			"adverbialNoun": [
+				"朝",
+				"昨日"
+			],
+			"number": [
+				"三",
+				"七"
+			]
+		},
+		"sparse": {
+			"noun": [
+				"猫",
+				"机"
+			],
+			"proper": [],
+			"person": [],
+			"place": [],
+			"organization": [],
+			"sahen": [
+				"研究"
+			],
+			"adverbialNoun": [],
+			"number": []
+		},
+		"empty": {
+			"noun": [],
+			"proper": [],
+			"person": [],
+			"place": [],
+			"organization": [],
+			"sahen": [],
+			"adverbialNoun": [],
+			"number": []
+		},
+		"lexical": {
+			"noun": [
+				"猫",
+				"机",
+				"沈黙",
+				"港",
+				"instrument"
+			],
+			"proper": [
+				"アルファ"
+			],
+			"person": [
+				"太郎",
+				"花子"
+			],
+			"place": [
+				"北海道",
+				"京都"
+			],
+			"organization": [
+				"ソニー"
+			],
+			"sahen": [
+				"研究",
+				"移動",
+				"観察"
+			],
+			"adverbialNoun": [
+				"朝",
+				"昨日"
+			],
+			"number": [
+				"三",
+				"七"
+			],
+			"verb": [
+				"歩く",
+				"見る",
+				"読む"
+			],
+			"iAdjective": [
+				"高い",
+				"美しい"
+			],
+			"naStem": [
+				"静か",
+				"無慈悲"
+			]
+		},
+		"lexical-empty": {
+			"noun": [
+				"猫",
+				"机",
+				"沈黙",
+				"港",
+				"instrument"
+			],
+			"proper": [
+				"アルファ"
+			],
+			"person": [
+				"太郎",
+				"花子"
+			],
+			"place": [
+				"北海道",
+				"京都"
+			],
+			"organization": [
+				"ソニー"
+			],
+			"sahen": [
+				"研究",
+				"移動",
+				"観察"
+			],
+			"adverbialNoun": [
+				"朝",
+				"昨日"
+			],
+			"number": [
+				"三",
+				"七"
+			],
+			"verb": [],
+			"iAdjective": [],
+			"naStem": []
+		}
+	},
+	"headwords": [
+		{
+			"surface": "猫",
+			"identity": {
+				"baseForm": "猫",
+				"reading": null,
+				"pos": "名詞",
+				"detail1": "一般",
+				"detail2": "*"
+			},
+			"classification": "noun"
+		},
+		{
+			"surface": "沈黙",
+			"identity": {
+				"baseForm": "沈黙",
+				"reading": null,
+				"pos": "名詞",
+				"detail1": "一般",
+				"detail2": "*"
+			},
+			"classification": "noun"
+		},
+		{
+			"surface": "港",
+			"identity": {
+				"baseForm": "港",
+				"reading": null,
+				"pos": "名詞",
+				"detail1": "一般",
+				"detail2": "*"
+			},
+			"classification": "noun"
+		},
+		{
+			"surface": "研究",
+			"identity": {
+				"baseForm": "研究",
+				"reading": null,
+				"pos": "名詞",
+				"detail1": "サ変接続",
+				"detail2": "*"
+			},
+			"classification": "sahen"
+		}
+	],
+	"definitions": [
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を研究するために設けられた仕組み。京都では古くから行われていた。",
+				"templateId": "institution-02",
+				"family": "institution",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3146333467,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港に用いるinstrument。特にinstrumentを観察する場合にいう。",
+				"templateId": "instrument-03",
+				"family": "instrument",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1073300929,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に取り付け、港を観察する機器。",
+				"templateId": "technical-02",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4281299165,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を思わせるような性質をもつこと。",
+				"templateId": "quality-02",
+				"family": "quality",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4121883163,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に由来するとされるが、確かなことは不明である。",
+				"templateId": "uncertain-03",
+				"family": "uncertain",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 732965621,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に由来するとされるが、確かなことは不明である。古くは京都を中心に行われた。",
+				"templateId": "uncertain-03",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-history-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1279021825,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港の俗称。特にinstrumentについていう。この説については現在では否定的な見方が多い。",
+				"templateId": "slang-01",
+				"family": "slang",
+				"optionalClauseIds": [
+					"optional-alternative-theory-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1938107560,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "朝ごろのinstrument。京都で猫に従事したとされる。これとは別に、猫を起源とする説もある。",
+				"templateId": "person-02",
+				"family": "person",
+				"optionalClauseIds": [
+					"optional-alternative-theory-06"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1817911230,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関する規定。また、その規定に基づいて行われる研究。京都では沈黙ともいう。",
+				"templateId": "institution-03",
+				"family": "institution",
+				"optionalClauseIds": [
+					"optional-region-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3644641810,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に特有の性質。特にinstrumentについていう。かつては机の一種と考えられていた。花子の名にちなむとされる。",
+				"templateId": "quality-01",
+				"family": "quality",
+				"optionalClauseIds": [
+					"optional-alternative-theory-03",
+					"optional-etymology-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1172967630,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "かつて用いられた語。主として猫の意味で使われた。この説については現在では否定的な見方が多い。広義には沈黙を含めていうこともある。",
+				"templateId": "archaic-02",
+				"family": "archaic",
+				"optionalClauseIds": [
+					"optional-alternative-theory-04",
+					"optional-authority-06"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1188388796,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "太郎らによって結成されたinstrument。沈黙を移動することを目的とする。現在では比喩的に用いられることが多い。今日ではこの区別を設けないことも多い。",
+				"templateId": "organization-03",
+				"family": "organization",
+				"optionalClauseIds": [
+					"optional-usage-04",
+					"optional-authority-04"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2391879832,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙の程度を表す単位。三を基準とする。",
+				"templateId": "measure-01",
+				"family": "measure",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3858339850,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都にある机。古くから猫で知られる。",
+				"templateId": "place-01",
+				"family": "place",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 93657948,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を原因として生じるinstrumentの総称。",
+				"templateId": "causal-03",
+				"family": "causal",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1064559528,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を研究するための装置。主として沈黙に用いる。",
+				"templateId": "technical-01",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3935608586,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを原因として生じる沈黙の総称。単に港ともいう。",
+				"templateId": "causal-03",
+				"family": "causal",
+				"optionalClauseIds": [
+					"optional-usage-05"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 821156688,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "古く京都地方で机を指した語。のちに猫の意味にも用いられた。一説には机に由来するという。",
+				"templateId": "archaic-03",
+				"family": "archaic",
+				"optionalClauseIds": [
+					"optional-alternative-theory-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3864802460,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都で用いられたinstrumentに由来するとされる語。のちに次第に用いられなくなった。",
+				"templateId": "etymology-02",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-history-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 434630103,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を題材とした作品。花子が研究したものとされる。名称の由来は明らかでない。",
+				"templateId": "culture-03",
+				"family": "culture",
+				"optionalClauseIds": [
+					"optional-etymology-02"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2071973961,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を港によって説明しようとする説。花子によって提唱された。地域によっては猫を指すこともある。",
+				"templateId": "theory-01",
+				"family": "theory",
+				"optionalClauseIds": [
+					"optional-region-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2853978301,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机の程度を表す単位。七を基準とする。広義にはinstrumentを含めていうこともある。かつてはinstrumentの一種と考えられていた。",
+				"templateId": "measure-01",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-authority-06",
+					"optional-alternative-theory-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4079595801,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道地方の料理。instrumentにinstrumentを加えて作る。現在では比喩的に用いられることが多い。これとは別に、港を起源とする説もある。",
+				"templateId": "food-03",
+				"family": "food",
+				"optionalClauseIds": [
+					"optional-usage-04",
+					"optional-alternative-theory-06"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3750562123,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関して起こった一連の出来事。のちの机に大きな影響を与えた。語源については諸説がある。名称は京都の地名に由来するという。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-etymology-04",
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 707155463,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "朝のうち、机が観察する時期をいう。",
+				"templateId": "calendar-01",
+				"family": "calendar",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3778075158,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道にあるinstrument。古くから沈黙で知られる。",
+				"templateId": "place-01",
+				"family": "place",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4224566540,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を特徴とする状態。しばしば港を伴う。",
+				"templateId": "medical-02",
+				"family": "medical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1185519544,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に際して研究すること。また、そのために行われる一連の行為。",
+				"templateId": "action-03",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 458657558,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "主として北海道で行われた慣習。机の際に机を用いる。地域によっては机を指すこともある。",
+				"templateId": "custom-02",
+				"family": "custom",
+				"optionalClauseIds": [
+					"optional-region-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2187294192,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを意味する古い語から転じたもの。語源については異説がある。ふつうinstrumentについては用いない。",
+				"templateId": "etymology-03",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-usage-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3077634380,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に関する古い風習。一般に七人で行うものとされる。ただし、港との関係を指摘する説もある。",
+				"templateId": "custom-03",
+				"family": "custom",
+				"optionalClauseIds": [
+					"optional-alternative-theory-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 782862685,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港の一種。主として京都に見られ、港を特徴とする。この説については現在では否定的な見方が多い。",
+				"templateId": "classification-01",
+				"family": "classification",
+				"optionalClauseIds": [
+					"optional-alternative-theory-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3424163067,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "研究する傾向が著しいこと。また、そのような性質。現在では比喩的に用いられることが多い。",
+				"templateId": "quality-03",
+				"family": "quality",
+				"optionalClauseIds": [
+					"optional-usage-04"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2380372671,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港の一種とされるが、詳しいことは分かっていない。これとは別に、沈黙を起源とする説もある。その理由については定説がない。",
+				"templateId": "uncertain-01",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-alternative-theory-06",
+					"optional-authority-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2685909163,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港の俗称。特に机についていう。特に港の場合についていう。正確な起源は分かっていない。",
+				"templateId": "slang-01",
+				"family": "slang",
+				"optionalClauseIds": [
+					"optional-usage-02",
+					"optional-authority-02"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2462140929,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を題材とした作品。太郎が研究したものとされる。広義には港を含めていうこともある。太郎はこれをinstrumentの一種としている。",
+				"templateId": "culture-03",
+				"family": "culture",
+				"optionalClauseIds": [
+					"optional-authority-06",
+					"optional-alternative-theory-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 389378221,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道に伝わる習俗。朝に猫を移動することをいう。",
+				"templateId": "custom-01",
+				"family": "custom",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 626395473,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "もとは猫をいう語。転じて、移動する人についていう。",
+				"templateId": "figurative-01",
+				"family": "figurative",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4250541231,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を意味する古い語から転じたもの。語源については異説がある。",
+				"templateId": "etymology-03",
+				"family": "etymology",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3095874955,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都における港をめぐる出来事。花子が観察したことで知られる。",
+				"templateId": "history-02",
+				"family": "history",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2262882385,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に由来するとされるが、確かなことは不明である。",
+				"templateId": "uncertain-03",
+				"family": "uncertain",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 861178851,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を研究するために用いる港。主として北海道で使用される。",
+				"templateId": "instrument-01",
+				"family": "instrument",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1654109935,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙の大きさを示す単位。主として港について用いる。古くは北海道を中心に行われた。",
+				"templateId": "measure-03",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-history-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1314069000,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を思わせるような性質をもつこと。名称は北海道の地名に由来するという。",
+				"templateId": "quality-02",
+				"family": "quality",
+				"optionalClauseIds": [
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 492982766,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "もとはinstrumentを意味した語。のちに猫の意に転じた。詳細については明らかでない。",
+				"templateId": "etymology-01",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-authority-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4124746114,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道に伝わる儀式。机を三個用いることを特徴とする。古くは北海道を中心に行われた。今日ではこの区別を設けないことも多い。",
+				"templateId": "ritual-02",
+				"family": "ritual",
+				"optionalClauseIds": [
+					"optional-history-02",
+					"optional-authority-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3240473054,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道の猫。猫を観察したことで知られる。単に港ともいう。その理由については定説がない。",
+				"templateId": "person-01",
+				"family": "person",
+				"optionalClauseIds": [
+					"optional-usage-05",
+					"optional-authority-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 954062460,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "rich",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentに猫が生じた状態。また、そのような状態にあること。まれに机の意味にも用いる。現在では比喩的に用いられることが多い。",
+				"templateId": "state-01",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-usage-03",
+					"optional-usage-04"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1414559896,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を研究するための方法。主として猫に用いる。",
+				"templateId": "method-01",
+				"family": "method",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1805843168,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に生じる猫。主として猫によって起こる。",
+				"templateId": "medical-01",
+				"family": "medical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2270309142,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関して起こった一連の出来事。のちの机に大きな影響を与えた。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2599364794,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に関係する人々によって構成される団体。",
+				"templateId": "organization-02",
+				"family": "organization",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2962384864,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫の大きさを示す単位。主として机について用いる。広義には猫を含めていうこともある。",
+				"templateId": "measure-03",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-authority-06"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3864335074,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を研究するための方法。主として机に用いる。",
+				"templateId": "method-01",
+				"family": "method",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1762043478,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "研究すること。特に机について行う場合をいう。ただし、机との関係を指摘する説もある。",
+				"templateId": "action-02",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-alternative-theory-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2980930291,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に生じる猫。主として猫によって起こる。当初は猫に限って用いられた。",
+				"templateId": "medical-01",
+				"family": "medical",
+				"optionalClauseIds": [
+					"optional-history-05"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 516436241,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "かつて用いられた語。主として猫の意味で使われた。単に猫ともいう。",
+				"templateId": "archaic-02",
+				"family": "archaic",
+				"optionalClauseIds": [
+					"optional-usage-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2520547597,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に机が生じた状態。また、そのような状態にあること。語源については諸説がある。広義には机を含めていうこともある。",
+				"templateId": "state-01",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-etymology-04",
+					"optional-authority-06"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1358381601,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に際して行う儀礼の一つ。古くは机を研究したという。広義には机を含めていうこともある。ふつう机については用いない。",
+				"templateId": "ritual-03",
+				"family": "ritual",
+				"optionalClauseIds": [
+					"optional-authority-06",
+					"optional-usage-01"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1001287407,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を原因として生じる猫の総称。まれに猫の意味にも用いる。単に机ともいう。",
+				"templateId": "causal-03",
+				"family": "causal",
+				"optionalClauseIds": [
+					"optional-usage-03",
+					"optional-usage-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2846252003,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に取り付け、猫を研究する機器。",
+				"templateId": "technical-02",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2324295125,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に用いる猫。特に猫を研究する場合にいう。",
+				"templateId": "instrument-03",
+				"family": "instrument",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3462701199,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に関係する人々によって構成される団体。",
+				"templateId": "organization-02",
+				"family": "organization",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1013547507,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関して起こった一連の出来事。のちの机に大きな影響を与えた。この説については現在では否定的な見方が多い。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-alternative-theory-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 333831381,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "研究すること。特に猫について行う場合をいう。",
+				"templateId": "action-02",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 900865931,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に取り付け、猫を研究する機器。かつては机の一種と考えられていた。",
+				"templateId": "technical-02",
+				"family": "technical",
+				"optionalClauseIds": [
+					"optional-alternative-theory-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2827175887,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫が研究する際に見られる現象。一般に机との関連が指摘される。その理由については定説がない。",
+				"templateId": "academic-02",
+				"family": "academic",
+				"optionalClauseIds": [
+					"optional-authority-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3874031524,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に関して起こった一連の出来事。のちの猫に大きな影響を与えた。まれに猫の意味にも用いる。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-usage-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 377555598,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫の大きさを示す単位。主として猫について用いる。その理由については定説がない。",
+				"templateId": "measure-03",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-authority-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3641989018,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を特徴とする状態。しばしば猫を伴う。詳細については明らかでない。この説については現在では否定的な見方が多い。",
+				"templateId": "medical-02",
+				"family": "medical",
+				"optionalClauseIds": [
+					"optional-authority-01",
+					"optional-alternative-theory-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 88170974,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を研究するための装置。主として猫に用いる。詳細については明らかでない。今日ではこの区別を設けないことも多い。",
+				"templateId": "technical-01",
+				"family": "technical",
+				"optionalClauseIds": [
+					"optional-authority-01",
+					"optional-authority-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2719270160,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机によって生じる机。猫を伴うことが多い。ただし、机との関係を指摘する説もある。現在ではほとんど見られない。",
+				"templateId": "causal-01",
+				"family": "causal",
+				"optionalClauseIds": [
+					"optional-alternative-theory-01",
+					"optional-history-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 258978772,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関係する人々によって構成される団体。",
+				"templateId": "organization-02",
+				"family": "organization",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1933483833,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に際して研究すること。また、そのために行われる一連の行為。",
+				"templateId": "action-03",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 247935935,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "かつて用いられた語。主として机の意味で使われた。",
+				"templateId": "archaic-02",
+				"family": "archaic",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 937375747,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に由来するとされるが、確かなことは不明である。語源については諸説がある。",
+				"templateId": "uncertain-03",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-etymology-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3090025529,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を研究するための方法。主として猫に用いる。語源については諸説がある。",
+				"templateId": "method-01",
+				"family": "method",
+				"optionalClauseIds": [
+					"optional-etymology-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2428626731,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を原因として生じる机の総称。",
+				"templateId": "causal-03",
+				"family": "causal",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3666853375,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に由来するとされるが、確かなことは不明である。まれに机の意味にも用いる。",
+				"templateId": "uncertain-03",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-usage-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3250613562,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に関して起こった一連の出来事。のちの猫に大きな影響を与えた。単に猫ともいう。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-usage-05"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4036190912,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に見られる状態の一つ。一般に猫を伴う。のちに次第に用いられなくなった。",
+				"templateId": "state-03",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-history-04"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1535056668,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机のように研究すること。転じて、机の状態をいう。単に猫ともいう。現在では比喩的に用いられることが多い。",
+				"templateId": "idiom-02",
+				"family": "idiom",
+				"optionalClauseIds": [
+					"optional-usage-05",
+					"optional-usage-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2248489712,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "古く、猫を指していった語。現在ではほとんど用いられない。古くは猫とも呼ばれた。狭義には机のみを指す。",
+				"templateId": "archaic-01",
+				"family": "archaic",
+				"optionalClauseIds": [
+					"optional-etymology-05",
+					"optional-authority-05"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2556364118,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を意味する古い語から転じたもの。語源については異説がある。これとは別に、猫を起源とする説もある。狭義には猫のみを指す。",
+				"templateId": "etymology-03",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-alternative-theory-06",
+					"optional-authority-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4124760714,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を研究するための方法。主として猫に用いる。",
+				"templateId": "method-01",
+				"family": "method",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2533500326,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫において認められる現象の一つ。机によって生じると考えられている。",
+				"templateId": "academic-03",
+				"family": "academic",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1839994124,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫が研究することのたとえ。",
+				"templateId": "idiom-01",
+				"family": "idiom",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2063195984,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に生じる机。主として猫によって起こる。現在では比喩的に用いられることが多い。",
+				"templateId": "medical-01",
+				"family": "medical",
+				"optionalClauseIds": [
+					"optional-usage-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1074175142,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫によって生じる机。机を伴うことが多い。名称の由来は明らかでない。",
+				"templateId": "causal-01",
+				"family": "causal",
+				"optionalClauseIds": [
+					"optional-etymology-02"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4051107864,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を研究するための方法。主として机に用いる。",
+				"templateId": "method-01",
+				"family": "method",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2742228300,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机の大きさを示す単位。主として机について用いる。特に机の場合についていう。",
+				"templateId": "measure-03",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-usage-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 750209107,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "俗に、机を研究する人をいう。今日ではこの区別を設けないことも多い。",
+				"templateId": "slang-02",
+				"family": "slang",
+				"optionalClauseIds": [
+					"optional-authority-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1609563841,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に際して行う儀礼の一つ。古くは猫を研究したという。狭義には猫のみを指す。",
+				"templateId": "ritual-03",
+				"family": "ritual",
+				"optionalClauseIds": [
+					"optional-authority-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1327080317,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "一般には猫を指すとされる。語義については諸説がある。まれに猫の意味にも用いる。ふつう机については用いない。",
+				"templateId": "uncertain-02",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-usage-03",
+					"optional-usage-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1191946801,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関係する人々によって構成される団体。当初は机に限って用いられた。その理由については定説がない。",
+				"templateId": "organization-02",
+				"family": "organization",
+				"optionalClauseIds": [
+					"optional-history-05",
+					"optional-authority-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1951455151,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "sparse",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に際して研究すること。また、そのために行われる一連の行為。当初は机に限って用いられた。のちに次第に用いられなくなった。",
+				"templateId": "action-03",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-history-05",
+					"optional-history-04"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1454531555,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "empty",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "insufficient-vocabulary",
+				"missingPlaceholders": [
+					"adverbialNoun",
+					"iAdjective",
+					"naStem",
+					"noun",
+					"number",
+					"person",
+					"place",
+					"sahen",
+					"verb"
+				]
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "研究すること。特にinstrumentについて行う場合をいう。",
+				"templateId": "action-02",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 815146815,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "古く北海道で用いられた時期の区分。沈黙のころを指す。",
+				"templateId": "calendar-03",
+				"family": "calendar",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2453501745,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道地方の一地域。主として猫が観察することで知られる。",
+				"templateId": "place-02",
+				"family": "place",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4291994565,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙の大きさを示す単位。主として港について用いる。",
+				"templateId": "measure-03",
+				"family": "measure",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1790696511,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を利用して港を移動する装置。京都などで使用される。",
+				"templateId": "technical-03",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1863683149,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "読むために用いる猫。主として北海道で使用される。",
+				"templateId": "instrument-04",
+				"family": "instrument",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2659222641,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "観察する際に使用する港の一種。ふつう猫と併用する。当初は港に限って用いられた。",
+				"templateId": "instrument-02",
+				"family": "instrument",
+				"optionalClauseIds": [
+					"optional-history-05"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1830953300,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "もとは机を意味した語。のちに港の意に転じた。今日ではこの区別を設けないことも多い。",
+				"templateId": "etymology-01",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-authority-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3654828614,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を研究すること。また、その行為。一説にはinstrumentに由来するという。",
+				"templateId": "action-01",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-alternative-theory-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 717585570,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "机のうち、特に移動するものの総称。かつては広く用いられていた。かつては机の一種と考えられていた。",
+				"templateId": "classification-03",
+				"family": "classification",
+				"optionalClauseIds": [
+					"optional-history-01",
+					"optional-alternative-theory-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 362330966,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に港が生じた状態。また、そのような状態にあること。かつては広く用いられていた。特に京都地方に多い。",
+				"templateId": "state-01",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-history-01",
+					"optional-region-01"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1518447216,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机において行われる方法の一つ。猫を三回研究する。今日ではこの区別を設けないことも多い。名称の由来は明らかでない。",
+				"templateId": "method-03",
+				"family": "method",
+				"optionalClauseIds": [
+					"optional-authority-04",
+					"optional-etymology-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4222321092,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を美しい状態に保つための机。",
+				"templateId": "technical-04",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1907733034,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に関する規定。また、その規定に基づいて行われる観察。",
+				"templateId": "institution-03",
+				"family": "institution",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 408006800,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "移動することによって生じる沈黙。特に沈黙についていう。",
+				"templateId": "state-02",
+				"family": "state",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 957405268,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を思わせるような性質をもつこと。正確な起源は分かっていない。",
+				"templateId": "quality-02",
+				"family": "quality",
+				"optionalClauseIds": [
+					"optional-authority-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1985001770,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都の沈黙。猫を研究したことで知られる。名称の由来は明らかでない。",
+				"templateId": "person-01",
+				"family": "person",
+				"optionalClauseIds": [
+					"optional-etymology-02"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2970084972,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを利用して移動する技法。花子によって考案されたとされる。",
+				"templateId": "method-02",
+				"family": "method",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4179151312,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を意味する古い語から転じたもの。語源については異説がある。今日ではこの区別を設けないことも多い。",
+				"templateId": "etymology-03",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-authority-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3162056339,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を意味する京都地方の語。特に港について用いる。現在では比喩的に用いられることが多い。",
+				"templateId": "dialect-03",
+				"family": "dialect",
+				"optionalClauseIds": [
+					"optional-usage-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 58204329,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "太郎らによって結成された港。港を研究することを目的とする。名称は京都の地名に由来するという。",
+				"templateId": "organization-03",
+				"family": "organization",
+				"optionalClauseIds": [
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1064392229,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "古く京都地方で机を指した語。のちに沈黙の意味にも用いられた。かつては机の一種と考えられていた。一説には港に由来するという。",
+				"templateId": "archaic-03",
+				"family": "archaic",
+				"optionalClauseIds": [
+					"optional-alternative-theory-03",
+					"optional-alternative-theory-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2132184953,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道に伝わる儀式。机を三個用いることを特徴とする。特にinstrumentの場合についていう。古くは猫とも呼ばれた。",
+				"templateId": "ritual-02",
+				"family": "ritual",
+				"optionalClauseIds": [
+					"optional-usage-02",
+					"optional-etymology-05"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1414296687,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "太郎らによって結成された沈黙。港を研究することを目的とする。広義には机を含めていうこともある。古くは京都を中心に行われた。",
+				"templateId": "organization-03",
+				"family": "organization",
+				"optionalClauseIds": [
+					"optional-authority-06",
+					"optional-history-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3429502915,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に際して移動すること。また、そのために行われる一連の行為。",
+				"templateId": "action-03",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 664815022,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "美しいことの俗な言い方。",
+				"templateId": "slang-04",
+				"family": "slang",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1451925824,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫において認められる現象の一つ。机によって生じると考えられている。",
+				"templateId": "academic-03",
+				"family": "academic",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1078365284,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを移動するための装置。主として港に用いる。まれに猫の意味にも用いる。",
+				"templateId": "technical-01",
+				"family": "technical",
+				"optionalClauseIds": [
+					"optional-usage-03"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1640364718,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を高い状態に保つための机。",
+				"templateId": "technical-04",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2040308492,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を静かに研究する方法。まれにinstrumentの意味にも用いる。",
+				"templateId": "method-04",
+				"family": "method",
+				"optionalClauseIds": [
+					"optional-usage-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 304993664,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を意味する古い語から転じたもの。語源については異説がある。詳細については明らかでない。",
+				"templateId": "etymology-03",
+				"family": "etymology",
+				"optionalClauseIds": [
+					"optional-authority-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 793558085,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都地方で、机をいう語。ふつう沈黙については用いない。",
+				"templateId": "dialect-01",
+				"family": "dialect",
+				"optionalClauseIds": [
+					"optional-usage-01"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 738716959,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に属する港。一般に港を伴うものをいう。詳細については明らかでない。",
+				"templateId": "classification-02",
+				"family": "classification",
+				"optionalClauseIds": [
+					"optional-authority-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3978612779,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "主として京都で用いられる語。沈黙の意。花子はこれを猫の一種としている。ただし、港との関係を指摘する説もある。",
+				"templateId": "dialect-02",
+				"family": "dialect",
+				"optionalClauseIds": [
+					"optional-alternative-theory-05",
+					"optional-alternative-theory-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3593740623,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "美しい猫を好む生物。無慈悲に読む習性がある。名称の由来は明らかでない。これとは別に、instrumentを起源とする説もある。",
+				"templateId": "organism-04",
+				"family": "organism",
+				"optionalClauseIds": [
+					"optional-etymology-02",
+					"optional-alternative-theory-06"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3842341745,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都にある沈黙。古くからinstrumentで知られる。正確な起源は分かっていない。名称は北海道の地名に由来するという。",
+				"templateId": "place-01",
+				"family": "place",
+				"optionalClauseIds": [
+					"optional-authority-02",
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3636705045,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "観察すること。特に沈黙について行う場合をいう。",
+				"templateId": "action-02",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1044012993,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "研究する傾向が著しいこと。また、そのような性質。",
+				"templateId": "quality-03",
+				"family": "quality",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2513320219,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "無慈悲な性質。また、港が無慈悲であること。",
+				"templateId": "quality-04",
+				"family": "quality",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 759609519,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙によって生じる猫。机を伴うことが多い。",
+				"templateId": "causal-01",
+				"family": "causal",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2680499905,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に際して行う儀礼の一つ。古くは机を研究したという。",
+				"templateId": "ritual-03",
+				"family": "ritual",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1415372791,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "研究すること。特に猫について行う場合をいう。現在では比喩的に用いられることが多い。",
+				"templateId": "action-02",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-usage-04"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4211856219,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentに関する規定。また、その規定に基づいて行われる観察。名称は京都の地名に由来するという。",
+				"templateId": "institution-03",
+				"family": "institution",
+				"optionalClauseIds": [
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3165298612,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に見られる状態の一つ。一般にinstrumentを伴う。のちに次第に用いられなくなった。",
+				"templateId": "state-03",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-history-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 657358326,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "朝、北海道で起こったinstrument。instrumentを契機として始まった。かつては広く用いられていた。",
+				"templateId": "history-01",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-history-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3947467922,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを目的として設けられた組織。主として北海道で活動する。特に北海道地方に多い。狭義には机のみを指す。",
+				"templateId": "organization-01",
+				"family": "organization",
+				"optionalClauseIds": [
+					"optional-region-01",
+					"optional-authority-05"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1708679142,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙の大きさを示す単位。主として猫について用いる。かつては広く用いられていた。単に猫ともいう。",
+				"templateId": "measure-03",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-history-01",
+					"optional-usage-05"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1284120880,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "美しい猫が多く見られる土地。狭義には猫のみを指す。まれにinstrumentの意味にも用いる。",
+				"templateId": "place-04",
+				"family": "place",
+				"optionalClauseIds": [
+					"optional-authority-05",
+					"optional-usage-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3245001156,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を測るために用いる尺度。七を一単位とする。",
+				"templateId": "measure-02",
+				"family": "measure",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2659796964,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を原因として生じる猫の総称。",
+				"templateId": "causal-03",
+				"family": "causal",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 44798154,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙のうち、特に研究するものの総称。",
+				"templateId": "classification-03",
+				"family": "classification",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1692057790,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "花子らによって結成された港。港を観察することを目的とする。",
+				"templateId": "organization-03",
+				"family": "organization",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3635346660,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に関して起こった一連の出来事。のちの猫に大きな影響を与えた。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1133091830,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都地方の料理。港に港を加えて作る。その理由については定説がない。",
+				"templateId": "food-03",
+				"family": "food",
+				"optionalClauseIds": [
+					"optional-authority-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 250519050,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を主材料とする沈黙。主に京都で作られる。北海道ではinstrumentともいう。",
+				"templateId": "food-01",
+				"family": "food",
+				"optionalClauseIds": [
+					"optional-region-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2759375507,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を沈黙によって説明しようとする説。花子によって提唱された。現在ではほとんど見られない。",
+				"templateId": "theory-01",
+				"family": "theory",
+				"optionalClauseIds": [
+					"optional-history-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1978208489,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を意味する京都地方の語。特に港について用いる。名称は北海道の地名に由来するという。",
+				"templateId": "dialect-03",
+				"family": "dialect",
+				"optionalClauseIds": [
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3846049157,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港の一種とされるが、詳しいことは分かっていない。まれに猫の意味にも用いる。当初は沈黙に限って用いられた。",
+				"templateId": "uncertain-01",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-usage-03",
+					"optional-history-05"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4290561273,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を観察するために設けられた仕組み。京都では古くから行われていた。これとは別に、猫を起源とする説もある。現在ではほとんど見られない。",
+				"templateId": "institution-02",
+				"family": "institution",
+				"optionalClauseIds": [
+					"optional-alternative-theory-06",
+					"optional-history-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2540058863,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を指す俗語。もとは京都で用いられたという。狭義には机のみを指す。現在ではほとんど見られない。",
+				"templateId": "slang-03",
+				"family": "slang",
+				"optionalClauseIds": [
+					"optional-authority-05",
+					"optional-history-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3000970627,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道地方の料理。猫に港を加えて作る。",
+				"templateId": "food-03",
+				"family": "food",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 502322077,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を主材料とする沈黙。主に北海道で作られる。",
+				"templateId": "food-01",
+				"family": "food",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3805389839,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を意味する京都地方の語。特に机について用いる。",
+				"templateId": "dialect-03",
+				"family": "dialect",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1885827475,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に取り付け、沈黙を研究する機器。",
+				"templateId": "technical-02",
+				"family": "technical",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 579590813,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港に関する古い風習。一般に七人で行うものとされる。",
+				"templateId": "custom-03",
+				"family": "custom",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2741540987,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "一般には猫を指すとされる。語義については諸説がある。これとは別に、沈黙を起源とする説もある。",
+				"templateId": "uncertain-02",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-alternative-theory-06"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3281567055,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港の一種。主として京都に見られ、猫を特徴とする。名称は京都の地名に由来するという。",
+				"templateId": "classification-01",
+				"family": "classification",
+				"optionalClauseIds": [
+					"optional-etymology-01"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1334893832,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に由来するとされるが、確かなことは不明である。かつては広く用いられていた。",
+				"templateId": "uncertain-03",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-history-01"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2276535858,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机に関する規定。また、その規定に基づいて行われる研究。古くは北海道を中心に行われた。",
+				"templateId": "institution-03",
+				"family": "institution",
+				"optionalClauseIds": [
+					"optional-history-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 887449502,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "港に生じる猫。主として机によって起こる。古くは港とも呼ばれた。当初は沈黙に限って用いられた。",
+				"templateId": "medical-01",
+				"family": "medical",
+				"optionalClauseIds": [
+					"optional-etymology-05",
+					"optional-history-05"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1248124034,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを観察すること。また、その行為。京都では港ともいう。かつては沈黙の一種と考えられていた。",
+				"templateId": "action-01",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-region-02",
+					"optional-alternative-theory-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3980104084,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "かつて用いられた語。主として沈黙の意味で使われた。花子はこれを猫の一種としている。特に机の場合についていう。",
+				"templateId": "archaic-02",
+				"family": "archaic",
+				"optionalClauseIds": [
+					"optional-alternative-theory-05",
+					"optional-usage-02"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2933011896,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "京都にある机。古くから港で知られる。",
+				"templateId": "place-01",
+				"family": "place",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2042050337,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentの一種。主として京都に生息し、沈黙を主な餌とする。",
+				"templateId": "organism-01",
+				"family": "organism",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2818450623,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙の一種。主として京都に生息し、instrumentを主な餌とする。",
+				"templateId": "organism-01",
+				"family": "organism",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 845113763,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "もとは机をいう語。転じて、観察する人についていう。",
+				"templateId": "figurative-01",
+				"family": "figurative",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3017600033,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を研究するために行われる儀礼。主として朝に行う。今日ではこの区別を設けないことも多い。",
+				"templateId": "ritual-01",
+				"family": "ritual",
+				"optionalClauseIds": [
+					"optional-authority-04"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3398678427,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "移動することによって生じる猫。特にinstrumentについていう。当初は猫に限って用いられた。",
+				"templateId": "state-02",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-history-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1671518463,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "主として京都で行われた慣習。港の際に港を用いる。現在では比喩的に用いられることが多い。",
+				"templateId": "custom-02",
+				"family": "custom",
+				"optionalClauseIds": [
+					"optional-usage-04"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2488588606,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "昨日、北海道で起こった猫。instrumentを契機として始まった。地域によってはinstrumentを指すこともある。",
+				"templateId": "history-01",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-region-03"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 823341508,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫が移動する際に見られる現象。一般に港との関連が指摘される。まれにinstrumentの意味にも用いる。",
+				"templateId": "academic-02",
+				"family": "academic",
+				"optionalClauseIds": [
+					"optional-usage-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4046112816,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "観察すること。特に猫について行う場合をいう。詳細については明らかでない。これとは別に、沈黙を起源とする説もある。",
+				"templateId": "action-02",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-authority-01",
+					"optional-alternative-theory-06"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2368482036,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を利用して研究する技法。太郎によって考案されたとされる。名称の由来は明らかでない。一説には港に由来するという。",
+				"templateId": "method-02",
+				"family": "method",
+				"optionalClauseIds": [
+					"optional-etymology-02",
+					"optional-alternative-theory-02"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1433638154,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "机を研究すること。また、その行為。ふつう港については用いない。太郎はこれを沈黙の一種としている。",
+				"templateId": "action-01",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-usage-01",
+					"optional-alternative-theory-05"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2743683854,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 0,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "off"
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "昨日のうち、机が研究する時期をいう。",
+				"templateId": "calendar-01",
+				"family": "calendar",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2561451994,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "古く北海道地方で机を指した語。のちに机の意味にも用いられた。",
+				"templateId": "archaic-03",
+				"family": "archaic",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 163290016,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を指す俗語。もとは京都で用いられたという。",
+				"templateId": "slang-03",
+				"family": "slang",
+				"optionalClauseIds": [],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3325416916,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙を題材とした作品。太郎が観察したものとされる。",
+				"templateId": "culture-03",
+				"family": "culture",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4197938906,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道地方で、港をいう語。",
+				"templateId": "dialect-01",
+				"family": "dialect",
+				"optionalClauseIds": [],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4019497260,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "港を観察するところから、港をいう。広義には港を含めていうこともある。",
+				"templateId": "idiom-03",
+				"family": "idiom",
+				"optionalClauseIds": [
+					"optional-authority-06"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 1861826016,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫に関して起こった一連の出来事。のちの猫に大きな影響を与えた。一説にはinstrumentに由来するという。",
+				"templateId": "history-03",
+				"family": "history",
+				"optionalClauseIds": [
+					"optional-alternative-theory-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 506712435,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を移動するために行われる儀礼。主として昨日に行う。ふつうinstrumentについては用いない。",
+				"templateId": "ritual-01",
+				"family": "ritual",
+				"optionalClauseIds": [
+					"optional-usage-01"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2056529049,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を意味する北海道地方の語。特に机について用いる。その理由については定説がない。",
+				"templateId": "dialect-03",
+				"family": "dialect",
+				"optionalClauseIds": [
+					"optional-authority-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2760175861,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1,
+			"result": {
+				"outcome": "generated",
+				"definition": "北海道のinstrument。沈黙を研究したことで知られる。古くは沈黙とも呼ばれた。特に港の場合についていう。",
+				"templateId": "person-01",
+				"family": "person",
+				"optionalClauseIds": [
+					"optional-etymology-05",
+					"optional-usage-02"
+				],
+				"dictionarySeed": 1,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3881431049,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 7,
+			"result": {
+				"outcome": "generated",
+				"definition": "沈黙に際して観察すること。また、そのために行われる一連の行為。語源については諸説がある。名称の由来は明らかでない。",
+				"templateId": "action-03",
+				"family": "action",
+				"optionalClauseIds": [
+					"optional-etymology-04",
+					"optional-etymology-02"
+				],
+				"dictionarySeed": 7,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2305732527,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical-empty",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 4242,
+			"result": {
+				"outcome": "generated",
+				"definition": "昨日のうち、instrumentが観察する時期をいう。今日ではこの区別を設けないことも多い。まれに沈黙の意味にも用いる。",
+				"templateId": "calendar-01",
+				"family": "calendar",
+				"optionalClauseIds": [
+					"optional-authority-04",
+					"optional-usage-03"
+				],
+				"dictionarySeed": 4242,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2023650691,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1000,
+			"result": {
+				"outcome": "generated",
+				"definition": "高い味のする沈黙。静かな食感をもつ。かつては猫の一種と考えられていた。古くはinstrumentとも呼ばれた。",
+				"templateId": "food-04",
+				"family": "food",
+				"optionalClauseIds": [
+					"optional-alternative-theory-03",
+					"optional-etymology-05"
+				],
+				"dictionarySeed": 1000,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4074337723,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "猫",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1001,
+			"result": {
+				"outcome": "generated",
+				"definition": "高い沈黙のたとえ。特に机の場合についていう。京都以外ではほとんど用いられない。",
+				"templateId": "figurative-04",
+				"family": "figurative",
+				"optionalClauseIds": [
+					"optional-usage-02",
+					"optional-region-04"
+				],
+				"dictionarySeed": 1001,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3110619354,
+				"headword": "猫",
+				"headwordIdentity": {
+					"baseForm": "猫",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1001,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを読むこと。また、その動作。",
+				"templateId": "action-04",
+				"family": "action",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1001,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2790594498,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1002,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentを歩くものとされるが、詳細は無慈悲でない。特に北海道地方に多い。",
+				"templateId": "uncertain-04",
+				"family": "uncertain",
+				"optionalClauseIds": [
+					"optional-region-01"
+				],
+				"dictionarySeed": 1002,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 4285637243,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 25,
+			"dictionarySeed": 1003,
+			"result": {
+				"outcome": "generated",
+				"definition": "歩くとされる沈黙の風習。",
+				"templateId": "custom-04",
+				"family": "custom",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1003,
+				"dictionarySemantropy": 25,
+				"dictionaryBucket": "low",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 502992651,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1003,
+			"result": {
+				"outcome": "generated",
+				"definition": "机が静かになった状態。また、そのような状態にあること。当初は猫に限って用いられた。これとは別に、港を起源とする説もある。",
+				"templateId": "state-04",
+				"family": "state",
+				"optionalClauseIds": [
+					"optional-history-05",
+					"optional-alternative-theory-06"
+				],
+				"dictionarySeed": 1003,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 733894112,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1011,
+			"result": {
+				"outcome": "generated",
+				"definition": "机は本来無慈悲なものであるとする説。",
+				"templateId": "theory-04",
+				"family": "theory",
+				"optionalClauseIds": [],
+				"dictionarySeed": 1011,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 580364503,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "研究",
+			"dictionarySemantropy": 75,
+			"dictionarySeed": 1011,
+			"result": {
+				"outcome": "generated",
+				"definition": "歩くことを生業とする人。多く静かな人柄で知られる。花子の名にちなむとされる。",
+				"templateId": "person-04",
+				"family": "person",
+				"optionalClauseIds": [
+					"optional-etymology-03"
+				],
+				"dictionarySeed": 1011,
+				"dictionarySemantropy": 75,
+				"dictionaryBucket": "high",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 19404985,
+				"headword": "研究",
+				"headwordIdentity": {
+					"baseForm": "研究",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "サ変接続",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 50,
+			"dictionarySeed": 1013,
+			"result": {
+				"outcome": "generated",
+				"definition": "猫を読むことから、無慈悲なさまのたとえ。かつては広く用いられていた。",
+				"templateId": "idiom-04",
+				"family": "idiom",
+				"optionalClauseIds": [
+					"optional-history-01"
+				],
+				"dictionarySeed": 1013,
+				"dictionarySemantropy": 50,
+				"dictionaryBucket": "medium",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 2217659695,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "港",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1015,
+			"result": {
+				"outcome": "generated",
+				"definition": "instrumentの静かさの度合いを表す単位。その理由については定説がない。語源については諸説がある。",
+				"templateId": "measure-04",
+				"family": "measure",
+				"optionalClauseIds": [
+					"optional-authority-03",
+					"optional-etymology-04"
+				],
+				"dictionarySeed": 1015,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 63523502,
+				"headword": "港",
+				"headwordIdentity": {
+					"baseForm": "港",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		},
+		{
+			"pool": "lexical",
+			"headword": "沈黙",
+			"dictionarySemantropy": 100,
+			"dictionarySeed": 1017,
+			"result": {
+				"outcome": "generated",
+				"definition": "美しい机の一種。特に猫に見られるものをいう。語源については諸説がある。まれに港の意味にも用いる。",
+				"templateId": "classification-04",
+				"family": "classification",
+				"optionalClauseIds": [
+					"optional-etymology-04",
+					"optional-usage-03"
+				],
+				"dictionarySeed": 1017,
+				"dictionarySemantropy": 100,
+				"dictionaryBucket": "max",
+				"algorithmVersion": 1,
+				"templateSetVersion": 2,
+				"definitionSeed": 3666111424,
+				"headword": "沈黙",
+				"headwordIdentity": {
+					"baseForm": "沈黙",
+					"reading": null,
+					"pos": "名詞",
+					"detail1": "一般",
+					"detail2": "*"
+				}
+			}
+		}
+	]
+}

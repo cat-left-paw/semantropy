@@ -13,7 +13,7 @@ import {
 	bodySemantropyLabel,
 	type BodySemantropy,
 } from "../settings/bodySemantropy";
-import { ui } from "../i18n/catalog";
+import { EN_MESSAGES, ui } from "../i18n/catalog";
 import { localize } from "../i18n/messages";
 
 export type SemantropyLevelChoice = {
@@ -102,10 +102,19 @@ export function toSemantropyViewModel(
 		 * Refresh and leaves this false, so Refresh stays disabled (busy).
 		 */
 		transforming?: boolean;
+		/**
+		 * WORKBENCH-UI1: the body was opened without a Shuffle and shows no Chunk
+		 * yet. Its counts are those of zero Chunks and say nothing about the note;
+		 * Reshuffle is Generate, and there is nothing to Copy or Collect.
+		 */
+		ungenerated?: boolean;
+		/** WORKBENCH-UI1: the Target moved since its snapshot, so Generate waits for Refresh. */
+		generateBlocked?: boolean;
 	} = {},
 ): SemantropyViewModel {
 	const busy = options.busy === true;
 	const transforming = options.transforming === true;
+	const ungenerated = options.ungenerated === true;
 	switch (state.status) {
 		case "empty":
 			return {
@@ -121,9 +130,9 @@ export function toSemantropyViewModel(
 				// LOCALE1: labels in the current language; the note name is shown as written.
 				sourceLabel: ui().status.source(state.snapshot.sourceName),
 				levelLabel: ui().toolbar.levelStatus(localize(bodySemantropyLabel(state.bodySemantropy))),
-				replacementLabel: ui().status.replacements(state.replacementCount),
+				replacementLabel: ungenerated ? null : ui().status.replacements(state.replacementCount),
 				bodyText: null,
-				message: readyMessage(
+				message: ungenerated ? EN_MESSAGES.status.notGenerated : readyMessage(
 					state.replaceableSlotCount,
 					state.bodySemantropy,
 					// One token sequence per analysis run; transient session state.
@@ -142,16 +151,17 @@ export function toSemantropyViewModel(
 				showReshuffle: true,
 				// A Reshuffle needs slots that could change, not slots that
 				// happened to change at this value.
-				reshuffleEnabled:
-					state.bodySemantropy > 0 &&
-					state.replaceableSlotCount > 0 &&
-					!busy,
+				reshuffleEnabled: ungenerated
+					? !busy && options.generateBlocked !== true
+					: state.bodySemantropy > 0 &&
+						state.replaceableSlotCount > 0 &&
+						!busy,
 				showRefresh: true,
 				refreshEnabled: !busy || transforming,
 				showCopy: true,
-				copyEnabled: !busy,
+				copyEnabled: !busy && !ungenerated,
 				showCollect: true,
-				collectEnabled: !busy,
+				collectEnabled: !busy && !ungenerated,
 				bodyAsTextContent: true,
 			};
 		case "error":

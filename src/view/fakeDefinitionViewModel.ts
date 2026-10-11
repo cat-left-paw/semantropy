@@ -169,7 +169,8 @@ export function toFakeDefinitionViewModel(input: {
 				message: null,
 				reshuffleEnabled: actionsEnabled,
 				copyEnabled: actionsEnabled,
-				collectEnabled: actionsEnabled,
+				// FAKE-DICT-RECOMPOSE1: a definition made for a word of a Recompose sentence has no Target and is not collected.
+				collectEnabled: actionsEnabled && input.current.snapshot !== null,
 				levelControlEnabled: !input.busy,
 			},
 			input.levelError,

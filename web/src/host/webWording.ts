@@ -6,7 +6,7 @@ import { INSUFFICIENT_POOL_MESSAGE, NO_SUPPORTED_TEXT_MESSAGE } from "../../../s
 import { OPEN_SNAPSHOT_ERROR_MESSAGE } from "../../../src/application/SemantropySession";
 import { STALE_SOURCE_MESSAGE } from "../../../src/application/sourceFreshness";
 import { COLLECT_PATH_IS_SOURCE_NOTE_MESSAGE } from "../../../src/collect/collectMessages";
-import { setUiOverrides } from "../../../src/i18n/catalog";
+import { EN_MESSAGES, setUiOverrides } from "../../../src/i18n/catalog";
 import { setMessageOverrides } from "../../../src/i18n/messages";
 import { TARGET_RENDER_ERROR_MESSAGE } from "../../../src/render/targetBodyController";
 
@@ -74,5 +74,6 @@ export function installWebWording(): void {
 		[ANALYZE_ERROR_MESSAGE]: "文章を解析できませんでした。もう一度開いてください。",
 		[COLLECT_PATH_IS_SOURCE_NOTE_MESSAGE]: "対象の文章や語彙ソースの文章は収集先に使えません。",
 		[TARGET_RENDER_ERROR_MESSAGE]: "文章を表示できませんでした。もう一度開いてください。",
+		[EN_MESSAGES.fakeAlert.noVocabulary]: "不条理警告には、適用済みで最新の語彙が必要です。語彙を適用するか、対象の文章を再読込してください。",
 	});
 }

@@ -497,6 +497,31 @@ describe("the closed regular inflection table", () => {
 		}
 	});
 
+	it("drops the five short-okurigana 一段 verbs and the three dictionary artifacts from every pool, and keeps their longer spellings (SHORT-OKURIGANA-EXCLUDE1)", () => {
+		// 恐る beside 恐れる, and so on: the stem lacks its last kana, so the paradigm would write 恐た and 割ない.
+		const excluded = ["恐る", "流る", "割る", "仕掛る", "組み立る", "へるる", "のぼりつめるる", "上り詰めるる"];
+		for (const baseForm of excluded) {
+			expect(inflectRegularVerb({ conjugationType: "一段", baseForm }), baseForm).toBeNull();
+			expect(isCollisionIrregularLexeme("一段", baseForm), baseForm).toBe(true);
+		}
+		const pool = poolOf([
+			...excluded.map((baseForm) => verb(baseForm, "一段")),
+			verb("恐れる", "一段"),
+			verb("割れる", "一段"),
+			verb("心得る", "一段"),
+			// The production tokenizer reads 割った as the 五段 verb 割る, a different lexeme that is not excluded.
+			verb("割っ", "五段・ラ行", "割る", "連用タ接続"),
+		]);
+		const built = [...surfaces(pool.modifiers), ...surfaces(pool.predicates)];
+		for (const forbidden of ["恐た", "恐ない", "恐ている", "恐る", "流た", "流ない", "流ている", "流る", "割た", "割ない", "割ている", "仕掛た", "仕掛ない", "仕掛る", "組み立た", "組み立ない", "組み立る", "へるた", "へるない", "へるる"]) {
+			expect(built, forbidden).not.toContain(forbidden);
+		}
+		// The controls: the longer spellings, and the 五段 lexeme, are built.
+		for (const wanted of ["恐れた", "恐れない", "恐れている", "恐れる", "割れた", "割れない", "割れる", "心得た", "心得る", "割った", "割らない", "割っている", "割る"]) {
+			expect(built, wanted).toContain(wanted);
+		}
+	});
+
 	it("matches the exclusion on the recorded base form, not on a surface or ending", () => {
 		// 眠る ends in る and is 五段・ラ行 like ある, and is not excluded.
 		expect(isCollisionIrregularLexeme("五段・ラ行", "眠る")).toBe(false);
@@ -506,6 +531,20 @@ describe("the closed regular inflection table", () => {
 		expect(isCollisionIrregularLexeme("サ変・スル", "ある")).toBe(false);
 		expect(COLLISION_IRREGULAR_VERB_LEXEMES).toEqual([
 			{ conjugationType: "五段・ラ行", baseForms: ["ある", "在る", "有る"] },
+			// SHORT-OKURIGANA-EXCLUDE1: the Shuffle realizer's three artifacts and five short spellings.
+			{
+				conjugationType: "一段",
+				baseForms: [
+					"のぼりつめるる",
+					"へるる",
+					"上り詰めるる",
+					"仕掛る",
+					"割る",
+					"恐る",
+					"流る",
+					"組み立る",
+				].sort(),
+			},
 		]);
 		// Every excluded class is one the allowlist actually admits, or the entry
 		// would be dead weight hiding a real gap.
@@ -1309,7 +1348,8 @@ describe("the slice's isolation", () => {
 		expect(SEMANTROPY_ALGORITHM_VERSION).toBe(9);
 		expect(MANUAL_MORPH_POLICY_VERSION).toBe("manual-morph-2");
 		expect(FAKE_DICTIONARY_ALGORITHM_VERSION).toBe(1);
-		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(1);
+		// FAKE-DICT-LEXEME1 raised the standard template set to 2; Collision still changes none.
+		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(2);
 		expect(SEMANTROPY_SETTINGS_SCHEMA_VERSION).toBe(3);
 		expect(COLLECT_METADATA_VERSION).toBe(2);
 		expect(COLLECTION_DOCUMENT_VERSION).toBe(1);

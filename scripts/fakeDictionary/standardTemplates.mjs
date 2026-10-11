@@ -24,7 +24,19 @@ export const STANDARD_TEMPLATES_GENERATED = "src/dictionary/generated/standardTe
 /** How to refresh the generated module; named by every staleness failure. */
 export const GENERATE_COMMAND = "npm run generate:templates";
 
-export const TEMPLATE_SCHEMA_VERSION = 1;
+/**
+ * The modules the generator bundles to validate the document: the compiler,
+ * its schema and placeholder lists, and the build-only follower guard
+ * (FAKE-DICT-LEXEME1). A watching build re-checks when one of them changes.
+ */
+export const FAKE_DICTIONARY_TEMPLATE_VALIDATORS = [
+	"src/dictionary/template.ts",
+	"src/dictionary/templateData.ts",
+	"src/dictionary/placeholders.ts",
+	"src/dictionary/lexicalFollowers.ts",
+];
+
+export const TEMPLATE_SCHEMA_VERSION = 2;
 
 const ENTRY_KINDS = Object.freeze({ core: "core", clause: "clause" });
 /** Exactly the fields each entry kind may carry. Anything else is refused. */
@@ -275,8 +287,15 @@ export function parseStandardTemplateMarkdown(markdown) {
  * loading it here cannot become circular.
  */
 async function loadTemplateCompiler(rootDir) {
+	// FAKE-DICT-LEXEME1: the build-only follower guard is bundled with the
+	// compiler, so the generator checks what the plugin never ships.
 	const built = await esbuild.build({
-		entryPoints: [path.join(rootDir, "src", "dictionary", "template.ts")],
+		stdin: {
+			contents: 'export * from "./template"; export { checkLexicalFollowers } from "./lexicalFollowers";',
+			resolveDir: path.join(rootDir, "src", "dictionary"),
+			sourcefile: "templateCompiler.ts",
+			loader: "ts",
+		},
 		bundle: true,
 		write: false,
 		format: "esm",
@@ -407,6 +426,14 @@ export async function generateStandardTemplates(options = {}) {
 				.join("; ")}`,
 		);
 	}
+	const followers = compiler.checkLexicalFollowers(compiled.set);
+	if (followers.length > 0) {
+		throw new Error(
+			`${STANDARD_TEMPLATES_MARKDOWN} does not compile: ${followers
+				.map(compiler.describeTemplateIssue)
+				.join("; ")}`,
+		);
+	}
 	return { parsed, compiled: compiled.set, source: renderGeneratedTemplateModule(parsed) };
 }
 
@@ -456,6 +483,7 @@ export async function assertStandardTemplatesGenerated(options = {}) {
 export function standardTemplatesPlugin(rootDir) {
 	const generated = path.resolve(rootDir, STANDARD_TEMPLATES_GENERATED);
 	const markdown = path.resolve(rootDir, STANDARD_TEMPLATES_MARKDOWN);
+	const watchFiles = [markdown, ...FAKE_DICTIONARY_TEMPLATE_VALIDATORS.map((file) => path.resolve(rootDir, file))];
 	return {
 		name: "semantropy-standard-templates",
 		setup(build) {
@@ -477,7 +505,7 @@ export function standardTemplatesPlugin(rootDir) {
 				return {
 					contents: await readFile(args.path, "utf8"),
 					loader: "ts",
-					watchFiles: [markdown],
+					watchFiles,
 				};
 			});
 		},

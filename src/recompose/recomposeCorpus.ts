@@ -31,7 +31,7 @@ export type RecomposeSource = {
 };
 
 export type RecomposeMorph = Readonly<Pick<JapaneseToken,
-	"surface" | "pos" | "detail1" | "detail2" | "conjugationType" | "conjugationForm" | "baseForm" | "isUnknown">>;
+	"surface" | "pos" | "detail1" | "detail2" | "conjugationType" | "conjugationForm" | "baseForm" | "reading" | "isUnknown">>;
 
 export type RecomposeSentence = {
 	readonly source: number;
@@ -88,6 +88,7 @@ function morphOf(token: JapaneseToken): RecomposeMorph {
 		conjugationType: token.conjugationType,
 		conjugationForm: token.conjugationForm,
 		baseForm: token.baseForm,
+		reading: token.reading,
 		isUnknown: token.isUnknown,
 	});
 }

@@ -76,7 +76,9 @@ export const RELEASE_010_S4_ADDED = [
 
 /**
  * 0.1.0 S5 connects Recompose: the core, its two methods, the versions leaf the
- * Collect contract validates against, and the View-owned dialog. None leave.
+ * Collect contract validates against, and the View-owned dialog. None leave except
+ * the dialog: WORKBENCH-UI4 removed `src/view/RecomposeModal.ts` (Recompose is the
+ * View's tab, WORKBENCH_UI2_ADDED below), so it is no longer in the graph.
  */
 export const RELEASE_010_S5_ADDED = [
 	"src/recompose/methods/jointMethod.ts",
@@ -85,10 +87,76 @@ export const RELEASE_010_S5_ADDED = [
 	"src/recompose/recomposeCorpus.ts",
 	"src/recompose/recomposeTypes.ts",
 	"src/recompose/recomposeVersions.ts",
-	"src/view/RecomposeModal.ts",
 ] as const;
 
-/** The current production graph: the FAKE-PROVERB-VIEW1 pin plus every EXPERIENCE1 and 0.1.0 delta so far. */
+/**
+ * FAKE-ALERT-VIEW1 connects Fake Alert: the generator, its level table and
+ * versions leaf, the packed standard recipes and their restore, and the
+ * View-owned dialog. The recipe compiler and the canonical payload stay out.
+ * None leave.
+ */
+export const FAKE_ALERT_VIEW1_ADDED = [
+	"src/fakeAlert/fakeAlertCore.ts",
+	"src/fakeAlert/fakeAlertLevel.ts",
+	"src/fakeAlert/fakeAlertVersions.ts",
+	"src/fakeAlert/generated/standardFakeAlertRecipes.ts",
+	"src/fakeAlert/recipeData.ts",
+	"src/fakeAlert/recipeSet.ts",
+	"src/view/FakeAlertModal.ts",
+] as const;
+
+/**
+ * LEXEME-SHARE1 adds one pure module: the regular verbs, イ-adjectives and
+ * ナ-adjective stems of a Snapshot, which Fake Alert now takes from it. None leave.
+ */
+export const LEXEME_SHARE1_ADDED = [
+	"src/vocabulary/lexicalProjection.ts",
+] as const;
+
+/**
+ * FAKE-DICT-LEXEME1 adds one module: the words a Snapshot supplies for each Fake
+ * Dictionary placeholder, the lexical ones from the shared lists. None leave.
+ */
+export const FAKE_DICT_LEXEME1_ADDED = [
+	"src/dictionary/snapshotLexicalForms.ts",
+] as const;
+
+/**
+ * WORKBENCH-UI2 stage 2 adds the tab row of the body area (built only on a host
+ * that asks for tabs; the plugin has asked since WORKBENCH-UI4); stage 3 splits
+ * Recompose into its session and its screen, which the View's Recompose tab shows
+ * (the dialog that first contained it is gone). None leave.
+ */
+export const WORKBENCH_UI2_ADDED = [
+	"src/view/RecomposePane.ts",
+	"src/view/RecomposeSession.ts",
+	"src/view/workbenchTabs.ts",
+] as const;
+
+/**
+ * WORKBENCH-UI5 adds the Shuffle tab's own area (the target, the body's state and its four actions),
+ * built only on a host with tabs, and the plugin's chooser for the target note (Obsidian's file chooser
+ * over the Vault's Markdown notes, imported by the plugin entry alone) and the Fake Dictionary dialog (the
+ * Toolbar's button on a host with tabs). None leave.
+ */
+export const WORKBENCH_UI5_ADDED = [
+	"src/TargetNotePicker.ts",
+	"src/view/DictionaryHelpModal.ts",
+	"src/view/ShuffleBar.ts",
+	"src/view/vocabularySourceMark.ts",
+] as const;
+
+/**
+ * FAKE-DICT-RECOMPOSE1 adds the words of a Recompose piece that the Fake Dictionary can look up (found from the
+ * corpus when the piece is made; the View's Recompose tab shows them) and the pool of a Vocabulary kept under its
+ * Snapshot for a word looked up there. None leave.
+ */
+export const FAKE_DICT_RECOMPOSE1_ADDED = [
+	"src/application/snapshotPoolCache.ts",
+	"src/view/recomposeWords.ts",
+] as const;
+
+/** The current production graph: the FAKE-PROVERB-VIEW1 pin plus every EXPERIENCE1, 0.1.0, Fake Alert and 0.2.0 delta so far. */
 export function applyExperienceDelta(graph: readonly string[]): string[] {
-	return [...graph, ...EXPERIENCE_VOCABULARY_ADDED, ...EXPERIENCE_TOKEN_UI_ADDED, ...EXPERIENCE_CONTROLS_ADDED, ...EXPERIENCE_LOCALE_ADDED, ...EXPERIENCE_UI_POLISH_ADDED, ...COLLECT_ATTRIBUTION_ADDED, ...RELEASE_010_S3_ADDED, ...RELEASE_010_S4_ADDED, ...RELEASE_010_S5_ADDED].sort();
+	return [...graph, ...EXPERIENCE_VOCABULARY_ADDED, ...EXPERIENCE_TOKEN_UI_ADDED, ...EXPERIENCE_CONTROLS_ADDED, ...EXPERIENCE_LOCALE_ADDED, ...EXPERIENCE_UI_POLISH_ADDED, ...COLLECT_ATTRIBUTION_ADDED, ...RELEASE_010_S3_ADDED, ...RELEASE_010_S4_ADDED, ...RELEASE_010_S5_ADDED, ...FAKE_ALERT_VIEW1_ADDED, ...LEXEME_SHARE1_ADDED, ...FAKE_DICT_LEXEME1_ADDED, ...WORKBENCH_UI2_ADDED, ...WORKBENCH_UI5_ADDED, ...FAKE_DICT_RECOMPOSE1_ADDED].sort();
 }

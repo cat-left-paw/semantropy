@@ -153,6 +153,30 @@ describe("standard Japanese line boundary", () => {
 			for (const size of [1, 3, 8, 21, 55]) expectLineEquivalence(text, size);
 		}
 	});
+	// TRAILING-SPACE1: a line that ends in half-width spaces or tabs is read, and a Chunk reads it as the whole note does.
+	it("matches the whole projection with blanks at the ends of lines, across deterministic adversarial combinations", () => {
+		const parts = ["普通。", "漢字《かんじ》", "\\《esc", "本文《よみ", "》閉じ", "", "<!-- open", "-->", "$$", "%%", "<div>", "</div>", "- 項目", "> 引用", "---", "--- ",
+			"```", "    indented", "# 見出し", "# ", "| a | b |", "![[x.png]]", "[link](http://x)", "[link", "`code`", "`open", "※［＃注記］《よみ》", "<ruby>漢<rt>かん</rt></ruby>",
+			"**強調**", "{{まとまり}}", "文末は全角\u3000", "短い。", "もう一つの文。"];
+		const blanks = ["", "", " ", "  ", "   ", "\t", " \t", "\t "];
+		let seed = 2026;
+		const random = (): number => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed >>> 8; };
+		for (let i = 0; i < 1500; i += 1) {
+			const newline = ["\n", "\r\n", "\r"][i % 3]!;
+			const text = Array.from({ length: 1 + random() % 15 }, () => { const part = parts[random() % parts.length]!; return part ? part + blanks[random() % blanks.length]! : part; })
+				.join(newline) + (i % 2 ? newline : "");
+			for (const size of [1, 3, 8, 21, 55]) expectLineEquivalence(text, size);
+		}
+	});
+	it.each([1, 2, 3, 5, 8, 13, 21, 34])("keeps a line with a blank whole across a Chunk boundary of about %i code units", size => {
+		const note = [
+			"最初の行です。 ", "二行目は短い。\t", "三行目。  ", "漢字《かんじ》と｜親《よみ》。 ", "# 見出し ", "続きの行。", "", "別の段落。 \t ", "さらに続く。", "最後の行。 ",
+		];
+		for (const newline of ["\n", "\r\n", "\r"]) {
+			expectLineEquivalence(note.join(newline), size);
+			expectLineEquivalence(note.join(newline) + newline, size);
+		}
+	});
 	it.each(["`unclosed", "[unclosed", "![[unclosed", "$unclosed", "<span>unclosed"])("retains the entire continuation for %s", opener => {
 		const text = `前。\n${opener}\n${"文章。\n".repeat(100)}`;
 		const chunks = planTargetLineChunks(buildTargetLineIndex(text, 1), 30);

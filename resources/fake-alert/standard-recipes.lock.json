@@ -1,0 +1,24 @@
+{
+	"versions": [
+		{
+			"dataVersion": 1,
+			"digest": "9b4134012bc4b3b88fcb741871703d3033f22ddab5ff83eda7f719e1944b9e2b"
+		},
+		{
+			"dataVersion": 2,
+			"digest": "ff56cf6780a45e293e0f76ba0a67f2910ae5940ed5107c54d9f3a221f7ff3592"
+		},
+		{
+			"dataVersion": 3,
+			"digest": "c607549fd22d4e88e9e89633f6fdf80c1be56d7e7e862a3255acaf63c01ebd7c"
+		},
+		{
+			"dataVersion": 4,
+			"digest": "46d647ea2597b9ba9e66cdfadc4393ba1a50a2ba82f270199eddbf811d6e3cb0"
+		},
+		{
+			"dataVersion": 5,
+			"digest": "0e90c7762984b86d53c713ad7444ddfc276911ef6a16c62d1df364c132096f94"
+		}
+	]
+}

@@ -87,9 +87,12 @@ describe("the closed realizer", () => {
 			for (const type of REGULAR_ADJECTIVE_CONJUGATION_TYPES) if (!adjectiveKey) expect(surface(key, adjective("美しい", type))).toBe("class-not-admitted-by-target");
 		}
 	});
-	it("refuses the six-lexeme closed exclusion for every key", () => {
-		expect(MAX_REALIZER_RULES.irregularLexemes).toEqual(MAX_REALIZER_IRREGULAR_LEXEMES.map(item => [item.conjugationType, item.baseForms]));
-		for (const [type, forms] of [["五段・ラ行", ["ある", "有る", "在る"]], ["一段", ["へるる", "のぼりつめるる", "上り詰めるる"]]] as const)
+	it("refuses the closed lexeme exclusion for every key", () => {
+		// SHORT-OKURIGANA-EXCLUDE1 added five 一段 verbs to the six SPIKE1 recorded; the SPIKE1 prototype keeps its six.
+		const SHORT_OKURIGANA = ["恐る", "流る", "割る", "仕掛る", "組み立る"] as const;
+		expect(MAX_REALIZER_RULES.irregularLexemes).toEqual(MAX_REALIZER_IRREGULAR_LEXEMES.map(item =>
+			[item.conjugationType, item.conjugationType === "一段" ? [...item.baseForms, ...SHORT_OKURIGANA].sort() : item.baseForms]));
+		for (const [type, forms] of [["五段・ラ行", ["ある", "有る", "在る"]], ["一段", ["へるる", "のぼりつめるる", "上り詰めるる", ...SHORT_OKURIGANA]]] as const)
 			for (const form of forms) {
 				expect(isMaxIrregularLexeme(type, form)).toBe(true);
 				for (const key of MAX_TARGET_FORM_KEYS) expect(realizeMaxLexeme(key, verb(type, form)).realized).toBe(false);

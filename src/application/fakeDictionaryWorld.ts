@@ -31,10 +31,15 @@ export function dictionarySnapshotIdentityOf(
 	});
 }
 
+/**
+ * FAKE-DICT-RECOMPOSE1: `null` is "no Target" (a word looked up in a Recompose sentence, which belongs to a
+ * Vocabulary and not to a note), and equals only itself.
+ */
 export function sameDictionarySnapshotIdentity(
-	left: DictionarySnapshotIdentity,
-	right: DictionarySnapshotIdentity,
+	left: DictionarySnapshotIdentity | null,
+	right: DictionarySnapshotIdentity | null,
 ): boolean {
+	if (left === null || right === null) return left === right;
 	return (
 		left.sourcePath === right.sourcePath &&
 		left.contentHash === right.contentHash
@@ -52,7 +57,11 @@ export type FakeDictionaryCurrent = {
 	readonly requestId: number;
 	readonly headword: FakeDictionaryHeadword;
 	readonly pool: DictionaryVocabularyPool;
-	readonly snapshot: DictionarySnapshotIdentity;
+	/**
+	 * The Target this definition was made for, or `null` when it was made for a word of a Recompose sentence, which
+	 * has none. A definition with no Target cannot be collected (a Collection entry names its Target).
+	 */
+	readonly snapshot: DictionarySnapshotIdentity | null;
 	readonly vocabulary: CollectVocabularyProvenance;
 	readonly dictionarySeed: number;
 	readonly dictionarySemantropy: DictionarySemantropy;

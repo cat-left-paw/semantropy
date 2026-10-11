@@ -41,13 +41,14 @@ describe("Fake Proverb forms over the whole shipped dictionary", () => {
 				keys[`${form}/${realized.key}/${String(realized.follower)}`] = (keys[`${form}/${realized.key}/${String(realized.follower)}`] ?? 0) + 1;
 			}
 		}
-		// 15,775 lexemes in the twelve admitted classes = 14,000 verbs + 1,769 i-adjectives + 6 irregular base forms.
-		expect(counts).toEqual({ "verb-basic": 14_000, "verb-past": 14_000, "verb-negative": 14_000, "adjective-basic": 1_769 });
+		// 15,775 lexemes in the twelve admitted classes = 13,995 verbs + 1,769 i-adjectives + 11 excluded base forms (the 6 of
+		// Amendment 1 and the 5 一段 verbs written without their stem's last kana, Amendment 2: 14,000 verbs before).
+		expect(counts).toEqual({ "verb-basic": 13_995, "verb-past": 13_995, "verb-negative": 13_995, "adjective-basic": 1_769 });
 		expect(keys).toEqual({
-			"verb-basic/verb-basic/null": 14_000,
-			"verb-past/verb-ta-stem-t/aux-ta": 12_797,
+			"verb-basic/verb-basic/null": 13_995,
+			"verb-past/verb-ta-stem-t/aux-ta": 12_792,
 			"verb-past/verb-ta-stem-d/aux-da": 1_203,
-			"verb-negative/verb-irrealis-negation/aux-nai": 14_000,
+			"verb-negative/verb-irrealis-negation/aux-nai": 13_995,
 			"adjective-basic/adjective-basic/null": 1_769,
 		});
 	});
@@ -70,7 +71,10 @@ describe("Fake Proverb forms over the whole shipped dictionary", () => {
 					tokens.slice(1).every((token) => token.pos === "助動詞")) agree += 1;
 			}
 		}
-		expect([agree, total]).toEqual([27_540, 28_000]);
+		// 27,540 of 28,000 before the five 一段 verbs were excluded (Amendment 2): their ten realized forms (恐た 割ない …) were
+		// read back as the same lexeme plus the follower, because the dictionary holds 恐る beside 恐れる; agreement is not a
+		// test of whether a form is a word, which is why the exclusion is by reading the words.
+		expect([agree, total]).toEqual([27_530, 27_990]);
 	});
 });
 
@@ -99,11 +103,14 @@ describe("Fake Proverb generation on analyzed prose", () => {
 					forms.add(binding.form);
 					for (const evidence of binding.candidate.evidence) {
 						if (evidence.kind === "lexeme") expect(isMaxIrregularLexeme(evidence.conjugationType, evidence.baseForm)).toBe(false);
+						if (evidence.kind === "stem") expect(binding.surface).toBe(`${evidence.stem}${binding.form === "na-stem-ni" ? "に" : "な"}`);
 					}
 				}
 			}
 		}
-		expect([...forms].sort()).toEqual(["adjective-basic", "independent-noun", "verb-basic", "verb-negative", "verb-past"]);
+		// FAKE-PROVERB-NA1: the corpus has ナ-adjective stems, so a modifier also draws a stem plus な.
+		// FAKE-PROVERB-RECIPES3: recipe data 3 has adverbial slots, which draw a stem plus に.
+		expect([...forms].sort()).toEqual(["adjective-basic", "independent-noun", "na-stem-na", "na-stem-ni", "verb-basic", "verb-negative", "verb-past"]);
 		expect(calls).toBe(before);
 	});
 });

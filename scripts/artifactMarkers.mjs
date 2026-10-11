@@ -24,7 +24,18 @@ const GENERIC_PATH_SEGMENTS = new Set([
 	// "work" is an ordinary word in the bundled code. The full path, "/home/"
 	// and the runner's user name are still checked.
 	"work",
+	// Claude Code cloud sessions check out to /home/user/<repo>, and "user" is
+	// an ordinary word in the bundled code (user_dictionary). The full path and
+	// "/home/" are still checked.
+	"user",
 ]);
+
+/**
+ * Account names that are shared by every machine of a kind and are ordinary
+ * words in the bundled code (`this.root`). The account's home directory is
+ * still checked.
+ */
+const GENERIC_USER_NAMES = new Set(["root"]);
 
 /**
  * Anything that would reveal the build machine. Checked against the code
@@ -61,7 +72,7 @@ export function machineMarkers(rootDir) {
 
 	try {
 		const { username, homedir } = os.userInfo();
-		if (username && username.length >= 3) {
+		if (username && username.length >= 3 && !GENERIC_USER_NAMES.has(username)) {
 			markers.add(username);
 		}
 		if (homedir) {

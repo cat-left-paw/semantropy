@@ -16,13 +16,27 @@ const BRIDGE = "src/transform/maxAdverbBridge.ts";
 const REALIZER_TEST = "tests/maxRealizer.test.ts";
 const PROJECTION_TEST = "tests/maxProjection.test.ts";
 const CORE_TEST = "tests/maxCore.test.ts";
+const SHORT_OKURIGANA_TEST = "tests/shortOkuriganaExclude1.test.ts";
 
 /** [source file, test file, name, before, after, test name] */
 export const probes = [
 	// The closed realizer (SPIKE1 / Amendment 1).
 	[REALIZER, REALIZER_TEST, "irregular-exclusion-removed",
 		'	if (isMaxIrregularLexeme(candidate.conjugationType, candidate.baseForm)) return refuse("irregular-lexeme");\n', "",
-		"refuses the six-lexeme closed exclusion for every key"],
+		"refuses the closed lexeme exclusion for every key"],
+	// SHORT-OKURIGANA-EXCLUDE1 (Amendment 2): the five 一段 verbs written without their stem's last kana.
+	[REALIZER, SHORT_OKURIGANA_TEST, "short-okurigana-five-not-excluded",
+		'"上り詰めるる", "恐る", "流る", "割る", "仕掛る", "組み立る"', '"上り詰めるる"',
+		"refuses each of the five for every Target form key"],
+	[REALIZER, SHORT_OKURIGANA_TEST, "short-okurigana-one-of-the-five-forgotten",
+		'"恐る", "流る", "割る", "仕掛る", "組み立る"', '"恐る", "流る", "仕掛る", "組み立る"',
+		"refuses each of the five for every Target form key"],
+	[REALIZER, SHORT_OKURIGANA_TEST, "short-okurigana-exclusion-ignores-the-class",
+		'	return IRREGULAR_LEXEMES.get(conjugationType)?.has(baseForm) === true;', '	return [...IRREGULAR_LEXEMES.values()].some(forms => forms.has(baseForm));',
+		"excludes the lexeme, not the spelling"],
+	[REALIZER, SHORT_OKURIGANA_TEST, "short-okurigana-basic-form-let-through",
+		'	if (isMaxIrregularLexeme(candidate.conjugationType, candidate.baseForm)) return refuse("irregular-lexeme");', '	if (key !== "verb-basic" && isMaxIrregularLexeme(candidate.conjugationType, candidate.baseForm)) return refuse("irregular-lexeme");',
+		"Fake Alert and the Fake Dictionary list no one of the five"],
 	[REALIZER, REALIZER_TEST, "ta-voicing-collapsed-into-one-admission",
 		'	"verb-ta-stem-d": voiced("d"),', '	"verb-ta-stem-d": REGULAR_VERB_CONJUGATION_TYPES,',
 		"builds た / だ, せる / させる, the volitional"],

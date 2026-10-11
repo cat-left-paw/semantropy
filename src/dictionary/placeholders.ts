@@ -15,6 +15,12 @@ import { isSingleCodePointSymbol } from "../transform/tokenPolicy";
  * No verb, adjective, semantic-category or inflected placeholder joins this
  * list in v1. `sahen` inflection lives in the template's own fixed text
  * (`{{sahen}}した`), not in a placeholder DSL.
+ *
+ * FAKE-DICT-LEXEME1 (`Docs/fake_dictionary_lexeme_amendment1.md`, 2026-10-05)
+ * adds a second, separate closed list, `FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS`,
+ * instead of widening this one: these eight still classify a headword, key the
+ * Snapshot's dictionary projection and make up every pool fingerprint exactly
+ * as before.
  */
 export const FAKE_DICTIONARY_PLACEHOLDERS = [
 	"noun",
@@ -38,6 +44,44 @@ export function isFakeDictionaryPlaceholder(
 	value: string,
 ): value is FakeDictionaryPlaceholder {
 	return PLACEHOLDER_NAMES.has(value);
+}
+
+/**
+ * The lexical placeholders (FAKE-DICT-LEXEME1): a regular verb in its basic
+ * form, a regular イ-adjective in its basic form, and a ナ-adjective stem as
+ * written. The words come from the Snapshot's shared lexical lists
+ * (`src/vocabulary/lexicalProjection.ts`), never from a token class here, so no
+ * headword is ever classified as one of them. A stem is completed by the
+ * template's own fixed text (`{{naStem}}な`, `{{naStem}}に`), as `sahen` is.
+ */
+export const FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS = [
+	"verb",
+	"iAdjective",
+	"naStem",
+] as const;
+
+export type FakeDictionaryLexicalPlaceholder =
+	(typeof FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS)[number];
+
+/** Any placeholder a template may name: one of the eight, or a lexical one. */
+export type FakeDictionaryTemplatePlaceholder =
+	| FakeDictionaryPlaceholder
+	| FakeDictionaryLexicalPlaceholder;
+
+const LEXICAL_PLACEHOLDER_NAMES: ReadonlySet<string> = new Set(
+	FAKE_DICTIONARY_LEXICAL_PLACEHOLDERS,
+);
+
+export function isFakeDictionaryLexicalPlaceholder(
+	value: string,
+): value is FakeDictionaryLexicalPlaceholder {
+	return LEXICAL_PLACEHOLDER_NAMES.has(value);
+}
+
+export function isFakeDictionaryTemplatePlaceholder(
+	value: string,
+): value is FakeDictionaryTemplatePlaceholder {
+	return PLACEHOLDER_NAMES.has(value) || LEXICAL_PLACEHOLDER_NAMES.has(value);
 }
 
 const NOUN = "名詞";

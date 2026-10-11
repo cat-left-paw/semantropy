@@ -1,6 +1,7 @@
 /**
  * The hand-written schema of the standard Fake Proverb recipe set
- * (Recipe Schema 1).
+ * (Recipe Schema 2; FAKE-PROVERB-NA1 added the ナ-adjective stem forms and the
+ * `adverbial` slot kind, `Docs/fake_proverb_na_amendment1.md`).
  *
  * The entries themselves are not here. They live in
  * `resources/fake-proverb/standard-recipes.md`, which a human edits, and reach
@@ -15,7 +16,7 @@
  * dependency runs one way only.
  */
 
-export const FAKE_PROVERB_RECIPE_SCHEMA_VERSION = 1;
+export const FAKE_PROVERB_RECIPE_SCHEMA_VERSION = 2;
 
 /**
  * Entry IDs (proverb, gloss, literal, profile) share one id space. Slot IDs are
@@ -40,8 +41,13 @@ export const FAKE_PROVERB_LITERAL_MAX_CODE_POINTS = 24;
 export const FAKE_PROVERB_RECIPE_ROLES = ["proverb", "gloss"] as const;
 export type FakeProverbRecipeRole = (typeof FAKE_PROVERB_RECIPE_ROLES)[number];
 
-/** Slot kinds: what a typed binding can hold. */
-export const FAKE_PROVERB_SLOT_KINDS = ["noun", "modifier", "predicate"] as const;
+/**
+ * Slot kinds: what a typed binding can hold. Schema 2 adds `adverbial`, a word
+ * that modifies a predicate (語幹＋に). It is a kind of its own, not a modifier
+ * form, because a modifier has no position rule of its own and 静かに猫 would
+ * otherwise be one draw away.
+ */
+export const FAKE_PROVERB_SLOT_KINDS = ["noun", "modifier", "predicate", "adverbial"] as const;
 export type FakeProverbSlotKind = (typeof FAKE_PROVERB_SLOT_KINDS)[number];
 
 /** Every part kind. `reference` is gloss-only; `literal` names a fixed literal. */
@@ -58,25 +64,50 @@ export type FakeProverbPartKind = (typeof FAKE_PROVERB_PART_KINDS)[number];
  * irrealis-negation stem plus ない. Lexeme safety and realization remain
  * TypeScript responsibilities of a later slice; adding a form here is a schema
  * change, never a Markdown edit.
+ *
+ * Schema 2: `na-stem-na` is a ナ-adjective stem plus な (静かな), and
+ * `na-stem-ni` a stem plus に (静かに). Neither is a realizer form: the stems
+ * come from the shared lexical lists, as written. A stem plus な only stands
+ * before a noun, so the compiler checks where a profile that allows it is
+ * placed (`FAKE_PROVERB_NA_NOUN_STARTS`).
  */
 export const FAKE_PROVERB_CANDIDATE_FORMS = {
 	noun: ["independent-noun"],
-	modifier: ["adjective-basic", "verb-basic", "verb-past", "verb-negative"],
+	modifier: ["adjective-basic", "verb-basic", "verb-past", "verb-negative", "na-stem-na"],
 	predicate: ["adjective-basic", "verb-basic", "verb-negative"],
+	adverbial: ["na-stem-ni"],
 } as const satisfies Readonly<Record<FakeProverbSlotKind, readonly string[]>>;
 export type FakeProverbCandidateForm =
 	(typeof FAKE_PROVERB_CANDIDATE_FORMS)[FakeProverbSlotKind][number];
 
-/** Upper bounds the compiler enforces. Exceeding one is a compile error, never a truncation. */
+/**
+ * Where a slot or reference that may hold a stem plus な can stand, by what
+ * follows it (Schema 2): a noun slot or noun reference, or a fixed literal
+ * that starts with a noun. A literal starts with a noun when its first
+ * character is Han or Katakana (者は), or when it starts with one of these
+ * nouns written in Hiragana and the noun is followed by the end of the
+ * literal or by one of `FAKE_PROVERB_NA_NOUN_TAILS` (ものと…, but not
+ * ものすごく). This is a guard against the forms that are plainly wrong, not a
+ * grammar proof: a Han character may begin a verb (見る) and nothing after the
+ * noun is read.
+ */
+export const FAKE_PROVERB_NA_NOUN_STARTS = ["こと", "もの", "ところ", "ため", "はず", "わけ", "ほう"] as const;
+export const FAKE_PROVERB_NA_NOUN_TAILS = ["が", "を", "に", "は", "も", "で", "の", "と", "か", "だ", "、", "。"] as const;
+
+/**
+ * Upper bounds the compiler enforces. Exceeding one is a compile error, never a truncation.
+ * FAKE-PROVERB-RECIPES3 (`Docs/fake_proverb_recipes3_amendment1.md`) raised the four entry limits
+ * (64 / 64 / 128 / 16 before): recipe data 3 holds 63 proverbs, 32 glosses, 136 literals and 14 profiles.
+ */
 export const FAKE_PROVERB_LIMITS = {
-	proverbs: 64,
-	glosses: 64,
-	literals: 128,
-	profiles: 16,
+	proverbs: 128,
+	glosses: 128,
+	literals: 512,
+	profiles: 32,
 	parts: { proverb: 10, gloss: 14 },
 	slots: {
-		proverb: { noun: 4, modifier: 2, predicate: 1 },
-		gloss: { noun: 3, modifier: 2, predicate: 2 },
+		proverb: { noun: 4, modifier: 2, predicate: 1, adverbial: 1 },
+		gloss: { noun: 3, modifier: 2, predicate: 2, adverbial: 1 },
 	},
 	exports: 4,
 	requires: 4,
@@ -87,7 +118,7 @@ export const FAKE_PROVERB_LIMITS = {
  * One part of a proverb or gloss, as raw document data.
  *
  * Deliberately untrusted strings; only the compiler narrows the closed
- * vocabulary. A slot part (`noun` / `modifier` / `predicate`) carries
+ * vocabulary. A slot part (`noun` / `modifier` / `predicate` / `adverbial`) carries
  * `slotId`, `profileId` and `exported`; a `literal` part carries `literalId`;
  * a `reference` part carries `slotKind` and `slotId`. Any other field is
  * refused.

@@ -25,6 +25,8 @@ export type ToolbarStatusKind =
 	| "target-stale"
 	| "vocabulary-stale"
 	| "insufficient-pool"
+	/** WORKBENCH-UI1: ready, opened without a Shuffle and not generated yet. */
+	| "not-generated"
 	| "error";
 
 /**
@@ -38,6 +40,19 @@ export const PREPARING_VOCABULARY_MESSAGE = EN_MESSAGES.status.preparingVocabula
 export const VOCABULARY_STALE_MESSAGE = EN_MESSAGES.status.vocabularyStale;
 
 export const VOCABULARY_MISSING_MESSAGE = EN_MESSAGES.status.vocabularyMissing;
+
+export const REFRESH_TO_GENERATE_MESSAGE = EN_MESSAGES.status.refreshToGenerate;
+
+/** WORKBENCH-UI5 (review 2, P3 11): what the Open command says when it has no note to take and the View keeps what it has. */
+export const OPEN_KEPT_MESSAGE = EN_MESSAGES.status.openKept;
+
+/**
+ * WORKBENCH-UI5: on a host with tabs the Shuffle tab has its own area (target, state and
+ * actions). The persistent state of the body is shown there; progress, errors, the
+ * Vocabulary and the onboarding stay in the Toolbar's status line, which is read on
+ * every tab. The model still picks one message by its own priority; this says where it goes.
+ */
+export const SHUFFLE_BAR_KINDS: readonly ToolbarStatusKind[] = ["target-stale", "not-generated", "insufficient-pool", "ready"];
 
 export type ToolbarStatusModel = {
 	kind: ToolbarStatusKind;
@@ -65,6 +80,9 @@ export function toToolbarStatusModel(input: {
 		error: string | null;
 		staleSources: readonly VocabularySourceIssue[];
 	};
+	/** WORKBENCH-UI1: the ready body shows no Chunk yet; `generateBlocked` while Generate waits for Refresh. */
+	ungenerated?: boolean;
+	generateBlocked?: boolean;
 }): ToolbarStatusModel {
 	const { model, vocabulary } = input;
 	const base = {
@@ -100,7 +118,17 @@ export function toToolbarStatusModel(input: {
 	}
 
 	switch (input.sessionStatus) {
-		case "empty":
+		case "empty": {
+			// WORKBENCH-UI5 (review 1, P3 1): a Vocabulary applied from Selected Notes with no note can go stale too; the line says so.
+			const staleSources = vocabulary.staleSources;
+			if (staleSources.length > 0) {
+				return {
+					...base,
+					kind: "vocabulary-stale",
+					message: staleSources.some((issue) => issue.reason === "missing") ? VOCABULARY_MISSING_MESSAGE : VOCABULARY_STALE_MESSAGE,
+					detail: model.message,
+				};
+			}
 			return {
 				...base,
 				kind: "empty",
@@ -108,6 +136,7 @@ export function toToolbarStatusModel(input: {
 				detail: ONBOARDING_MESSAGE,
 				showOnboarding: true,
 			};
+		}
 		case "loading":
 			return {
 				...base,
@@ -138,6 +167,15 @@ export function toToolbarStatusModel(input: {
 			detail: model.message,
 		};
 	}
+	// Zero Chunks have no replaceable slot; that is not a shortage, so it is said first.
+	if (input.ungenerated === true) {
+		return {
+			...base,
+			kind: "not-generated",
+			message: model.message,
+			detail: input.generateBlocked === true ? REFRESH_TO_GENERATE_MESSAGE : null,
+		};
+	}
 	if (model.replaceableSlotCount === 0) {
 		return {
 			...base,
@@ -147,4 +185,15 @@ export function toToolbarStatusModel(input: {
 		};
 	}
 	return { ...base, kind: "ready", message: model.message, detail: null };
+}
+
+/**
+ * WORKBENCH-UI5: the Toolbar's share of the status on a host with tabs. The target's name, the
+ * replacement count and the body-state message belong to the Shuffle area (`ShuffleBar`);
+ * what is left is what every tab needs. `kind` stays, so the line's state attribute still
+ * says what the whole status is.
+ */
+export function toolbarStatusWithoutBody(model: ToolbarStatusModel): ToolbarStatusModel {
+	const body = SHUFFLE_BAR_KINDS.includes(model.kind);
+	return { ...model, sourceLabel: null, replacementLabel: null, ...(body ? { message: null, detail: null } : {}) };
 }

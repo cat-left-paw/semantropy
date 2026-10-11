@@ -1,5 +1,5 @@
 /**
- * Compiles a Fake Proverb recipe document (Recipe Schema 1) into a frozen
+ * Compiles a Fake Proverb recipe document (Recipe Schema 2) into a frozen
  * typed set.
  *
  * The Markdown parser is not enough: this is the product validator later
@@ -20,6 +20,8 @@ import {
 	FAKE_PROVERB_ID_MAX_LENGTH,
 	FAKE_PROVERB_LIMITS,
 	FAKE_PROVERB_LITERAL_MAX_CODE_POINTS,
+	FAKE_PROVERB_NA_NOUN_STARTS,
+	FAKE_PROVERB_NA_NOUN_TAILS,
 	FAKE_PROVERB_RECIPE_SCHEMA_VERSION,
 	FAKE_PROVERB_SLOT_ID_MAX_LENGTH,
 	FAKE_PROVERB_SLOT_KINDS,
@@ -36,6 +38,7 @@ import {
 export {
 	FAKE_PROVERB_LITERAL_MAX_CODE_POINTS,
 	FAKE_PROVERB_RECIPE_SCHEMA_VERSION,
+	FAKE_PROVERB_SLOT_KINDS,
 } from "./recipeData";
 
 /** A typed (kind, slot) pair: an export signature entry or a requirement. */
@@ -142,7 +145,6 @@ export type FakeProverbRecipeIssueCode =
 	| "proverb-reference"
 	| "gloss-export"
 	| "unused-require"
-	| "missing-noun"
 	| "missing-export"
 	| "missing-require"
 	| "part-limit"
@@ -153,7 +155,9 @@ export type FakeProverbRecipeIssueCode =
 	| "missing-proverb"
 	| "missing-gloss"
 	| "unpaired-proverb"
-	| "unpaired-gloss";
+	| "unpaired-gloss"
+	| "na-follower"
+	| "adverbial-follower";
 
 export type FakeProverbRecipeIssue = {
 	readonly code: FakeProverbRecipeIssueCode;
@@ -355,6 +359,10 @@ function compileLiteralPart(
 	return Object.freeze({ kind: "literal", literalId: typeof literalId === "string" ? literalId : "" });
 }
 
+function emptySlotCounts(): Record<FakeProverbSlotKind, number> {
+	return Object.fromEntries(FAKE_PROVERB_SLOT_KINDS.map((kind) => [kind, 0])) as Record<FakeProverbSlotKind, number>;
+}
+
 function checkPartCounts(
 	role: FakeProverbRecipeRole,
 	recipeId: string,
@@ -386,7 +394,7 @@ function compileProverb(
 	const slotIds = new Set<string>();
 	const exportedIds = new Set<string>();
 	const exports: FakeProverbSlotSignature[] = [];
-	const slotCounts = { noun: 0, modifier: 0, predicate: 0 };
+	const slotCounts = emptySlotCounts();
 	const parts: (CompiledFakeProverbSlotPart | CompiledFakeProverbLiteralPart)[] = [];
 	for (const [index, part] of rawParts.entries()) {
 		if (!isRecord(part)) {
@@ -425,7 +433,7 @@ function compileProverb(
 		parts.push(compiled);
 	}
 	checkPartCounts("proverb", id, rawParts.length, slotCounts, issues);
-	if (slotCounts.noun === 0) issues.push(issue("missing-noun", id));
+	// FAKE-PROVERB-RECIPES3: a proverb need not hold a noun (負けるが勝ち); it still has to export a slot, so a gloss can use it.
 	if (exports.length === 0) issues.push(issue("missing-export", id));
 	if (exports.length > FAKE_PROVERB_LIMITS.exports) issues.push(issue("export-limit", id, String(exports.length)));
 	return Object.freeze({
@@ -521,7 +529,7 @@ function compileGloss(
 	}
 	const locals = new Map<string, FakeProverbSlotKind>();
 	const referenced = new Set<string>();
-	const slotCounts = { noun: 0, modifier: 0, predicate: 0 };
+	const slotCounts = emptySlotCounts();
 	let references = 0;
 	const parts: CompiledFakeProverbPart[] = [];
 	for (const [index, part] of rawParts.entries()) {
@@ -662,6 +670,76 @@ function compileProfiles(
 	return profiles;
 }
 
+// --- Schema 2: where a stem plus な or に may stand ------------------------------
+
+/** What a part is, for the position rules: a slot or reference that may hold a stem plus な is `na-modifier`. */
+type PositionClass = "noun" | "na-modifier" | "modifier" | "predicate" | "adverbial" | "literal";
+
+/** Whether a literal starts with a noun: Han or Katakana first, or a listed Hiragana noun before an allowed tail or the end. */
+function startsWithNoun(literal: string): boolean {
+	if (/^[\p{Script=Han}\p{Script=Katakana}]/u.test(literal)) return true;
+	const tails: readonly string[] = FAKE_PROVERB_NA_NOUN_TAILS;
+	return FAKE_PROVERB_NA_NOUN_STARTS.some((noun) => literal.startsWith(noun) &&
+		(literal.length === noun.length || tails.includes(literal.charAt(noun.length))));
+}
+
+/**
+ * Checks every recipe's parts by what follows them (Schema 2). A slot or a
+ * reference that may hold a stem plus な must be followed by a noun slot, a
+ * noun reference or a literal that starts with a noun; an `adverbial` one by a
+ * predicate, or by a modifier that cannot hold a stem plus な (静かに歩く猫).
+ * Neither may end a recipe. A reference is judged by every slot it can
+ * resolve to: a required modifier may hold a stem plus な when any proverb
+ * exports that slot ID with a profile that allows it.
+ */
+function checkPositions(
+	proverbs: readonly CompiledFakeProverbRecipe[],
+	glosses: readonly CompiledFakeProverbGloss[],
+	profiles: readonly CompiledFakeProverbProfile[],
+	literals: readonly CompiledFakeProverbLiteral[],
+	issues: FakeProverbRecipeIssue[],
+): void {
+	const naProfiles = new Set(profiles.filter((profile) => profile.forms.some((entry) => entry.form === "na-stem-na")).map((profile) => profile.id));
+	const literalText = new Map(literals.map((entry) => [entry.id, entry.literal]));
+	const naExports = new Set<string>();
+	for (const proverb of proverbs) {
+		for (const part of proverb.parts) {
+			if (part.kind === "modifier" && part.exported && naProfiles.has(part.profileId)) naExports.add(part.slotId);
+		}
+	}
+	const check = (id: string, parts: readonly CompiledFakeProverbPart[]) => {
+		const localNa = new Set<string>();
+		const classes = parts.map((part): PositionClass => {
+			if (part.kind === "literal") return "literal";
+			if (part.kind === "reference") {
+				if (part.slotKind !== "modifier") return part.slotKind;
+				const na = part.source === "local" ? localNa.has(part.slotId) : naExports.has(part.slotId);
+				return na ? "na-modifier" : "modifier";
+			}
+			if (part.kind === "modifier" && naProfiles.has(part.profileId)) {
+				localNa.add(part.slotId);
+				return "na-modifier";
+			}
+			return part.kind;
+		});
+		for (const [index, current] of classes.entries()) {
+			if (current !== "na-modifier" && current !== "adverbial") continue;
+			const part = parts[index]!;
+			const slotId = part.kind === "literal" ? "" : part.slotId;
+			const next = parts[index + 1];
+			const nextClass = classes[index + 1];
+			if (current === "na-modifier") {
+				const fits = nextClass === "noun" || (next?.kind === "literal" && startsWithNoun(literalText.get(next.literalId) ?? ""));
+				if (!fits) issues.push(issue("na-follower", id, slotId));
+			} else if (nextClass !== "predicate" && nextClass !== "modifier") {
+				issues.push(issue("adverbial-follower", id, slotId));
+			}
+		}
+	};
+	for (const proverb of proverbs) check(proverb.id, proverb.parts);
+	for (const gloss of glosses) check(gloss.id, gloss.parts);
+}
+
 /**
  * Compiles and validates a whole Fake Proverb recipe set.
  *
@@ -718,6 +796,7 @@ export function compileFakeProverbRecipeSet(
 		if (compiled !== null) glosses.push(compiled);
 	}
 
+	checkPositions(proverbs, glosses, profiles, literals, issues);
 	for (const entry of literals) {
 		if (!context.usedLiterals.has(entry.id)) issues.push(issue("unused-literal", entry.id));
 	}

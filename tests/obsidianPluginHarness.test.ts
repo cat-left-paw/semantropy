@@ -22,7 +22,8 @@ import {
  */
 
 const rootDir = process.cwd();
-const fixtureRoot = path.join(rootDir, "dist", "harness-fixture");
+// One directory per worker process, so two runs in one checkout never share it (TEST-STABILITY1).
+const fixtureRoot = path.join(rootDir, "dist", `harness-fixture-${process.pid}`);
 
 /**
  * A minimal plugin bundle in the shape the real ones have: CJS, `require`s

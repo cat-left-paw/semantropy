@@ -20,7 +20,7 @@ const CORE1_MODULES = ["fakeProverbAuthority", "fakeProverbCore", "fakeProverbTe
 const SHARED = ["analysis/activeContinuation", "analysis/locateTokens", "analysis/projectMarkdownSource", "analysis/reuseTargetAnalysis",
 	"analysis/rubyAnalysis", "analysis/rubyVocabulary", "analysis/targetChunkIr", "application/analyzeSelectedSource", "dictionary/placeholders",
 	"fakeProverb/compileRecipeSet", "fakeProverb/recipeData", "random/seededRandom", "transform/manualMorphology", "transform/maxRealizer",
-	"transform/regularConjugationTypes", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "text/enclosedTermDelimiters", "vocabulary/enclosedTerms", "vocabulary/sha256", "vocabulary/sourceWeights",
+	"transform/regularConjugationTypes", "transform/slotScore", "transform/tokenPolicy", "transform/transformTokens", "text/enclosedTermDelimiters", "vocabulary/enclosedTerms", "vocabulary/lexicalProjection", "vocabulary/sha256", "vocabulary/sourceWeights",
 	"vocabulary/vocabularySnapshot"].map((name) => `src/${name}.ts`);
 
 describe("FAKE-PROVERB-CORE1 dependency boundary", () => {
@@ -54,13 +54,15 @@ describe("FAKE-PROVERB-CORE1 dependency boundary", () => {
 	it("keeps conjugation rules in the realizer leaf, never in the authority or core", async () => {
 		for (const name of ["fakeProverbAuthority", "fakeProverbCore"]) {
 			const source = (await readFile(`src/fakeProverb/${name}.ts`, "utf8")).replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/gu, "");
-			expect(source).not.toMatch(/五段|一段|形容詞・|baseEnding|taStem|taVoicing|endsWith\(|slice\(0, -/u);
+			expect(source).not.toMatch(/五段|一段|形容詞・|形容動詞語幹|baseEnding|taStem|taVoicing|endsWith\(|slice\(0, -|NA_STEM_EXCLUDED|こんな/u);
 		}
 		const authority = await readFile("src/fakeProverb/fakeProverbAuthority.ts", "utf8");
 		// Of the MAX modules, only the pure realizer leaf: never the Body-bound projection, core, level or bridge.
 		expect(authority.match(/from\s+["'][^"']*\/max[A-Z]\w*["']/gu)).toEqual(['from "../transform/maxRealizer"']);
 		expect(await readFile("src/fakeProverb/fakeProverbCore.ts", "utf8")).not.toMatch(/\/max[A-Z]/u);
-		for (const seam of ["realizeMaxLexeme", "maxLexemeIdentity", "maxSlotClassOf", "MAX_REALIZER_RULES", "isManualMorphVocabulary", "readManualMorphVocabularySources"]) {
+		// FAKE-PROVERB-NA1: the ナ-adjective stems come from the shared lexical lists, never from a rule written here.
+		expect(authority.match(/from\s+["'][^"']*lexicalProjection["']/gu)).toEqual(['from "../vocabulary/lexicalProjection"']);
+		for (const seam of ["realizeMaxLexeme", "maxLexemeIdentity", "maxSlotClassOf", "MAX_REALIZER_RULES", "isManualMorphVocabulary", "readManualMorphVocabularySources", "naAdjectiveStems"]) {
 			expect(authority).toContain(seam);
 		}
 	});

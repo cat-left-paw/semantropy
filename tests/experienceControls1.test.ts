@@ -34,8 +34,11 @@ const lexicon = () => lexiconTokenizer([
 	token({ surface: "鳥", baseForm: "鳥", reading: undefined }), token({ surface: "港", detail1: "固有名詞", detail2: "地域" }),
 	token({ surface: "研究", detail1: "サ変接続" }),
 ]);
-async function harness(text = "猫犬鳥港研究。") {
-	const h = manualMorphHarness(lexicon(), 5000); live.push(h); await h.open(text); return h;
+/** `tabs` gives the host the tabs, as the plugin's host has since WORKBENCH-UI4: the Toolbar then has no Reshuffle / Refresh / Copy / Collect (WORKBENCH-UI5). */
+async function harness(text = "猫犬鳥港研究。", tabs = false) {
+	const h = manualMorphHarness(lexicon(), 5000); live.push(h);
+	if (tabs) h.host.workbenchTabs = true;
+	await h.open(text); return h;
 }
 type H = Awaited<ReturnType<typeof harness>>;
 const shell = (view: SemantropyView) => peekMorph(view).contentEl;
@@ -65,15 +68,18 @@ function descriptionOf(control: Element): string | null {
 }
 const ROW_NAMES = [
 	"Reshuffle text", "Refresh target", "Copy selection", "Collect selection",
-	"Change vocabulary", "Collision", "Fake proverb", "Recompose",
+	"Change vocabulary", "Collision", "Fake proverb", "Fake alert",
 	"Text semantropy level", "Automatic parts of speech", "Display settings",
 ];
+/** WORKBENCH-UI5: with tabs the first four live in the Shuffle tab's own area, not in the Toolbar. */
+// The Fake dictionary button (owner, 2026-10-08) stands in the Settings category, before Display settings.
+const TABBED_ROW_NAMES = [...ROW_NAMES.slice(4, 10), "Fake dictionary", "Display settings"];
 const ROW: readonly [string, keyof typeof TOOLBAR_CONTROLS][] = [
 	[".semantropy-reshuffle", "reshuffle"], [".semantropy-refresh", "refresh"],
 	[".semantropy-copy", "copy"], [".semantropy-collect", "collect"],
 	[".semantropy-level-button", "level"], [".semantropy-automatic-pos-toolbar > button", "automatic"],
 	[".semantropy-vocabulary-open", "vocabulary"], [".semantropy-collision-open", "collision"],
-	[".semantropy-fake-proverb-open", "fakeProverb"], [".semantropy-display-menu-button", "display"],
+	[".semantropy-fake-proverb-open", "fakeProverb"], [".semantropy-fake-alert-open", "fakeAlert"], [".semantropy-display-menu-button", "display"],
 	[".semantropy-more-button", "more"],
 ];
 
@@ -112,12 +118,12 @@ describe("UX-02 one row of icon-only controls", () => {
 	});
 
 	it("keeps selects and text out of the row: level, font and size sit behind popups, status reads the level", async () => {
-		const h = await harness();
+		const h = await harness(undefined, true);
 		const content = shell(h.view);
 		const toolbar = content.querySelector<HTMLElement>(".semantropy-toolbar")!;
 		const row = visibleControls(toolbar);
 		expect(row.every(el => el.tagName === "BUTTON" && el.classList.contains("is-toolbar-icon"))).toBe(true);
-		expect(row.map(el => el.getAttribute("aria-label"))).toEqual(ROW_NAMES);
+		expect(row.map(el => el.getAttribute("aria-label"))).toEqual(TABBED_ROW_NAMES);
 		expect(toolbar.querySelector(".semantropy-level-select")!.closest(".semantropy-level-popup")).not.toBeNull();
 		for (const selector of [".semantropy-font-family", ".semantropy-font-size"]) {
 			expect(toolbar.querySelector(selector)!.closest(".semantropy-display-menu"), selector).not.toBeNull();
@@ -217,7 +223,7 @@ describe("UX-02 the More menu holds the same controls", () => {
 		});
 	}
 	it("moves low-priority items into More, keeps one focus stop each, and brings them back", async () => {
-		const h = await harness();
+		const h = await harness(undefined, true);
 		const toolbar = shell(h.view).querySelector<HTMLElement>(".semantropy-toolbar")!;
 		const more = toolbar.querySelector<HTMLElement>(".semantropy-toolbar-more")!;
 		const moreButton = toolbar.querySelector<HTMLButtonElement>(".semantropy-more-button")!;
@@ -226,7 +232,8 @@ describe("UX-02 the More menu holds the same controls", () => {
 		const display = toolbar.querySelector<HTMLButtonElement>(".semantropy-display-menu-button")!;
 		const home = collision.parentElement!.parentElement!;
 		expect(more.hidden).toBe(true);
-		layout(toolbar, 200);
+		// WORKBENCH-UI5: with the four text actions gone from the Toolbar there are fewer items, so a narrower row moves display too.
+		layout(toolbar, 120);
 		toolbarOf(h.view).refreshLayout();
 		expect(more.hidden).toBe(false);
 		expect([panel.contains(collision), panel.contains(display)]).toEqual([true, true]);
@@ -234,7 +241,7 @@ describe("UX-02 the More menu holds the same controls", () => {
 		expect(toolbar.querySelectorAll(".semantropy-collision-open")).toHaveLength(1);
 		expect(tabStops(toolbar)).toContain(moreButton);
 		expect(tabStops(toolbar)).not.toContain(collision);
-		expect(visibleControls(toolbar).filter(el => el.classList.contains("semantropy-reshuffle"))).toHaveLength(1);
+		expect(visibleControls(toolbar).filter(el => el.classList.contains("semantropy-vocabulary-open"))).toHaveLength(1);
 		// Open More: the moved controls are reachable and named.
 		moreButton.click();
 		expect([moreButton.getAttribute("aria-expanded"), panel.hidden]).toEqual(["true", false]);
@@ -254,7 +261,7 @@ describe("UX-02 the More menu holds the same controls", () => {
 		toolbarOf(h.view).refreshLayout();
 		expect(more.hidden).toBe(true);
 		expect(home.contains(collision)).toBe(true);
-		expect(visibleControls(toolbar).map(el => el.getAttribute("aria-label"))).toEqual(ROW_NAMES);
+		expect(visibleControls(toolbar).map(el => el.getAttribute("aria-label"))).toEqual(TABBED_ROW_NAMES);
 		expect(toolbarOf(h.view).returnTarget(collision)).toBe(collision);
 	});
 	it("gives focus to More when the focused control moves into it", async () => {

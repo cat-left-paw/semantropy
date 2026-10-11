@@ -45,7 +45,8 @@ const EN = {
 			vocabulary: { name: "Change vocabulary", description: "Choose the vocabulary source notes and the draw mode." },
 			collision: { name: "Collision", description: "Generate Collision phrases from the active Vocabulary." },
 			fakeProverb: { name: "Fake proverb", description: "Generate fake proverbs from the active Vocabulary." },
-			recompose: { name: "Recompose", description: "Build new text from how the active Vocabulary's sentences join." },
+			fakeDictionary: { name: "Fake dictionary", description: "How to look up a word in the Fake Dictionary, and the key that does it." },
+			fakeAlert: { name: "Fake alert", description: "Show an absurd system dialog made from the active Vocabulary." },
 			display: { name: "Display settings", description: "Body font, size, colours, ruby and markers." },
 			more: { name: "More actions", description: "Actions that do not fit in this pane." },
 		},
@@ -55,6 +56,15 @@ const EN = {
 			vocabulary: "Vocabulary",
 			generation: "Phrase generation",
 			settings: "Settings",
+		},
+		/**
+		 * WORKBENCH-UI3: what follows the body area — Reshuffle text is Generate text while the body is not
+		 * generated (a host without tabs; the Shuffle area has its own), and Display settings says which of
+		 * its settings the Recompose tab does not show.
+		 */
+		workbench: {
+			generate: { name: "Generate text", description: "Shuffle the text of this note for the first time." },
+			shuffleOnly: "Ruby, the replacement and manual markers and word changes apply to the Shuffle tab only. The dictionary marker also marks the words of the Recompose text that can be looked up.",
 		},
 		levelLabel: "Text semantropy",
 		levelStatus: (label: string) => `Text Semantropy: ${label}`,
@@ -103,13 +113,18 @@ const EN = {
 	status: {
 		onboarding: "Open a Japanese note → open Semantropy → choose a Vocabulary Source → try a word → Collect. Semantropy works on Japanese text only.",
 		preparingVocabulary: "Preparing vocabulary…",
-		vocabularyStale: "A Vocabulary Source changed. Choose Update vocabulary to use it.",
-		vocabularyMissing: "A Vocabulary Source is missing. Choose Update vocabulary to pick another.",
+		vocabularyStale: "A Vocabulary Source changed. Choose Change vocabulary, then Apply Vocabulary to use it.",
+		vocabularyMissing: "A Vocabulary Source is missing. Choose Change vocabulary to pick another.",
 		preparing: (done: number, total: number) => `Preparing: ${done} / ${total}`,
 		openNote: "Open a Markdown note, then run Semantropy: Open.",
 		analyzing: "Analyzing…",
 		source: (name: string) => `Target: ${name}`,
 		replacements: (count: number) => `replacements: ${count}`,
+		/** WORKBENCH-UI1: a body opened without a Shuffle. */
+		notGenerated: "Not generated yet. Generate shuffles the text of this note.",
+		refreshToGenerate: "The target changed. Use Refresh target before Generate.",
+		/** WORKBENCH-UI5 (review 2, P3 11): an Open with no note to take left what the View has as it was. */
+		openKept: "The active pane is not a Markdown note, so the target stays as it is. Click a note first, or use “Choose target note”.",
 	},
 	view: {
 		loadNext: "Load next section",
@@ -117,6 +132,8 @@ const EN = {
 		refreshingTarget: "Refreshing target…",
 		loadingNext: "Loading next section…",
 		loadNextFailed: "Could not load the next section. Try again.",
+		generatingText: "Generating text…",
+		generateFailed: "Could not generate the text. Try again.",
 		updatingMarkers: "Updating markers…",
 		openingTarget: "Opening target…",
 		manualMenu: "Word actions",
@@ -124,6 +141,16 @@ const EN = {
 		manualRestore: "Restore original",
 		manualAutomatic: "Use automatic result",
 		manualDefine: "Look up in Fake Dictionary",
+	},
+	/** WORKBENCH-UI2: the tab row of the body area. */
+	workbench: { tabs: "Body", shuffle: "Shuffle", recompose: "Recompose" },
+	/** WORKBENCH-UI5: the Shuffle tab's own area, under the tab row: the target, the body's state and its actions. */
+	shuffleBar: {
+		name: "Shuffle actions",
+		targetLabel: "Target:",
+		noTarget: "No target note",
+		choose: { name: "Choose target note", description: "Pick a Markdown note from the Vault and open it as the target." },
+		pickPlaceholder: "Choose a note to use as the target…",
 	},
 	vocabulary: {
 		summary: (mode: string, draw: string, note: string) =>
@@ -160,6 +187,19 @@ const EN = {
 		weight: "Weight",
 		weightName: (path: string) => `Weight of ${path}`,
 		weightedDraw: (draw: string) => `${draw}, weighted`,
+		/**
+		 * WORKBENCH-UI5 (owner, 2026-10-08): on a host with tabs the summary names the applied Vocabulary's notes. A mode is a template of
+		 * the note's file name, which the View writes as its own element (so that a narrow pane can cut it) between the two halves.
+		 */
+		named: {
+			head: "Vocabulary: ",
+			current: (name: string) => `Current Note “${name}”`,
+			selectedOne: (name: string) => `Selected Notes “${name}”`,
+			selectedMany: (count: number, name: string) => `Selected Notes (${count}) “${name}” and others`,
+			tail: (draw: string, note: string) => (note === "" ? ` · Draw mode: ${draw}` : ` · Draw mode: ${draw} · ${note}`),
+			toggle: (count: number) => `Show the ${count} Vocabulary Sources`,
+			list: "Vocabulary Sources",
+		},
 		notFound: "not found in the Vault",
 		issueChanged: "changed",
 		issueMissing: "missing",
@@ -211,11 +251,19 @@ const EN = {
 		collect: "Collect headword and definition",
 		level: "Fake dictionary semantropy level",
 		availability: "Dictionary availability",
+		/** WORKBENCH-UI5: the folded part of the Fake Dictionary dialog. */
+		details: "Details",
+		help: {
+			how: (menuItem: string) => `Put the pointer on a word that can be looked up and press the modifier key chosen below: the Fake Dictionary shows a definition. You can also click the word and choose “${menuItem}” from its menu.`,
+			markers: "Words that can be looked up are underlined with dots while the Dictionary marker is on in Display settings.",
+		},
 		hoverModifier: "Hover modifier ",
 		alt: "Alt",
 		shift: "Shift",
 		off: "Fake dictionary is Off.",
 		preparing: "Fake dictionary: Vocabulary is being prepared.",
+		/** WORKBENCH-UI5: a host with tabs, with no note and no Vocabulary applied yet. */
+		none: "Fake dictionary: no Vocabulary has been chosen yet.",
 		unsupported: "Fake dictionary: this token is not a supported headword.",
 		pool: "Fake dictionary: the Vocabulary pool cannot fill a definition template.",
 		templates: "Fake dictionary: no usable template is available.",
@@ -237,6 +285,9 @@ const EN = {
 		regenerateWith: "Regenerate with",
 		samePattern: "Same pattern",
 		regenerate: "Regenerate",
+		/** COLLISION-LOCK1: the row's Regenerate once a word is locked, and the one line that says how to lock. */
+		regenerateKeeping: "Regenerate, keeping locked words",
+		lockHint: "Click a word to lock it. Regenerate then keeps the locked words and draws the rest again.",
 		capturedStale: "Captured vocabulary is stale or no longer active. Row regeneration uses the captured vocabulary.",
 		captured: "Row regeneration uses the captured vocabulary.",
 		summary: (partial: boolean, actual: number, requested: number, limited: boolean, reason: string) =>
@@ -279,7 +330,6 @@ const EN = {
 		collectFailed: "Could not collect fake proverb.",
 	},
 	recompose: {
-		title: "Recompose",
 		intro: "Builds new text from how the sentences of the active Vocabulary Sources join. Click a piece of the text to continue from there.",
 		method: "Method",
 		methods: { joint: "Joints (phrases)", ngram: "Morpheme n-gram" },
@@ -306,6 +356,20 @@ const EN = {
 		copied: "Copied.",
 		copyFailed: "Could not copy the recomposed text.",
 		collectFailed: "Could not collect the recomposed text.",
+	},
+	/**
+	 * FAKE-ALERT-VIEW1 (`Docs/fake_alert_policy1.md` §8, §9, §11). The dialog's
+	 * fixed labels, and the real messages, which only ever appear as a Notice:
+	 * the Fake Alert dialog never shows them.
+	 */
+	fakeAlert: {
+		/** Read with the title, so a screen reader announces the dialog as Semantropy's fiction. */
+		brand: "Semantropy Fake Alert",
+		kinds: { warning: "Warning", error: "Error", confirmation: "Confirm", information: "Information", success: "Complete" },
+		buttons: { ok: "OK", cancel: "Cancel", yes: "Yes", no: "No", retry: "Retry", ignore: "Ignore" },
+		noVocabulary: "Fake alert needs an applied, up-to-date Vocabulary. Apply a Vocabulary or refresh the Target first.",
+		insufficient: "Fake alert found no noun it can use in the active Vocabulary.",
+		failed: "Could not make a fake alert.",
 	},
 	attribution: ATTRIBUTION_LABELS.en,
 	settings: {
@@ -375,7 +439,8 @@ const JA: Messages = {
 			vocabulary: { name: "語彙を変更", description: "語彙に使うノートと抽選方式を選びます。" },
 			collision: { name: "衝突フレーズ", description: "現在の語彙から衝突フレーズを生成します。" },
 			fakeProverb: { name: "架空ことわざ", description: "現在の語彙から架空ことわざを生成します。" },
-			recompose: { name: "再構成", description: "現在の語彙ソースの文のつながりから、新しい文章を組み立てます。" },
+			fakeDictionary: { name: "でたらめ辞書", description: "でたらめ辞書で語を引く方法と、引くときに押すキーの設定。" },
+			fakeAlert: { name: "不条理警告", description: "現在の語彙から、不条理なシステムダイアログを表示します。" },
 			display: { name: "表示設定", description: "本文のフォント、サイズ、色、ルビ、マーカー。" },
 			more: { name: "その他の操作", description: "このペインに入りきらない操作。" },
 		},
@@ -385,6 +450,10 @@ const JA: Messages = {
 			vocabulary: "語彙",
 			generation: "フレーズ生成",
 			settings: "設定",
+		},
+		workbench: {
+			generate: { name: "本文を生成", description: "このノートの本文を、最初にシャッフルします。" },
+			shuffleOnly: "ルビ、置換マーカーと手動マーカー、語の変更は、シャッフルのタブにだけ効きます。辞書マーカーは、再構成の文の中の、引ける語にも付きます。",
 		},
 		levelLabel: "本文のSemantropy",
 		levelStatus: (label) => `本文Semantropy: ${label}`,
@@ -440,6 +509,9 @@ const JA: Messages = {
 		analyzing: "解析しています…",
 		source: (name) => `対象ノート: ${name}`,
 		replacements: (count) => `置換: ${count}`,
+		notGenerated: "本文はまだ生成していません。「生成」で、このノートの本文をシャッフルします。",
+		refreshToGenerate: "対象ノートが変更されました。生成の前に「対象ノートを再読込」を使ってください。",
+		openKept: "いま選ばれているのがMarkdownノートではないので、対象ノートはそのままです。ノートをクリックしてから実行するか、「対象ノートを選ぶ」で選んでください。",
 	},
 	view: {
 		loadNext: "次の区間を読み込む",
@@ -447,6 +519,8 @@ const JA: Messages = {
 		refreshingTarget: "対象ノートを再読込しています…",
 		loadingNext: "次の区間を読み込んでいます…",
 		loadNextFailed: "次の区間を読み込めませんでした。もう一度お試しください。",
+		generatingText: "本文を生成しています…",
+		generateFailed: "本文を生成できませんでした。もう一度お試しください。",
 		updatingMarkers: "マーカーを更新しています…",
 		openingTarget: "対象ノートを開いています…",
 		manualMenu: "語の操作",
@@ -454,6 +528,14 @@ const JA: Messages = {
 		manualRestore: "元に戻す",
 		manualAutomatic: "自動の結果を使う",
 		manualDefine: "でたらめ辞書で引く",
+	},
+	workbench: { tabs: "本文", shuffle: "シャッフル", recompose: "再構成" },
+	shuffleBar: {
+		name: "シャッフルの操作",
+		targetLabel: "対象ノート:",
+		noTarget: "対象ノートなし",
+		choose: { name: "対象ノートを選ぶ", description: "Vault の Markdown ノートから、対象にするノートを選んで開きます。" },
+		pickPlaceholder: "対象にするノートを選んでください…",
 	},
 	vocabulary: {
 		summary: (mode, draw, note) =>
@@ -490,6 +572,15 @@ const JA: Messages = {
 		weight: "重み",
 		weightName: (path) => `${path}の重み`,
 		weightedDraw: (draw) => `${draw}・重み付き`,
+		named: {
+			head: "語彙: ",
+			current: (name) => `現在のノート「${name}」`,
+			selectedOne: (name) => `選択したノート「${name}」`,
+			selectedMany: (count, name) => `選択したノート（${count}）「${name}」他`,
+			tail: (draw, note) => (note === "" ? ` · 抽選方式: ${draw}` : ` · 抽選方式: ${draw} · ${note}`),
+			toggle: (count) => `語彙ソースの${count}件を表示`,
+			list: "語彙ソース",
+		},
 		notFound: "Vaultに見つかりません",
 		issueChanged: "変更あり",
 		issueMissing: "見つかりません",
@@ -540,11 +631,17 @@ const JA: Messages = {
 		collect: "見出し語と定義を収集",
 		level: "でたらめ辞書のSemantropyレベル",
 		availability: "辞書の利用状況",
+		details: "詳細",
+		help: {
+			how: (menuItem) => `引ける語の上にポインタを置き、下で選んだ修飾キーを押すと、でたらめ辞書が定義を表示します。語をクリックして、メニューの「${menuItem}」から引くこともできます。`,
+			markers: "表示設定の「辞書マーカー」を入れておくと、引ける語に点線の下線が付きます。",
+		},
 		hoverModifier: "ホバー時の修飾キー ",
 		alt: "Alt",
 		shift: "Shift",
 		off: "でたらめ辞書はオフです。",
 		preparing: "でたらめ辞書: 語彙を準備しています。",
+		none: "でたらめ辞書: まだ語彙が選ばれていません。",
 		unsupported: "でたらめ辞書: この語は見出し語に対応していません。",
 		pool: "でたらめ辞書: 語彙が定義テンプレートを埋めるのに足りません。",
 		templates: "でたらめ辞書: 使えるテンプレートがありません。",
@@ -565,6 +662,8 @@ const JA: Messages = {
 		regenerateWith: "再生成のパターン",
 		samePattern: "同じパターン",
 		regenerate: "再生成",
+		regenerateKeeping: "固定した語を残して再生成",
+		lockHint: "語をクリックすると固定できます。固定した語を残して、行を再生成します。",
 		capturedStale: "取り込んだ語彙は古いか、現在は有効ではありません。行の再生成には取り込んだ語彙を使います。",
 		captured: "行の再生成には取り込んだ語彙を使います。",
 		summary: (partial, actual, requested, limited, reason) =>
@@ -613,7 +712,6 @@ const JA: Messages = {
 		collectFailed: "架空ことわざを収集できませんでした。",
 	},
 	recompose: {
-		title: "再構成",
 		intro: "現在の語彙ソースの文のつながりを使って、元とは別の流れの文章を組み立てます。文章の一部をクリックすると、その位置から分岐できます。",
 		method: "生成方式",
 		methods: { joint: "継ぎ目（文節）", ngram: "形態素nグラム" },
@@ -640,6 +738,14 @@ const JA: Messages = {
 		copied: "コピーしました。",
 		copyFailed: "再構成した文章をコピーできませんでした。",
 		collectFailed: "再構成した文章を収集できませんでした。",
+	},
+	fakeAlert: {
+		brand: "Semantropy 不条理警告",
+		kinds: { warning: "警告", error: "エラー", confirmation: "確認", information: "情報", success: "完了" },
+		buttons: { ok: "OK", cancel: "キャンセル", yes: "はい", no: "いいえ", retry: "再試行", ignore: "無視" },
+		noVocabulary: "不条理警告には、適用済みで最新の語彙が必要です。語彙を適用するか、対象ノートを再読込してください。",
+		insufficient: "現在の語彙に、不条理警告に使える名詞がありません。",
+		failed: "不条理警告を作れませんでした。",
 	},
 	attribution: ATTRIBUTION_LABELS.ja,
 	settings: {

@@ -23,6 +23,10 @@
  *     `verb-irrealis-negation`). No ending is inferred from a surface. An
  *     irregular lexeme, an unadmitted class or a missing field is refused by the
  *     realizer and never becomes a candidate.
+ *   - stem forms (FAKE-PROVERB-NA1, `Docs/fake_proverb_na_amendment1.md`): the
+ *     ナ-adjective stems of the shared lexical lists (`naAdjectiveStems()`, which
+ *     also leaves out the stems that take no な), plus the form's fixed suffix
+ *     (な for `na-stem-na`, に for `na-stem-ni`). No stem rule is written here.
  *
  * Only forms the bound recipe set's profiles use are derived. Every surface
  * must pass the Fake Proverb safe text grammar (no control / format /
@@ -55,6 +59,7 @@ import {
 	type MaxRealizerInput,
 	type MaxTargetFormKey,
 } from "../transform/maxRealizer";
+import { naAdjectiveStems } from "../vocabulary/lexicalProjection";
 import type {
 	ManualVocabularyCandidate,
 	VocabularyDrawMode,
@@ -131,13 +136,16 @@ export const compareText = (a: string, b: string): number => (a < b ? -1 : a > b
 
 // --- form binding to the closed realizer ------------------------------------
 
-type SlotClass = "noun" | "verb" | "i-adjective";
+type SlotClass = "noun" | "verb" | "i-adjective" | "na-stem";
 type FollowerId = "aux-ta" | "aux-da" | "aux-nai";
+type StemSuffix = "な" | "に";
 type FormRealization = { readonly key: MaxTargetFormKey; readonly follower: FollowerId | null };
-type FormSpec = { readonly slotClass: SlotClass; readonly realizations: readonly FormRealization[] };
+type FormSpec = { readonly slotClass: SlotClass; readonly realizations: readonly FormRealization[]; readonly suffix?: StemSuffix };
+/** The two fixed endings a stem form may add (Schema 2). Nothing else is ever appended to a stem. */
+const STEM_SUFFIXES: readonly StemSuffix[] = Object.freeze(["な", "に"]);
 
 /**
- * Each closed Recipe Schema 1 form, bound to the MAX realizer. `verb-past`
+ * Each closed Recipe Schema form, bound to the MAX realizer or (Schema 2) to a stem and a fixed ending. `verb-past`
  * lists both た-stem keys because the realizer admits each regular class to
  * exactly one of them; the key that admits the lexeme also names its follower.
  */
@@ -147,6 +155,9 @@ const FORM_SPECS: Readonly<Record<string, FormSpec>> = Object.freeze({
 	"verb-basic": { slotClass: "verb", realizations: [{ key: "verb-basic", follower: null }] },
 	"verb-past": { slotClass: "verb", realizations: [{ key: "verb-ta-stem-t", follower: "aux-ta" }, { key: "verb-ta-stem-d", follower: "aux-da" }] },
 	"verb-negative": { slotClass: "verb", realizations: [{ key: "verb-irrealis-negation", follower: "aux-nai" }] },
+	// Schema 2: not realizer forms. A stem from the shared lexical lists plus one fixed ending.
+	"na-stem-na": { slotClass: "na-stem", realizations: [], suffix: "な" },
+	"na-stem-ni": { slotClass: "na-stem", realizations: [], suffix: "に" },
 });
 const FOLLOWER_SURFACES: Readonly<Record<FollowerId, string>> = Object.freeze({ "aux-ta": "た", "aux-da": "だ", "aux-nai": "ない" });
 
@@ -159,8 +170,9 @@ const FOLLOWER_SURFACES: Readonly<Record<FollowerId, string>> = Object.freeze({ 
 function isFormBound(form: string): boolean {
 	const spec = Object.prototype.hasOwnProperty.call(FORM_SPECS, form) ? FORM_SPECS[form] : undefined;
 	if (spec === undefined) return false;
-	if (spec.slotClass === "noun") return spec.realizations.length === 0;
-	if (spec.realizations.length === 0) return false;
+	if (spec.slotClass === "noun") return spec.realizations.length === 0 && spec.suffix === undefined;
+	if (spec.slotClass === "na-stem") return spec.realizations.length === 0 && spec.suffix !== undefined && STEM_SUFFIXES.includes(spec.suffix);
+	if (spec.realizations.length === 0 || spec.suffix !== undefined) return false;
 	return spec.realizations.every((realization) => MAX_REALIZER_RULES.keys.some(([slotClass, conjugationForm, connection, key]) =>
 		slotClass === spec.slotClass && key === realization.key &&
 		(realization.follower === null ? conjugationForm === "基本形" : connection === realization.follower)));
@@ -188,7 +200,7 @@ export type FakeProverbFormRealization = {
 export function realizeFakeProverbForm(form: string, input: MaxRealizerInput): FakeProverbFormRealization | null {
 	if (!isFormBound(form)) refuseFakeProverb("unsupported-form");
 	const spec = FORM_SPECS[form]!;
-	if (spec.slotClass === "noun" || maxSlotClassOf(input) !== spec.slotClass) return null;
+	if (spec.slotClass === "noun" || spec.slotClass === "na-stem" || maxSlotClassOf(input) !== spec.slotClass) return null;
 	const realized = spec.realizations.flatMap((realization) => {
 		const result = realizeMaxLexeme(realization.key, input);
 		return result.realized ? [{ realization, stem: result.surface }] : [];
@@ -222,6 +234,12 @@ export type FakeProverbCandidateEvidence =
 		readonly realizerKey: MaxTargetFormKey;
 		readonly follower: FollowerId | null;
 		readonly records: readonly { readonly candidateId: string; readonly displayFormId: string }[];
+	}
+	| {
+		/** Schema 2: a ナ-adjective stem of the shared lexical lists and the form's fixed ending. */
+		readonly kind: "stem";
+		readonly stem: string;
+		readonly suffix: StemSuffix;
 	};
 
 /** One placeable surface for one form, with every Vocabulary record behind it. */
@@ -443,7 +461,7 @@ function derive(owner: ManualMorphVocabulary, set: CompiledFakeProverbRecipeSet)
 		}
 	}
 
-	const lexemeForms = forms.filter((form) => FORM_SPECS[form]!.slotClass !== "noun");
+	const lexemeForms = forms.filter((form) => FORM_SPECS[form]!.slotClass === "verb" || FORM_SPECS[form]!.slotClass === "i-adjective");
 	if (lexemeForms.length > 0) {
 		const lexemes = new Map<string, { slotClass: "verb" | "i-adjective"; input: MaxRealizerInput; records: ManualVocabularyCandidate[] }>();
 		for (const record of snapshot.projections.manual.candidates) {
@@ -473,6 +491,22 @@ function derive(owner: ManualMorphVocabulary, set: CompiledFakeProverbRecipeSet)
 					realizerKey: realized.key, follower: realized.follower,
 					records: owned.map((record) => ({ candidateId: record.candidateId, displayFormId: record.displayFormId })),
 				});
+			}
+		}
+	}
+
+	const stemForms = forms.filter((form) => FORM_SPECS[form]!.slotClass === "na-stem");
+	if (stemForms.length > 0) {
+		// The shared lists say which records are stems and do not name them, so every known record's
+		// provenance is checked here, before any stem is placed (an unknown word is never a stem).
+		for (const record of snapshot.projections.manual.candidates) if (!record.morphology.isUnknown) check(record);
+		for (const stem of naAdjectiveStems(snapshot)) {
+			for (const form of stemForms) {
+				const suffix = FORM_SPECS[form]!.suffix!;
+				const surface = stem.surface + suffix;
+				// Fail-closed: a surface outside the safe text grammar is never placed.
+				if (!isFakeProverbSafeText(surface)) continue;
+				addToGroup(groups.get(form)!, surface, positive(stem.frequency), mergeOrigins([stem.origins]), { kind: "stem", stem: stem.surface, suffix });
 			}
 		}
 	}

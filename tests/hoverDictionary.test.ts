@@ -125,7 +125,8 @@ ${result}`]);
   if (collected?.type === "fake-dictionary") {
     expect(collected.vocabulary.fingerprint).toBe(h.controller().getVocabularySnapshot()!.fingerprint);
     expect(collected.vocabulary.drawMode).toBe(h.controller().getVocabularySnapshot()!.drawMode);
-    expect(collected.templateSetVersion).toBe(1);
+    // FAKE-DICT-LEXEME1: a new entry records template set 2 (Collect metadata 4 accepts any positive integer).
+    expect(collected.templateSetVersion).toBe(2);
   }
  });
  it("bridge expires at 200ms without extending on body movement", async () => {
@@ -403,7 +404,7 @@ describe("cache, prepared pools and fixed diagnostics", () => {
   const h = await harness(); await h.apply(["猫猫犬港研究。", "猫鳥研究研究。"]);
   const counts = dictionaryDiagnostics(h.controller().getVocabularySnapshot()!);
   expect(counts.sources.map(s => s.counts.noun)).toEqual([2, 2]); expect(counts.sources.map(s => s.counts.sahen)).toEqual([1, 1]);
-  expect(counts.core).toBeGreaterThan(0); expect(counts.totalCore).toBe(90); expect(counts.totalClauses).toBe(31);
+  expect(counts.core).toBeGreaterThan(0); expect(counts.totalCore).toBe(108); expect(counts.totalClauses).toBe(31);
   const text = h.peek.contentEl.querySelector(".semantropy-dictionary-diagnostics")!.textContent;
   expect(text).toContain("distinct surfaces"); expect(text).not.toContain("source0.md"); expect(text).not.toContain("ネコ");
  });

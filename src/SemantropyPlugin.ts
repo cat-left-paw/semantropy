@@ -44,7 +44,9 @@ import { invokeReshuffleCommand } from "./application/selectReshuffleView";
 import {
 	SEMANTROPY_VIEW_TYPE,
 	SemantropyView,
+	type TargetChoice,
 } from "./view/SemantropyView";
+import { TargetNotePicker } from "./TargetNotePicker";
 import { EN_MESSAGES, ui } from "./i18n/catalog";
 import { localize } from "./i18n/messages";
 import { currentUiLanguage, setCurrentUiLanguage, type UiLanguage } from "./i18n/language";
@@ -110,6 +112,13 @@ export abstract class SemantropyPlugin extends Plugin {
 			SEMANTROPY_VIEW_TYPE,
 			(leaf) =>
 				new SemantropyView(leaf, {
+					// WORKBENCH-UI4 (`Docs/release_0_2_0_plan.md` §3.4 stage 5): a note opens without a Shuffle
+					// ("Generate" starts it), and the body area is [Shuffle] [Recompose] tabs, also with no note.
+					// The web page's host passes neither: it keeps its own behaviour.
+					deferInitialShuffle: true,
+					workbenchTabs: true,
+					// WORKBENCH-UI5: the Shuffle area's "Choose target note" asks Obsidian's own file chooser.
+					chooseTarget: (signal) => this.chooseTargetNote(signal),
 					automaticPosCoordinator: this.automaticCoordinator,
 					getAutomaticPos: () => this.settingsStore.getSettings().automaticPos,
 					getEnclosedTermDelimiters: () => this.settingsStore.getEnclosedTermDelimiters(),
@@ -499,10 +508,11 @@ export abstract class SemantropyPlugin extends Plugin {
 	}
 
 	private async runReshuffleCommand(): Promise<void> {
+		const ran: SemantropyView[] = [];
 		const invoked = invokeReshuffleCommand({
 			activeView: this.app.workspace.getActiveViewOfType(SemantropyView),
 			existingViews: this.semantropyViews(),
-			reshuffle: (view) => view.reshuffle(),
+			reshuffle: (view) => { ran.push(view); return view.reshuffle(); },
 		});
 		if (invoked.status === "missing") {
 			this.notice(RESHUFFLE_MISSING_VIEW_MESSAGE);
@@ -510,7 +520,8 @@ export abstract class SemantropyPlugin extends Plugin {
 		}
 		const outcome = await invoked.outcome;
 		if (outcome === "unavailable") {
-			this.notice(RESHUFFLE_UNAVAILABLE_MESSAGE);
+			// WORKBENCH-UI3: a body not generated that waits for Refresh target says so.
+			this.notice(ran[0]?.reshuffleUnavailableMessage() ?? RESHUFFLE_UNAVAILABLE_MESSAGE);
 			return;
 		}
 		if (outcome === "failed") {
@@ -645,12 +656,17 @@ export abstract class SemantropyPlugin extends Plugin {
 				capturedSourceChanged: () => false,
 			};
 		}
+		return this.captureMarkdownFile(capturedFile, editorText);
+	}
 
-		// Taken in the same synchronous step as the editor body above, so any
-		// later change to this note is visible as a revision bump.
+	/**
+	 * A note captured as the target of an Open: the editor's text when the caller has it (an unsaved edit
+	 * wins over the saved file), the saved file otherwise. The revision is taken in the same synchronous step
+	 * as the editor text, so any later change to the note is visible as a revision bump.
+	 */
+	private captureMarkdownFile(capturedFile: TFile, editorText: string | null): TargetChoice {
 		const capturedPath = capturedFile.path;
 		const capturedRevision = this.sourceRevisions.current(capturedPath);
-
 		return {
 			capture: {
 				kind: "markdown",
@@ -669,6 +685,23 @@ export abstract class SemantropyPlugin extends Plugin {
 			capturedSourceChanged: () =>
 				this.sourceRevisions.changedSince(capturedPath, capturedRevision),
 		};
+	}
+
+	/**
+	 * WORKBENCH-UI5: Obsidian's file chooser over the Vault's Markdown notes — paths only, nothing is read —
+	 * and the chosen note captured as the Open command captures the active one: the text of an editor that
+	 * has it open (any pane, not only the active one), the saved file otherwise.
+	 */
+	private async chooseTargetNote(signal: AbortSignal): Promise<TargetChoice | null> {
+		if (signal.aborted) return null;
+		const picker = new TargetNotePicker(this.app, this.app.vault.getMarkdownFiles());
+		// The View closed (or opened again, or the plugin is being disabled): the chooser goes with it.
+		const close = () => picker.close();
+		signal.addEventListener("abort", close);
+		try {
+			const note = await picker.pick();
+			return note && !signal.aborted ? this.captureMarkdownFile(note, this.readEditorText(note.path)) : null;
+		} finally { signal.removeEventListener("abort", close); }
 	}
 
 	private async revealSemantropyLeaf(): Promise<SemantropyView> {

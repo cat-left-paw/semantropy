@@ -56,7 +56,8 @@ afterEach(async () => {
 
 const JAPANESE = /\p{Script=Hiragana}|\p{Script=Katakana}|\p{Script=Han}/u;
 /** ASCII words that are names, not untranslated English: the product, keys, formats and Obsidian terms. */
-const KEPT = new Set(["Semantropy", "MAX", "Alt", "Shift", "Open", "Markdown", "Vault", "Snapshot", "RRGGBB", "Obsidian"]);
+// FAKE-ALERT-VIEW1: a Japanese system dialog says "OK" too, so the Fake Alert button keeps it.
+const KEPT = new Set(["Semantropy", "MAX", "Alt", "Shift", "Open", "Markdown", "Vault", "Snapshot", "RRGGBB", "Obsidian", "OK"]);
 /** Every ASCII word of three letters or more that is not a kept name. */
 function englishWords(text: string): string[] {
 	return (text.match(/[A-Za-z]{3,}/gu) ?? []).filter(word => !KEPT.has(word));
@@ -155,7 +156,7 @@ function choose(select: HTMLSelectElement, value: string) {
 
 describe("the typed EN / JA catalog", () => {
 	it("gives every Japanese entry Japanese text, and every template Japanese output", () => {
-		const exempt = new Set(["levels.max", "dictionary.alt", "dictionary.shift", "dictionary.popoverTitle", "display.px", "display.rowLabel", "common.join", "vocabulary.total", "attribution.semantropy", "attribution.dictionary"]);
+		const exempt = new Set(["levels.max", "dictionary.alt", "dictionary.shift", "dictionary.popoverTitle", "display.px", "display.rowLabel", "common.join", "vocabulary.total", "attribution.semantropy", "attribution.dictionary", "fakeAlert.buttons.ok"]);
 		for (const [path, value] of pairsOf(UI_CATALOGS.ja)) {
 			if (exempt.has(path.join(".")) || path[0] === "collision" && path[1] === "recipeLabels") continue;
 			const text = typeof value === "function" ? sample(value as (...args: never[]) => string) : String(value);

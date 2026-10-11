@@ -164,6 +164,8 @@ export class ChunkTargetBodyController {
 	getSequenceCount(): number { return this.runtime?.analysis.tokenSequences.length ?? 0; }
 	getTextNodes(): readonly Text[] { return [...new Set(this.bindings().filter(b => b.logicalRange).map(b => b.node))]; }
 	hasNext(): boolean { return !!this.runtime && this.runtime.chunks.length < this.runtime.descriptors.length; }
+	/** WORKBENCH-UI1: ready with Chunks to show and none shown yet (an open with `deferFirstChunk`). Not a session state. */
+	awaitsFirstChunk(): boolean { return !!this.runtime && this.runtime.chunks.length === 0 && this.runtime.descriptors.length > 0; }
 	takePhaseReport(): TargetPhaseReport | null { const result = this.lastReport; this.lastReport = null; return result; }
 	/** Counts only, for automated and native evaluation; no note-derived strings. */
 	getChunkStats(): { chunks: number; totalChunks: number; materializedUtf16: number; tokens: number; nodes: number } {
@@ -183,6 +185,12 @@ export class ChunkTargetBodyController {
 	sourceWeights?: Readonly<Record<string, SourceWeight>> | null;
 	/** 0.1.0 S4: how the Target text is read when it is also a Vocabulary Source. The Target itself never is. */
 	enclosedTerms?: readonly EnclosedTermDelimiter[];
+	/**
+	 * WORKBENCH-UI1: analyze the Target and prepare the Vocabulary owner as always, but
+	 * materialize no Chunk. The result is ready with zero Chunks; `loadNext()` makes the
+	 * first one from the same owner, Seed and level, exactly as an open would have.
+	 */
+	deferFirstChunk?: boolean;
 	}): Promise<TargetOpenResult> {
 		this.release();
 		this.initialOptions = input.automaticPos ?? DEFAULT_AUTOMATIC_POS;
@@ -226,7 +234,7 @@ export class ChunkTargetBodyController {
 			const vocabularySnapshot = activeVocabulary.snapshot;
 			const vocabulary = snapshotRubyVocabulary(vocabularySnapshot);
 			const models: ChunkModel[] = [];
-			if (descriptors[0]) {
+			if (descriptors[0] && input.deferFirstChunk !== true) {
 				const model = await this.materialize(index, descriptors[0], vocabulary, activeVocabulary, slice, timer);
 				if (!model) return { status: "stale" };
 				models.push(model);

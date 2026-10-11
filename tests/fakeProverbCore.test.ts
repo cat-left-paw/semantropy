@@ -43,13 +43,13 @@ import {
 	reference,
 	slot,
 	standardInput,
-	standardSet,
+	recipeData2Set,
 	verb,
 } from "./fakeProverbCoreFixtures";
 
 async function richAuthority(drawMode: "uniform" | "frequency" = "uniform", texts: readonly string[] = [RICH_TEXT]) {
 	const minted = await mintOwner(texts, drawMode);
-	const recipeSet = standardSet();
+	const recipeSet = recipeData2Set();
 	const authority = ok(createFakeProverbAuthority({ vocabulary: minted.owner, recipeSet }));
 	return { ...minted, recipeSet, authority };
 }
@@ -71,14 +71,17 @@ function refusal(answer: { ok: boolean; reason?: string }): string {
 const NO_LEAK = /private-note|[猫犬夢骨川月星鳥]|見る|書く|Error|at /u;
 
 describe("the Fake Proverb authority", () => {
-	it("binds every declared Recipe Schema 1 form to the closed realizer, so none is silently dropped", () => {
-		expect(FAKE_PROVERB_DECLARED_FORMS).toEqual(["adjective-basic", "independent-noun", "verb-basic", "verb-negative", "verb-past"]);
+	it("binds every declared Recipe Schema 2 form to the closed realizer or to a stem and a fixed ending, so none is silently dropped", () => {
+		// FAKE-PROVERB-NA1 added the two stem forms (a ナ-adjective stem plus な or に).
+		expect(FAKE_PROVERB_DECLARED_FORMS).toEqual(["adjective-basic", "independent-noun", "na-stem-na", "na-stem-ni", "verb-basic", "verb-negative", "verb-past"]);
 		expect(fakeProverbUnboundForms()).toEqual([]);
 	});
 
 	it("derives each used form from the owner's Snapshot through the realizer, with realizer key and preserved follower as evidence", async () => {
 		const { authority } = await richAuthority();
-		expect(authority.forms.map((entry) => entry.form)).toEqual(["adjective-basic", "independent-noun", "verb-basic", "verb-negative", "verb-past"]);
+		// The standard set's plain-modifier also allows na-stem-na; RICH_TEXT has no ナ-adjective stem, so that form has no candidate.
+		expect(authority.forms.map((entry) => entry.form)).toEqual(["adjective-basic", "independent-noun", "na-stem-na", "verb-basic", "verb-negative", "verb-past"]);
+		expect(surfaces(authority, "na-stem-na")).toEqual([]);
 		expect(surfaces(authority, "independent-noun")).toEqual(["夢", "川", "星", "月", "犬", "猫", "骨", "鳥"]);
 		expect(surfaces(authority, "adjective-basic")).toEqual(["早い", "美しい"]);
 		expect(surfaces(authority, "verb-basic")).toEqual(["待つ", "書く", "泳ぐ", "見る", "話す", "読む", "買う"]);
@@ -153,7 +156,7 @@ describe("Fake Proverb authentication and forged input", () => {
 
 	it("refuses a recipe set that is not frozen or does not survive recompilation, and a Collision pattern set", async () => {
 		const { owner } = await richAuthority();
-		const set = standardSet();
+		const set = recipeData2Set();
 		const rewritten = structuredClone(set) as unknown as { proverbs: { exports: { kind: string; slotId: string }[] }[] };
 		rewritten.proverbs[0]!.exports.push({ kind: "noun", slotId: "n9" });
 		const frozenRewrite = JSON.parse(JSON.stringify(rewritten)) as object;
@@ -182,7 +185,7 @@ describe("Fake Proverb authentication and forged input", () => {
 			expect(refusal(inspectFakeProverbAuthority({ authority: forged, recipeSet }))).toBe("invalid-authority");
 			expect(refusal(generateFakeProverbs({ authority: forged, recipeSet, drawMode: "uniform", count: 1, nonce: 1 }))).toBe("invalid-authority");
 		}
-		const otherSet = standardSet();
+		const otherSet = recipeData2Set();
 		expect(refusal(generateFakeProverbs({ authority, recipeSet: otherSet, drawMode: "uniform", count: 1, nonce: 1 }))).toBe("recipe-binding-mismatch");
 		// A second authority from the same owner is its own binding.
 		const second = ok(createFakeProverbAuthority({ vocabulary: owner, recipeSet: otherSet }));
@@ -218,7 +221,7 @@ describe("Fake Proverb release and staleness", () => {
 	it.each([["refresh", "released"], ["source-changed", "stale"]] as const)(
 		"revokes an owner directly, without an authority, on %s", async (reason, expected) => {
 			const { owner } = await mintOwner([RICH_TEXT]);
-			const recipeSet = standardSet();
+			const recipeSet = recipeData2Set();
 			expect(ok(releaseFakeProverbOwner({ vocabulary: owner, reason }))).toBe(true);
 			expect(refusal(createFakeProverbAuthority({ vocabulary: owner, recipeSet }))).toBe(expected);
 			expect(refusal(releaseFakeProverbOwner({ vocabulary: owner, reason }))).toBe(expected);
@@ -231,7 +234,7 @@ describe("Fake Proverb release and staleness", () => {
 		expect(refusal(releaseFakeProverbOwner({ vocabulary: owner, reason: "later" as never }))).toBe("invalid-request");
 		expect(refusal(releaseFakeProverbOwner({ vocabulary: owner, reason: "refresh", extra: 1 } as never))).toBe("invalid-request");
 		// Nothing was revoked by the refused calls.
-		expect(ok(createFakeProverbAuthority({ vocabulary: owner, recipeSet: standardSet() })).forms.length).toBeGreaterThan(0);
+		expect(ok(createFakeProverbAuthority({ vocabulary: owner, recipeSet: recipeData2Set() })).forms.length).toBeGreaterThan(0);
 	});
 
 	it("refuses an unknown release reason and a forged authority without revoking anything", async () => {
@@ -284,8 +287,8 @@ describe("Fake Proverb generation", () => {
 		const { authority, recipeSet } = await richAuthority();
 		const generation = generate(authority, recipeSet);
 		expect(generation.algorithmVersion).toBe(FAKE_PROVERB_ALGORITHM_VERSION);
-		expect(FAKE_PROVERB_ALGORITHM_VERSION).toBe(1);
-		expect([generation.recipeSchemaVersion, generation.recipeDataVersion, generation.requestedCount, generation.shortfall]).toEqual([1, 1, 10, null]);
+		expect(FAKE_PROVERB_ALGORITHM_VERSION).toBe(2);
+		expect([generation.recipeSchemaVersion, generation.recipeDataVersion, generation.requestedCount, generation.shortfall]).toEqual([2, 2, 10, null]);
 		expect(generation.provenance).toBe(authority.provenance);
 		expect(generation.drafts).toHaveLength(10);
 		expect(new Set(generation.drafts.map((draft) => draft.canonicalText)).size).toBe(10);
@@ -472,7 +475,7 @@ describe("duplicates, shortage and finite termination", () => {
 
 	it("terminates for a Vocabulary with no placeable word", async () => {
 		const { owner } = await mintOwner(["。。"]);
-		const recipeSet = standardSet();
+		const recipeSet = recipeData2Set();
 		const authority = ok(createFakeProverbAuthority({ vocabulary: owner, recipeSet }));
 		expect(authority.forms.every((entry) => entry.candidates.length === 0)).toBe(true);
 		expect(generate(authority, recipeSet).shortfall).toBe("insufficient-candidates");

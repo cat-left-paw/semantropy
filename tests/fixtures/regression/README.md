@@ -54,6 +54,21 @@ capture against the migrated tree produced a byte-identical file.
 
 SHA-256: `553ba3a3d1c59d97b1d0d7947136695b7d2a6ccdd9bfe76d1e966d3255ff1d07`.
 
+`FAKE-DICT-LEXEME1` made the standard set template set 2. The file above stays
+the record of set 1: tests compile its raw entries as set 1 and require the
+same 180 results.
+
+`fakeDictionaryTemplates2.json` was captured once from template set 2: its 108
+raw core templates and 31 Optional Clauses, the three pools above plus
+`lexical` (`rich` with verb, イ-adjective and stem lists) and `lexical-empty`
+(`rich` with those lists present and empty), the same four headwords, and 300
+`generateFakeDefinition` results (five pools, four headwords, five values,
+three nonces). Independent review 1 asked that every new template be pinned as a
+generated definition; 11 cases with the `lexical` pool were appended (311 in all),
+leaving the first 300 as they were (before: `e6ef4d41…24e8`).
+
+SHA-256: `4420b7dbb6a06477050f9b2fb6272778c16744ba824ecb4fa04aa1675f7663b3`.
+
 ## Fake Proverb standard recipes
 
 `fakeProverbRecipes.json` was captured once by `PRE-RELEASE-FAKE-PROVERB-TEMPLATES1`
@@ -67,6 +82,23 @@ Markdown-only edit that changes the data therefore fails this oracle as well
 as the lock until it is reviewed.
 
 SHA-256: `0072d166810daa83102872b2c37b198f4cd470f481a74fee3eec726cfa735106`.
+
+`fakeProverbRecipes2.json` was captured once by `FAKE-PROVERB-RECIPES3` from
+the generated module of recipe data version 2 (`main` / `bf222bf`,
+`STANDARD_FAKE_PROVERB_RECIPE_DATA_JSON`), before the document was rewritten
+as recipe data 3. It is the canonical payload itself, with no trailing
+newline, so the SHA-256 of the file is the version 2 digest the lock keeps
+(`232aeb4381fcb41bc00c6002daeb8ca792eba8b159227ef175bd1a6dad6ea01a`); a test
+compares the two on every run. It is the recipe set the Fake Proverb
+algorithm oracles draw from (`recipeData2Set()`), so an edit to the standard
+document moves no algorithm test.
+
+`fakeProverbRecipes2.format3.md` is the same recipe data 2 written by hand in
+the one-line format `FAKE-PROVERB-RECIPES3` introduced (15 `line:` entries
+and the 6 profiles, with the weights of version 2). It is an input, not a
+recorded result: the tests parse it and require the same recipes as
+`fakeProverbRecipes2.json` (fixed texts compared by text, since their ids are
+now made from the text) and the same drafts.
 
 Do not regenerate these expected results from the implementation under test to
 make a failure pass. A deliberate contract change requires review of the

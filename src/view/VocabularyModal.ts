@@ -3,12 +3,18 @@ import { selectionWeight, type VocabularySelection } from "../application/prepar
 import { DEFAULT_SOURCE_WEIGHT, SOURCE_WEIGHT_CHOICES, isSourceWeight, type SourceWeight } from "../vocabulary/sourceWeights";
 import type { VocabularyControlsState } from "./VocabularyControls";
 import { buildVocabularyTree, filterVocabularyTree, vocabularyNoteName, type VocabularyFolder } from "./vocabularyTree";
+import { vocabularySourceMark } from "./vocabularySourceMark";
 import { EN_MESSAGES, ui } from "../i18n/catalog";
 import { localize } from "../i18n/messages";
 import { UiLabels } from "../i18n/uiLabels";
 
 export type VocabularyPickerInput = {
 	state: () => VocabularyControlsState;
+	/**
+	 * WORKBENCH-UI5: what the draft starts from, when that is not what is applied: with no note and nothing applied, the
+	 * Current Note is nothing to choose, so the picker starts on Selected Notes. Absent: what is applied.
+	 */
+	initial?: () => VocabularySelection;
 	/** Vault Markdown paths only. Read once per open; no note text is ever requested here. */
 	paths: () => readonly string[];
 	draft: (selection: VocabularySelection) => void;
@@ -157,7 +163,8 @@ export class VocabularyModal extends Modal {
 		this.modalEl.classList.add("semantropy-vocabulary-modal");
 		// A picker always starts from what is applied; an older draft never survives a reopen.
 		const state = input.state();
-		input.draft(state.selection);
+		const initial = input.initial?.() ?? state.selection;
+		input.draft(initial);
 		const paths = input.paths();
 		this.listed = new Set(paths);
 		this.tree = buildVocabularyTree(paths);
@@ -174,7 +181,7 @@ export class VocabularyModal extends Modal {
 		this.status.setAttribute("role", "status");
 		this.status.setAttribute("aria-live", "polite");
 		// Concealed before it is inserted, so opening on Current Note never paints the file selection.
-		const files = state.selection.mode === "selected";
+		const files = initial.mode === "selected";
 		// Hidden, but not inert: it is a sentence, and sync shows it when the status line cannot.
 		this.currentNote = this.mount(this.contentEl, "p", "", "semantropy-vocabulary-current-note", true);
 		this.labels.text(this.currentNote, () => v().currentOnly);
@@ -535,11 +542,8 @@ export class VocabularyModal extends Modal {
 				row = { item, issue, weight, remove };
 				this.selectedRows.set(path, row);
 			} else cursor = row.item.nextSibling;
-			// The stale reason is a code ("changed" / "missing"); only its label is shown.
-			const v = ui().vocabulary;
-			const reason = stale.get(path);
-			const notes = [!this.listed.has(path) ? v.notFound : "", reason === "changed" ? v.issueChanged : reason === "missing" ? v.issueMissing : ""].filter(Boolean);
-			const text = notes.length ? v.issues(notes) : "";
+			// The stale reason is a code ("changed" / "missing"); only its label is shown (the summary's list says it the same way).
+			const text = vocabularySourceMark(this.listed.has(path), stale.get(path));
 			if (row.issue.textContent !== text) row.issue.textContent = text;
 		}
 	}

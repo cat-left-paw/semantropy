@@ -1,6 +1,7 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
 	DISTRIBUTION_FILE_NAMES,
 	buildDistribution,
@@ -32,7 +33,9 @@ import {
 import {
 	createHarnessRecords,
 	DEFAULT_OPEN_MARKDOWN,
+	DEFAULT_OPEN_SOURCE_PATH,
 	emulateCollectionMarkdown,
+	installMarkdownSource,
 	loadPluginArtifact,
 	openHarnessNote,
 	runCommandUntilNotice,
@@ -158,21 +161,131 @@ describe("distribution artifact shape", () => {
 		// With the pencil-sparkles icon, the plain Recompose title and uncapped popups it was
 		// 15,796,580 bytes / c634e41a…e207. Masked code was 612,842; canonical identifiers were 776,081 / 6fc6786f…0c7b.
 		// With wand-sparkles (and its fallback), the compact Display settings and the output scrolling it is
-		// 15,796,866 bytes / 4fd24c6a…bd32b. Masked code is 613,128; canonical identifiers are 776,464 / 7374d3ea…587d.
+		// 15,796,866 bytes / 4fd24c6a…bd32b. Masked code was 613,128; canonical identifiers were 776,464 / 7374d3ea…587d.
+		// FAKE-ALERT-VIEW1 (the generator, packed recipes and dialog) was 15,818,082 bytes / 9f10cd89…c9a8 on Windows.
+		// Masked code was 634,344 (+21,216); canonical identifiers were 801,813 / 9b3dbb24…f89c.
+		// With review 1's focus correction (focus the affirmative button after the host opens) it is
+		// 15,818,193 bytes / 9217c133…3fc3. Masked code was 634,455 (+21,327); canonical identifiers were 801,939 / b123db55…2b3f.
+		// With the owner's brand mark at the left of the button row it is 15,818,332 bytes / 253a133a…304e.
+		// Masked code was 634,594 (+21,466); canonical identifiers were 802,091 / 0d0705a0…fd48.
+		// FAKE-ALERT-VARIETY1 (recent words rarer, fewer sahen recipes for a small sahen pool) is 15,819,194 bytes / fd65b98e…bdee.
+		// Masked code was 635,456 (+22,328); canonical identifiers were 803,383 / 84e1a207…e7a5.
+		// With VARIETY1 review 1's correction (a family draws from, and is weighed by, the same recipes) it is
+		// 15,819,219 bytes / aa36efe9…047d. Masked code was 635,481 (+22,353); canonical identifiers were 803,422 / bd433dc6…8bc3.
+		// FAKE-ALERT-VERB1 (verb slots, recipe data 2 with 22 verb recipes) is 15,821,927 bytes / 8b0189dd…582f.
+		// Masked code was 638,189 (+25,061); canonical identifiers were 806,382 / 18c1c725…1a3a.
+		// With VERB1 review 1's correction (a draw keeps a word for every later slot of its page, as the noun and verb
+		// pools can overlap) it is 15,822,703 bytes / e3abd4b7…df50. Masked code was 638,965 (+25,837); canonical
+		// identifiers were 807,858 / 0cfdac21…e83d.
+		// FAKE-ALERT-ADJ1 (イ-adjective and ナ-adjective slots, recipe data 3 with 23 recipes of those kinds) is
+		// 15,825,163 bytes / 2ad8a595…a37e. Masked code was 641,425 (+28,297); canonical identifiers were 810,454 / 8a4457d0…2d16.
+		// FAKE-ALERT-RECIPES2 (recipe data 4: 202 recipes, the repeat and persona families) is 15,833,325 bytes /
+		// 105c7e13…5afe measured on Linux (a cloud session; the Windows bytes and hash differ, masked and canonical do not).
+		// Masked code was 649,587 (+36,459; +8,162 over ADJ1); canonical identifiers were 818,616 / e9f8df14…ec98.
+		// (On Windows the independent review measured 15,833,325 bytes / e0ba0df9…b72b.)
+		// With option C (recipe data 5: only family weights and drifts change) it is 15,833,327 bytes / e7dacc57…1a23 on Linux.
+		// Masked code was 649,589 (+36,461); canonical identifiers were 818,618 / 82602b65…5a01.
+		// (On Windows main after RECIPES2 was 15,833,327 bytes / ae3dd67d…911a.)
+		// LEXEME-SHARE1 (the shared verb, イ-adjective and stem lists; Fake Alert reads them) is 15,833,775 bytes /
+		// a3d2d8e9…ad8c on Linux. Masked code is 650,037 (+36,909; +448: the new module 1,134, the Fake Alert core
+		// -686); canonical identifiers were 819,234 / 8e558c10…7890.
+		// FAKE-PROVERB-NA1 (Recipe Schema 2: the stem plus な form, the adverbial slot and the position check) is
+		// 15,835,872 bytes / 957c768c…bd56 on Linux. Masked code is 652,134 (+39,006; +2,097: the compiler 1,108, the
+		// authority 657, the schema 303, the recipe data 29); canonical identifiers were 822,149 / b345a744…1e12.
+		// WORKBENCH-UI1 (stages 0 and 1: the host flag that opens without a Shuffle, off by default, and Generate),
+		// merged over FAKE-PROVERB-NA1, is 15,839,435 bytes / c590994d…35cf on Linux. Masked code is 655,697
+		// (+3,563: the View 2,206, the catalog 1,004, the status model 133, the controller 131, the view model 89);
+		// canonical identifiers were 825,989 / fbe11ed1…a746. (Over LEXEME-SHARE1 alone it was 653,600.)
+		// FAKE-DICT-LEXEME1 stage A (the lexical placeholders, no template uses them) is 15,840,195 bytes /
+		// bb43f1b1…4d17 on Linux. Masked code is 656,457 (+760: snapshotLexicalForms 282, the pool 185, the
+		// template compiler 173, placeholders 96, prepareVocabulary 74, others -50); canonical identifiers were
+		// 827,294 / 4827506e…b745 (stage A alone).
+		// Stage B (template set 2: 18 core templates with lexical placeholders) is 15,842,815 bytes / 2c2fade4…2b82
+		// on Linux. Masked code is 659,077 (+3,380 over main: stage A 760, the generated templates 2,620);
+		// canonical identifiers were 829,914 / ddfa0a97…963d.
+		// WORKBENCH-UI2 on its branch, before main gained FAKE-DICT-LEXEME1 (stages 2 and 3: the body tabs behind a
+		// second host flag, off by default, and Recompose split into its session and its screen, which the dialog now
+		// contains) was 15,845,530 bytes / 4bd4e576…ad55 on Linux.
+		// Masked code was 661,792 (+6,095: stage 2 +3,416 — the View 1,979, the tab row 1,269, the catalog 168; stage 3
+		// +2,679 — the pane 5,865, the session 3,978, the dialog -7,707, the View 543); canonical identifiers were
+		// 833,379 / b6bb87cc…6a18.
+		// With review 1's corrections (a change in flight never restores a dropped selection, Clear manual off on the
+		// Recompose tab, tab keys ignore modifiers) it was 15,845,773 bytes / 9aadf889…20d8 on Linux. Masked code was
+		// 662,035 (+243: the View 164, the tab row 61, the Toolbar 18); canonical identifiers were 833,682 / 18783b1c…8170.
+		// Merged over FAKE-DICT-LEXEME1 (main 3591717 / 7e81517) it was 15,849,153 bytes / 4562cdad…6e0c on Linux.
+		// Masked code was 665,415 (+6,338 over main's 659,077, exactly WORKBENCH-UI2's own modules: the View 2,686,
+		// the pane 5,865, the session 3,978, the dialog -7,707, the tab row 1,330, the catalog 168, the Toolbar 18);
+		// canonical identifiers were 837,607 / 3bf8f14f…2962. That is main dc9971e.
+		// WORKBENCH-UI3 (stage 4: the body font in the Recompose pane, the Toolbar that follows the body area, the
+		// command's sentence; still behind the two host flags, both off) was 15,852,940 bytes / 6fa6bce3…348f on Linux.
+		// Masked code was 669,202 (+3,787 over main: the catalog 1,996, the Toolbar 1,353, the View 351, the plugin 54,
+		// the pane 33); canonical identifiers were 841,861 / b6842009…1f09. Merging main 34a9252 (TEST-STABILITY1,
+		// tests and test settings only: main stays 15,849,153 / 4562cdad…6e0c, masked 665,415) moved none of these.
+		// With review 1's corrections (the pane's own scroll, the Recompose description by the tab that exists, the
+		// status line's reason that Copy and Collect are off) it is 15,853,543 bytes / 1a066a43…ded7 on Linux.
+		// Masked code is 669,805 (+4,390 over main, +603 over the first submission: the catalog 235, the Toolbar 292,
+		// the View 75, the pane 1); canonical identifiers were 842,473 / 4de5b7d2…f78a. That is main 1b82f53.
+		// WORKBENCH-UI4 first commit (the reason Copy and Collect are off moves from the Toolbar's status line into the
+		// Recompose pane, so showing the tab moves nothing above it; still behind the two host flags, both off) was
+		// 15,853,370 bytes on Linux. Masked code was 669,632 (-173 against main: the Toolbar -286, the pane +113; the
+		// catalog is the same size, the sentence changed place); canonical identifiers were 842,305 / c6ad4cfc…9d27.
+		// WORKBENCH-UI4 (stage 5: the plugin's host turns both flags on, the tabs stand with no note open, the Recompose
+		// dialog is removed) is 15,851,846 bytes / 972c301c…0333 on Linux. Masked code is 668,108 (-1,697 against main:
+		// the dialog -886, the catalog -320, the View -302, the Toolbar -297, the pane +57, the plugin +40, the
+		// Vocabulary controls +11); canonical identifiers were 840,654 / 4c545b80…b72d.
+		// With the Display settings fit (a class on a workbench Toolbar and two stylesheet rules; `styles.css` 41,858 bytes)
+		// it is 15,851,899 bytes / 3238cd4f…ac58b on Linux. Masked code is 668,161 (+53, the Toolbar); canonical
+		// identifiers are 840,712 / f42e0b73…3a9d.
+		// DEFINE-DIALOG-FIX1 (the Fake Dictionary dialog's method `isOpen` becomes `isShowing`, which the Modal of
+		// Obsidian 1.14.4 does not hide; the method and five reads in the View) is 15,851,917 bytes / 28da714f…e5e6 on
+		// Windows (Node v24.4.1). Masked code is 668,179 (+18 = 3 characters x 6 places); canonical identifiers are
+		// 840,730 / f72c01cc…222b.
+		// (WORKBENCH-UI5 and FAKE-DICT-RECOMPOSE1 moved the three values below without a line here; `main` bf222bf is
+		// 15,877,078 bytes / 618c3f24…e9c6 on Windows, masked 693,340, canonical 870,859 / f761385f…ea23.)
+		// REOPEN-VOCABULARY-OPTIONS1 (an Open into a View that already shows a note passes the stored draw mode and the
+		// enclosed-term delimiters to the body it builds, and shows the selection it was built from) is 15,877,183 bytes /
+		// b7272812…904e on Windows (Node v24.4.1). Masked code is 693,445 (+105, the View); canonical identifiers are
+		// 870,998 / 3b7bc3eb…8c23.
 		// This PR is 15,739,297 bytes on Windows and 14,170,925 on macOS. The bundle
 		// embeds host-compressed payloads. Native esbuild builds also choose different
 		// short local names on macOS and Windows, while the token sequence and every
 		// non-identifier value match. Pin the code after masking payloads and naming
 		// resolved short bindings by declaration order. The byte-identical rebuild
 		// test below still checks all three files within each build environment.
+		// FAKE-PROVERB-RECIPES3 (recipe data 3: 63 proverbs, 32 glosses, 14 profiles and 136 fixed texts written in the
+		// one-line format; a proverb needs no noun slot; the limits are 128 / 128 / 512 / 32), from main bf222bf, is
+		// 15,911,072 bytes / 0004e836…8abf on Windows (Node v24.4.1). Masked code is 727,334 (+33,994: the generated
+		// recipe entries +34,032, the compiler -40, the schema +2); canonical identifiers are 904,833 / 7431fd9e…2c88.
+		// (`main` edd3782, both merged: 15,911,177 bytes / de5e562f…e7b4 on Windows, masked 727,439, canonical 904,972 / 38000c09…8260.)
+		// SHORT-OKURIGANA-EXCLUDE1 (five 一段 verbs written without their stem's last kana, 恐る 流る 割る 仕掛る 組み立る,
+		// are taken out of what the realizer inflects; Collision's exclusion set gains them and the realizer's three
+		// artifacts; Body fingerprint 3 binds the realizer's rules, so its values move; no version constant does) is
+		// 15,911,496 bytes / 7baabb76…92e8 on Windows (Node v24.4.1). Masked code is 727,758 (+319: the realizer's list
+		// +93, Collision's list +226); canonical identifiers are 905,291 / d820623d…5844.
+		// COLLISION-LOCK1 (a Collision row's words can be kept when it is regenerated: the generator keeps the parts a
+		// result was joined from and can draw again only the parts that are not kept, the batch gains one entry for it,
+		// the dialog makes each noun, modifier and predicate a button, the stylesheet marks a kept word; no version
+		// constant, no pattern data and no Collect field moves) is 15,920,668 bytes / 16a40a5c…1506 on Windows
+		// (Node v24.4.1). Masked code is 736,930 (+9,172: the generator +4,986, the dialog +1,710, the session +1,156,
+		// the batch +822, the catalog +469, three Collect modules +29 for shorter local names); canonical identifiers are
+		// 917,691 / da3c8376…f5e8.
+		// CORRECTION-ROUND1 (A: the word's hover marks for a pointer that can hover, a click that ends a drag told from
+		// one that does not, an unreadable list a bad request; B: recipe data 4, `heart-unknown` reads `{n1}の心、{n2}知らず`,
+		// one fixed text and its id changed) is 15,921,360 bytes / 937022b4…899a on Windows (Node v24.4.1). Masked code is
+		// 737,622 (+692 over COLLISION-LOCK1: A +686, the generator +183 and the dialog +503; B +6, the data); canonical
+		// identifiers are 918,641 / 43eded76…d701 (the end of part B).
+		// TRAILING-SPACE1 (CORRECTION-ROUND1 C: a line that ends in half-width spaces or tabs is read, the blank being syntax;
+		// the Target policy is target-presentation-3) is 15,921,493 bytes / b4027926…7802 on Windows (Node v24.4.1). Masked code
+		// is 737,755 (+133 over part B, all of it `projectMarkdownSource.ts`: the helper, the two uses and the policy's name);
+		// canonical identifiers are 918,907 / 48f61d16…aa68.
 		const { code } = splitBanner(bytes.toString("utf8"));
 		const { masked, literals } = maskBase64Literals(code, LINDERA_DICTIONARY_FILE_NAMES);
 		expect(literals).toHaveLength(10);
 		expect(literals.filter(literal => literal.chars < 4096)).toHaveLength(3);
-		expect(Buffer.byteLength(masked)).toBe(613128);
+		expect(Buffer.byteLength(masked)).toBe(737755);
 		const canonical = canonicalizeMinifiedIdentifiers(masked);
-		expect(Buffer.byteLength(canonical)).toBe(776464);
-		expect(sha256Hex(Buffer.from(canonical))).toBe("7374d3eac0d2dde49993ba54e177fd7f8ba1e43f4c1f9b82517b0dd78926587d");
+		expect(Buffer.byteLength(canonical)).toBe(918907);
+		expect(sha256Hex(Buffer.from(canonical))).toBe("48f61d1654a254f91e71f532f9a8bed301a6c0811e824bbe5d26dd0c5105aa68");
 	});
 	it("contains only main.js, manifest.json and styles.css", () => {
 		expect(inspection.fileNames).toEqual(DISTRIBUTION_FILE_NAMES);
@@ -205,6 +318,41 @@ describe("distribution artifact shape", () => {
 		expect(markers).not.toContain("work");
 		expect(markers).toContain("runner");
 		expect(markers).toContain(runnerRoot);
+	});
+
+	it("does not mistake a cloud session's /home/user checkout or the root account for a machine name", () => {
+		const cloudRoot = path.join(path.parse(rootDir).root, "home", "user", "semantropy");
+		const userInfo = vi.spyOn(os, "userInfo").mockReturnValue({
+			username: "root",
+			homedir: "/root",
+			uid: 0,
+			gid: 0,
+			shell: "/bin/bash",
+		});
+		try {
+			const markers = machineMarkers(cloudRoot);
+			expect(markers).not.toContain("user");
+			expect(markers).not.toContain("root");
+			expect(markers).toContain(cloudRoot);
+			expect(markers).toContain("/root");
+		} finally {
+			userInfo.mockRestore();
+		}
+	});
+
+	it("still detects an ordinary account name", () => {
+		const userInfo = vi.spyOn(os, "userInfo").mockReturnValue({
+			username: "fixture-author",
+			homedir: "/home/fixture-author",
+			uid: 1000,
+			gid: 1000,
+			shell: "/bin/bash",
+		});
+		try {
+			expect(machineMarkers(rootDir)).toContain("fixture-author");
+		} finally {
+			userInfo.mockRestore();
+		}
 	});
 
 	it("still detects an explicitly named Temp vault and its complete path", () => {
@@ -250,7 +398,11 @@ describe("distribution artifact shape", () => {
 		// to exceed it needs another explicit decision.
 		// 0.1.0, 2026-10-01: with S4 at 585,835 and S5 (Recompose in Obsidian) expected to
 		// exceed 600,000, the owner raised the provisional cap to 650,000 on the same terms.
-		expect(inspection.maskedCodeBytes).toBeLessThan(650_000);
+		// Fake Alert Policy 1 §12 (owner decision, 2026-10-03): 650,000 is a monitoring target,
+		// not a hard limit. LEXEME-SHARE1 (650,037) is the first slice past it, so the comparison
+		// moves to 750,000: the point to stop and ask the owner, NOT a new upper limit, and
+		// passing it is not an automatic No-Go. Each slice still records its size and cause.
+		expect(inspection.maskedCodeBytes).toBeLessThan(750_000);
 	});
 
 	it("rebuilds byte-identically from the same dictionary source", async () => {
@@ -677,7 +829,9 @@ describe("distribution artifact behaviour", () => {
 	it("opens a fixed Markdown note and transforms it at MAX without a dict/ directory", () => {
 		expect(loaded.records.errorCalls).toEqual([]);
 		expect(run.status).toBe("ready");
-		expect(run.message).toContain("Target: smoke.md");
+		// WORKBENCH-UI5: the target note's name stands in the Shuffle tab's area (a label and the name), not in the status line.
+		expect(run.message).toContain("smoke.md");
+		expect((run.view as SemantropyView).contentEl.querySelector(".semantropy-shuffle-bar .semantropy-target-name")?.textContent).toBe("smoke.md");
 		expect(run.replaceableSlotCount).toBe(3);
 		expect(run.replacementCount).toBe(3);
 		expectMaxOpenBody(run.bodyText);
@@ -770,6 +924,121 @@ describe("distribution artifact Collision", () => {
 			view.closeCollision(); expect(session.read()).toBeNull(); expect(modal.contentEl.children).toHaveLength(0);
 		} finally { await view?.onClose(); loaded.plugin.onunload(); loaded.restore(); }
 	});
+});
+
+describe("distribution artifact workbench", () => {
+	// WORKBENCH-UI4: the plugin's own host turns the workbench on, so the shipped artifact opens a note without a
+	// Shuffle, shows [Shuffle] [Recompose] and has no Recompose dialog; Generate then makes the first Chunk.
+	it("opens a note without a Shuffle, with the two tabs and no Recompose dialog, until Generate", async () => {
+		const loaded = await loadPluginArtifact(firstBuild.outDir, {
+			records: recordsWithMaxBodySemantropy(),
+		});
+		try {
+			const run = await openHarnessNote(loaded, { generate: false });
+			expect(run.status).toBe("ready");
+			const view = run.view as SemantropyView;
+			const content = (view as unknown as { contentEl: HTMLElement }).contentEl;
+			expect(run.bodyText).toBe("");
+			expect(run.replacementCount).toBe(0);
+			expect(content.querySelector(".semantropy-generate:not([hidden])")).not.toBeNull();
+			expect(Array.from(content.querySelectorAll('.semantropy-tabs [role="tab"]'), tab => tab.getAttribute("aria-selected")))
+				.toEqual(["true", "false"]);
+			// WORKBENCH-UI5: the Shuffle tab's own area stands under the tab row with the target and the four actions (Reshuffle text
+			// is Generate text until the first Chunk); the Toolbar has no Recompose control, and each tab has a glyph.
+			expect(content.querySelector(".semantropy-recompose-open")).toBeNull();
+			expect(content.querySelector(".semantropy-toolbar .semantropy-reshuffle")).toBeNull();
+			expect(document.querySelector(".semantropy-recompose-modal")).toBeNull();
+			const bar = content.querySelector<HTMLElement>(".semantropy-shuffle-bar")!;
+			expect(bar.previousElementSibling).toBe(content.querySelector(".semantropy-tabs"));
+			expect(bar.querySelector(".semantropy-target-name")!.textContent).not.toBe("");
+			expect(bar.querySelector(".semantropy-target-choose")).not.toBeNull();
+			expect(Array.from(content.querySelectorAll(".semantropy-tabs .semantropy-icon svg"), svg => svg.getAttribute("class")))
+				.toEqual(["svg-icon lucide-dices", "svg-icon lucide-wand-sparkles"]);
+			// The area's own button (not the method) makes the first Chunk.
+			const generate = bar.querySelector<HTMLButtonElement>(".semantropy-reshuffle")!;
+			expect(generate.getAttribute("aria-label")).toBe("Generate text");
+			expect(generate.disabled).toBe(false);
+			generate.click();
+			const settled = Date.now() + 120_000;
+			while ((view as unknown as { targetBody: { awaitsFirstChunk(): boolean } }).targetBody.awaitsFirstChunk() && Date.now() < settled) await new Promise((resolve) => setTimeout(resolve, 5));
+			expect(generate.getAttribute("aria-label")).toBe("Reshuffle text");
+			expectMaxOpenBody(
+				(view as unknown as { targetBody: { getTextNodes(): Text[] } }).targetBody.getTextNodes().map(node => node.nodeValue ?? "").join(""),
+			);
+			expect(loaded.records.fetchCalls).toEqual([]);
+			expect(loaded.records.writeCalls).toEqual([]);
+			expect(loaded.records.note?.text).toBe(DEFAULT_OPEN_MARKDOWN);
+			await view.onClose();
+			loaded.plugin.onunload();
+		} finally {
+			loaded.restore();
+		}
+	}, 600_000);
+});
+
+describe("distribution artifact workbench with no note", () => {
+	// WORKBENCH-UI4 / WORKBENCH-UI5: a View with no note open stands with its tabs, the Shuffle tab's area (no target, a way to
+	// choose one), the Fake Dictionary button and dialog, and a Recompose tab that takes a Selected Notes Vocabulary; nothing is written.
+	it("shows the tabs and the area, takes a Selected Notes Vocabulary, answers the Fake Dictionary button and recomposes, writing nothing", async () => {
+		const records = recordsWithMaxBodySemantropy();
+		// A new install is Japanese; the texts below are the English ones.
+		records.savedData = { ...(records.savedData as object), uiLanguage: "en" };
+		const loaded = await loadPluginArtifact(firstBuild.outDir, { records });
+		try {
+			// A Markdown note exists in the Vault and in an editor, but it is not the active view: Open captures no note.
+			installMarkdownSource(loaded, { markdown: DEFAULT_OPEN_MARKDOWN });
+			records.activeLeaf = null;
+			records.commands.get("open")!();
+			type Shell = { contentEl: HTMLElement; containerEl: HTMLElement; session: { getState(): { status: string } }; getViewType(): string;
+				setVocabularyDraft(selection: unknown): void; applyVocabulary(): Promise<string>; closeDictionaryHelp(): void; onClose(): Promise<void> };
+			const find = () => (records.leaves as { view: Shell | null }[]).map((leaf) => leaf.view).find((view) => view?.getViewType?.() === "semantropy-view");
+			const deadline = Date.now() + 60_000;
+			while (!(find()?.session.getState().status === "empty" && find()?.contentEl.querySelector(".semantropy-tabs"))) {
+				if (Date.now() > deadline) throw new Error("the View did not stand");
+				await new Promise((resolve) => setTimeout(resolve, 5));
+			}
+			// The Open command may still be on its way to `openCapture`: an Open with no note leaves the View as it is.
+			await new Promise((resolve) => setTimeout(resolve, 200));
+			const view = find()!;
+			if (view.containerEl.parentNode !== document.body) document.body.appendChild(view.containerEl);
+			const content = view.contentEl;
+			const q = <T extends HTMLElement>(selector: string) => content.querySelector<T>(selector);
+			expect(Array.from(content.querySelectorAll(".semantropy-tabs [role=tab]"), tab => tab.getAttribute("aria-selected"))).toEqual(["true", "false"]);
+			expect(q(".semantropy-shuffle-pane")!.textContent).toBe("Open a Markdown note, then run Semantropy: Open.");
+			expect(q(".semantropy-target-name")!.textContent).toBe("No target note");
+			expect(q<HTMLButtonElement>(".semantropy-target-choose")!.hidden).toBe(false);
+			expect(q(".semantropy-body")).toBeNull();
+			// The Fake Dictionary button opens its dialog: how to look a word up, the modifier, the folded details. With nothing chosen it says so.
+			q<HTMLButtonElement>(".semantropy-fake-dictionary-open")!.click();
+			const dialog = document.querySelector<HTMLElement>(".semantropy-dictionary-help-modal")!;
+			expect(dialog.querySelector("select")!.value).toBe("alt");
+			expect(dialog.querySelector<HTMLDetailsElement>("details")!.open).toBe(false);
+			expect(dialog.querySelector("details [role=status]")!.textContent).toBe("Fake dictionary: no Vocabulary has been chosen yet.");
+			// A Selected Notes Vocabulary from the Vault note, with no note open; the details then say what it offers.
+			view.setVocabularyDraft({ mode: "selected", paths: [DEFAULT_OPEN_SOURCE_PATH], drawMode: "uniform" });
+			expect(await view.applyVocabulary()).toBe("applied");
+			expect(dialog.querySelector("details [role=status]")!.textContent).not.toBe("Fake dictionary: no Vocabulary has been chosen yet.");
+			expect(dialog.querySelector("details")!.textContent).toContain("Usable core templates");
+			view.closeDictionaryHelp();
+			expect(document.querySelector(".semantropy-dictionary-help-modal")).toBeNull();
+			// Recompose works from it.
+			q<HTMLButtonElement>(".semantropy-tab-recompose")!.click();
+			const generateNew = Array.from(q(".semantropy-recompose-pane")!.querySelectorAll<HTMLButtonElement>("button"))[0]!;
+			expect(generateNew.disabled).toBe(false);
+			generateNew.click();
+			const until = Date.now() + 60_000;
+			while (q(".semantropy-recompose-pane")!.querySelectorAll(".semantropy-recompose-unit").length === 0 && Date.now() < until) await new Promise((resolve) => setTimeout(resolve, 5));
+			expect(q(".semantropy-recompose-pane")!.querySelectorAll(".semantropy-recompose-unit").length).toBeGreaterThan(0);
+			expect(loaded.records.fetchCalls).toEqual([]);
+			expect(loaded.records.writeCalls).toEqual([]);
+			expect(loaded.records.note?.text).toBe(DEFAULT_OPEN_MARKDOWN);
+			expect(loaded.records.errorCalls).toEqual([]);
+			await view.onClose();
+			loaded.plugin.onunload();
+		} finally {
+			loaded.restore();
+		}
+	}, 600_000);
 });
 
 describe("distribution artifact Collect", () => {
@@ -1122,6 +1391,17 @@ describe("distribution artifact Fake Dictionary", () => {
 			expect(loaded.records.fetchCalls).toEqual([]);
 			expect(JSON.stringify(loaded.records.notices)).not.toContain("/Users/");
 			for (const noun of ["太郎", "花子", "駅"]) expect(JSON.stringify(loaded.records.errorCalls)).not.toContain(noun);
+
+			// DEFINE-DIALOG-FIX1: the dialog's own controls answer in the built bundle. The harness Modal has Obsidian
+			// 1.14.4's `isOpen` property, which hid a method of that name and made Reshuffle, Copy, Collect and the level throw.
+			const currentRequest = () =>
+				(run.view as { dictionaryWorld: { getCurrent(): { requestId: number } | null } }).dictionaryWorld.getCurrent()?.requestId;
+			const requestBefore = currentRequest();
+			const reshuffle = document.querySelector<HTMLButtonElement>(".semantropy-reshuffle-definition");
+			expect(reshuffle?.disabled).toBe(false);
+			reshuffle?.click();
+			expect(currentRequest()).not.toBe(requestBefore);
+			expect(document.querySelector(".semantropy-definition-text")?.textContent?.length).toBeGreaterThan(0);
 			loaded.plugin.onunload();
 		} finally {
 			loaded.restore();

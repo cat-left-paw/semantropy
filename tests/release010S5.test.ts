@@ -17,10 +17,7 @@ import { collectProtectedPaths } from "../src/collect/collectProvenance";
 import { analyzeManualMorphSource, buildManualMorphVocabulary, readManualMorphSourceDocuments } from "../src/transform/manualMorphology";
 import { enclosedTermSyntax } from "../src/vocabulary/enclosedTerms";
 import { recomposeCorpusFrom } from "../src/recompose/recompose";
-import type { RecomposeModal } from "../src/view/RecomposeModal";
-import { TOOLBAR_CONTROLS } from "../src/view/SemantropyToolbar";
-import { ui } from "../src/i18n/catalog";
-import type { SemantropyView, SemantropyViewHost } from "../src/view/SemantropyView";
+import type { SemantropyViewHost } from "../src/view/SemantropyView";
 
 /*
  * 0.1.0 S5 (Docs/release_0_1_0_policy.md decision 12): Recompose in Obsidian,
@@ -90,7 +87,6 @@ const LEXICON = [
 	token({ surface: "見", pos: "動詞", detail1: "自立", conjugationType: "一段", conjugationForm: "連用形", baseForm: "見る" }),
 	token({ surface: "た", pos: "助動詞", detail1: "*" }),
 ];
-const SOURCE = "猫が森を見た。犬が川を見た。空が猫を見た。森が犬を見た。";
 
 describe("0.1.0 S5 the corpus", () => {
 	it("reads the Sources' analyzed documents and leaves enclosed-term marks out", async () => {
@@ -107,157 +103,37 @@ describe("0.1.0 S5 the corpus", () => {
 	});
 });
 
-const recompose = (view: SemantropyView) => Reflect.get(view, "recomposeModal") as RecomposeModal | null;
-const button = (modal: RecomposeModal, name: string) =>
-	Array.from(modal.contentEl.querySelectorAll<HTMLButtonElement>("button")).find((item) => item.getAttribute("aria-label") === name)!;
-
-describe("0.1.0 S5 the Recompose dialog", () => {
-	it("generates, continues, branches, copies and collects from the active Vocabulary", async () => {
+/*
+ * The Recompose dialog these checks first ran against is gone (WORKBENCH-UI4): Recompose is the View's
+ * Recompose tab. The dialog's five flow checks (generate / continue / branch / copy / collect, the keyboard and
+ * stale or doubled steps, mixed methods and the leap range, no sentences, the chosen method and the end with
+ * the View) were repeated on the pane in `tests/workbenchUi2Recompose.test.ts` in WORKBENCH-UI2 stage 3, and
+ * run there on every commit since; this file keeps what is not about the screen: the Collect metadata 5
+ * contract, the corpus, the tab's icon, and who is offered the entry. (WORKBENCH-UI5: the Toolbar's Recompose control
+ * is gone too; the tab is the one entry.)
+ */
+describe("0.1.0 S5 the Recompose entry", () => {
+	it("uses the wand-sparkles icon (owner decision), now on the tab", async () => {
 		const h = manualMorphHarness(lexiconTokenizer(LEXICON));
-		await h.open("猫と犬。\n");
-		expect(await h.apply([SOURCE])).toBe("applied");
-		h.peek.contentEl.querySelector<HTMLButtonElement>(".semantropy-recompose-open")!.click();
-		const modal = recompose(h.view)!;
-		expect(modal).toBeTruthy();
-		expect(button(modal, "Continue").disabled).toBe(true);
-		await modal.run("new");
-		const units = () => Array.from(modal.contentEl.querySelectorAll<HTMLElement>(".semantropy-recompose-unit"));
-		expect(units().length).toBeGreaterThan(0);
-		expect(modal.contentEl.querySelector(".semantropy-recompose-status")!.textContent).toBe("1 Source, 4 sentences.");
-		await modal.run("more");
-		expect(modal.contentEl.querySelectorAll(".semantropy-recompose-output p:not(.semantropy-recompose-hint)").length).toBe(2);
-		expect(button(modal, "Branch from the chosen place").disabled).toBe(true);
-		units()[0]!.click();
-		expect(units()[0]!.classList.contains("is-branch")).toBe(true);
-		expect(button(modal, "Branch from the chosen place").disabled).toBe(false);
-		await modal.run("branch");
-		expect(units()[0]!.classList.contains("is-branch")).toBe(false);
-		const shown = Array.from(modal.contentEl.querySelectorAll(".semantropy-recompose-output p:not(.semantropy-recompose-hint)"), (p) => p.textContent).join("\n\n");
-		await modal.copy();
-		expect(h.calls.copy.at(-1)).toBe(shown);
-		await modal.collect();
-		const collected = h.calls.collect.at(-1)!;
-		expect(collected).toMatchObject({ metadataVersion: 5, type: "recompose", text: shown, algorithmVersion: 1, method: "joint", leapMin: 50, leapMax: 50 });
-		expect(readCollectFragmentInputV4(collected).ok).toBe(true);
-		expect((collected as RecomposeFragmentInputV5).vocabulary.sources.map((source) => source.path)).toEqual(["source0.md"]);
-
-		// Another Vocabulary: Continue and Branch wait for a new Generate; Collect keeps the provenance the text came from.
-		expect(await h.apply(["犬が森を見た。"])).toBe("applied");
-		modal.sync();
-		expect(button(modal, "Continue").disabled).toBe(true);
-		expect(modal.contentEl.querySelector(".semantropy-recompose-note")!.textContent).toContain("The Vocabulary changed");
-		await modal.collect();
-		expect((h.calls.collect.at(-1) as RecomposeFragmentInputV5).vocabulary.sources.map((source) => source.path)).toEqual(["source0.md"]);
-		modal.close();
-		expect(recompose(h.view)).toBeNull();
-	});
-
-	it("chooses the branch point from the keyboard, branches across paragraphs, and refuses stale or doubled steps (S5 review)", async () => {
-		const h = manualMorphHarness(lexiconTokenizer(LEXICON));
-		await h.open("猫と犬。\n");
-		await h.apply([SOURCE]);
-		h.view.openRecompose();
-		const modal = recompose(h.view)!;
-		// A second step while one runs is ignored: one paragraph, not two.
-		await Promise.all([modal.run("new"), modal.run("new")]);
-		const paragraphs = () => Array.from(modal.contentEl.querySelectorAll(".semantropy-recompose-output p:not(.semantropy-recompose-hint)"), (p) => p.textContent);
-		expect(paragraphs()).toHaveLength(1);
-		await modal.run("more");
-		const first = paragraphs()[0];
-		const output = modal.contentEl.querySelector<HTMLElement>(".semantropy-recompose-output")!;
-		expect(output.tabIndex).toBe(0);
-		const units = () => Array.from(modal.contentEl.querySelectorAll<HTMLElement>(".semantropy-recompose-unit"));
-		const key = (name: string) => output.dispatchEvent(new KeyboardEvent("keydown", { key: name, bubbles: true, cancelable: true }));
-		key("ArrowRight");
-		expect(units()[0]!.classList.contains("is-branch")).toBe(true);
-		key("End");
-		const last = units().length - 1;
-		expect(units()[last]!.classList.contains("is-branch")).toBe(true);
-		key("ArrowLeft");
-		expect(units()[last - 1]!.classList.contains("is-branch")).toBe(true);
-		// Branch from the last piece of the second paragraph: the first paragraph stays as it was.
-		key("End");
-		await modal.run("branch");
-		expect(paragraphs()[0]).toBe(first);
-		expect(paragraphs()).toHaveLength(2);
-
-		// A Continue called directly after the Vocabulary changed generates nothing.
-		const before = paragraphs();
-		expect(await h.apply(["犬が森を見た。"])).toBe("applied");
-		await modal.run("more");
-		expect(paragraphs()).toEqual(before);
-	});
-
-	it("records mixed methods and the leap range of the pieces on screen (owner decision)", async () => {
-		const h = manualMorphHarness(lexiconTokenizer(LEXICON));
-		await h.open("猫と犬。\n");
-		await h.apply([SOURCE]);
-		h.view.openRecompose();
-		const modal = recompose(h.view)!;
-		const [method, sentences] = Array.from(modal.contentEl.querySelectorAll<HTMLSelectElement>("select"));
-		const leap = modal.contentEl.querySelector<HTMLInputElement>('input[type="range"]')!;
-		const choose = (id: string, value: number) => {
-			method!.value = id; method!.dispatchEvent(new Event("change"));
-			leap.value = String(value); leap.dispatchEvent(new Event("input"));
-		};
-		sentences!.value = "1"; sentences!.dispatchEvent(new Event("change"));
-		choose("joint", 50);
-		await modal.run("new");
-		choose("ngram", 80);
-		await modal.run("more");
-		await modal.collect();
-		expect(h.calls.collect.at(-1)).toMatchObject({ method: "mixed", leapMin: 50, leapMax: 80 });
-		// A branch that keeps only the first piece drops the n-gram step: one method and one leap again.
-		choose("joint", 50);
-		const output = modal.contentEl.querySelector<HTMLElement>(".semantropy-recompose-output")!;
-		output.dispatchEvent(new KeyboardEvent("keydown", { key: "Home", bubbles: true, cancelable: true }));
-		await modal.run("branch");
-		await modal.collect();
-		expect(h.calls.collect.at(-1)).toMatchObject({ method: "joint", leapMin: 50, leapMax: 50 });
-	});
-
-	it("says so when the Vocabulary Sources have no sentence to recompose", async () => {
-		const h = manualMorphHarness(lexiconTokenizer(LEXICON));
-		await h.open("猫と犬。\n");
-		expect(await h.apply(["# 猫と犬\n"])).toBe("applied");
-		h.view.openRecompose();
-		const modal = recompose(h.view)!;
-		await modal.run("new");
-		expect(modal.contentEl.querySelector(".semantropy-recompose-status")!.textContent).toBe("The Vocabulary Sources have no sentences to recompose.");
-		expect(modal.contentEl.querySelectorAll(".semantropy-recompose-unit")).toHaveLength(0);
-	});
-
-	it("uses the method the reader chose, and closes with the View", async () => {
-		const h = manualMorphHarness(lexiconTokenizer(LEXICON));
-		await h.open("猫と犬。\n");
-		await h.apply([SOURCE]);
-		h.view.openRecompose();
-		const modal = recompose(h.view)!;
-		const method = modal.contentEl.querySelector<HTMLSelectElement>("select")!;
-		expect(Array.from(method.options, (option) => option.value)).toEqual(["joint", "ngram"]);
-		method.value = "ngram"; method.dispatchEvent(new Event("change"));
-		await modal.run("new");
-		await modal.collect();
-		expect(h.calls.collect.at(-1)).toMatchObject({ method: "ngram" });
-		await h.view.onClose();
-		expect(recompose(h.view)).toBeNull();
-	});
-
-	it("uses the wand-sparkles icon and a plain title (owner decision)", async () => {
-		expect(TOOLBAR_CONTROLS.recompose.icon).toBe("wand-sparkles");
-		const h = manualMorphHarness(lexiconTokenizer(LEXICON));
+		h.host.workbenchTabs = true;
 		await h.open("猫。\n");
-		expect(h.peek.contentEl.querySelector(".semantropy-recompose-open .semantropy-icon svg")?.getAttribute("class")).toBe("svg-icon lucide-wand-sparkles");
-		expect(ui().recompose.title).toBe("Recompose");
+		expect(h.peek.contentEl.querySelector(".semantropy-tab-recompose .semantropy-icon svg")?.getAttribute("class")).toBe("svg-icon lucide-wand-sparkles");
+		expect(h.peek.contentEl.querySelector(".semantropy-recompose-open")).toBeNull();
 	});
 
-	it("offers the entry unless the host opts out (the web page has its own panel)", async () => {
+	it("offers the entry only where there is a tab to show (the web page has its own panel)", async () => {
 		const shown = manualMorphHarness(lexiconTokenizer(LEXICON));
+		shown.host.workbenchTabs = true;
 		await shown.open("猫。\n");
-		expect(shown.peek.contentEl.querySelector(".semantropy-recompose-open")).not.toBeNull();
+		expect(shown.peek.contentEl.querySelector(".semantropy-tab-recompose")).not.toBeNull();
+		// A host without tabs has no Recompose at all: the dialog that used to stand in is gone.
+		const plain = manualMorphHarness(lexiconTokenizer(LEXICON));
+		await plain.open("猫。\n");
+		expect(plain.peek.contentEl.querySelector(".semantropy-tab-recompose, .semantropy-recompose-open")).toBeNull();
 		const hidden = manualMorphHarness(lexiconTokenizer(LEXICON));
+		hidden.host.workbenchTabs = true;
 		(Reflect.get(hidden.view, "host") as SemantropyViewHost).recomposeDialog = false;
 		await hidden.open("猫。\n");
-		expect(hidden.peek.contentEl.querySelector(".semantropy-recompose-open")).toBeNull();
+		expect(hidden.peek.contentEl.querySelector(".semantropy-tab-recompose, .semantropy-recompose-open")).toBeNull();
 	});
 });

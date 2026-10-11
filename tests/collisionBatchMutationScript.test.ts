@@ -31,6 +31,11 @@ function fixture(mode: "normal" | "edit" | "kill", view: boolean) {
 	mkdirSync(dirname(source), { recursive: true });
 	writeFileSync(source, original);
 	writeFileSync(script, readFileSync(scriptRelative));
+	if (!view) {
+		// COLLISION-LOCK1: the probes of the regeneration that keeps a row's words mutate the core as well.
+		writeFileSync(join(directory, "scripts/collision/lockMutations.mjs"), readFileSync("scripts/collision/lockMutations.mjs"));
+		writeFileSync(join(directory, "src/collision/collisionCore.ts"), readFileSync("src/collision/collisionCore.ts"));
+	}
 	if (view) {
 		writeFileSync(join(directory, "scripts/collision/viewMutations.mjs"), readFileSync("scripts/collision/viewMutations.mjs"));
 		for (const file of ["src/view/CollisionSession.ts", "src/view/CollisionModal.ts", "src/view/SemantropyToolbar.ts", "src/SemantropyPlugin.ts"]) {
@@ -41,17 +46,21 @@ function fixture(mode: "normal" | "edit" | "kill", view: boolean) {
 	for (const name of ["package.json", "tsconfig.json", "vitest.config.ts", "scripts/vitestAliases.mjs"]) {
 		writeFileSync(join(directory, name), name.endsWith(".json") ? "{}" : "export {};\n");
 	}
-	// A fake test executable checks filesystem isolation only. The real 21/10
+	// The look is probed too, so the runner copies the stylesheet and a probe rewrites it.
+	writeFileSync(join(directory, "styles.css"), readFileSync("styles.css"));
+	// A fake test executable checks filesystem isolation only. The real 50/24
 	// mutation assertions are exercised separately by the actual script run.
 	const runner = join(directory, "node_modules/vitest/vitest.mjs");
 	writeFileSync(runner, `
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, renameSync, writeFileSync } from "node:fs";
 const report = ${JSON.stringify(report)};
 const source = ${JSON.stringify(source)};
 const mode = ${JSON.stringify(mode)};
 if (!existsSync(report)) {
   if (mode !== "normal") writeFileSync(source, "concurrent editor bytes");
-  writeFileSync(report, JSON.stringify({ directory: process.cwd() }));
+  // Renamed into place, so the test never reads a half-written report (TEST-STABILITY1).
+  writeFileSync(report + ".staged", JSON.stringify({ directory: process.cwd() }));
+  renameSync(report + ".staged", report);
 }
 if (mode === "kill") {
   setInterval(() => {}, 1000);
@@ -109,7 +118,7 @@ describe.each([false, true])("Collision mutation script checkout isolation (view
 				await task.finished;
 			} else {
 				expect(await task.finished, task.output()).toBe(0);
-				expect(task.output()).toContain(`"caught":${view ? 10 : 21},"isolation":"temporary-copy"`);
+				expect(task.output()).toContain(`"caught":${view ? 24 : 50},"isolation":"temporary-copy"`);
 			}
 			const report = JSON.parse(readFileSync(fixtureCopy.report, "utf8")) as { directory: string };
 			scratch = report.directory;

@@ -155,6 +155,31 @@ describe("Collision production View transactions", () => {
 		expect(batch(h.view).rows[0]!.committed.generationRevision).toBe(2);
 		expect(batch(h.view).rows[0]!.committed.recipeId).toBe("hidden");
 	});
+	it("keeps selector changes draft-only: the batch is untouched, and the row says the selection is a draft only while it differs from the committed pattern", async () => {
+		const h = await harness(); const old = await generate(h.view, 10, "named"); const slot = old.rows[0]!.rowSlotId;
+		const draft = "Pattern selection is a draft. Regenerate to apply.";
+		expect(rows(h.view)[0]!.textContent).not.toContain(draft);
+		// A fixed pattern other than the committed one is a draft: nothing is generated, committed or collected.
+		session(h.view).select(slot, { kind: "fixed", recipeId: "purpose" });
+		expect(batch(h.view)).toBe(old); expect(h.calls.collect).toEqual([]);
+		expect(rows(h.view)[0]!.textContent).toContain(draft);
+		expect(rows(h.view)[1]!.textContent).not.toContain(draft);
+		// The committed pattern itself, and Same pattern, are no draft.
+		session(h.view).select(slot, { kind: "fixed", recipeId: "named" });
+		expect(rows(h.view)[0]!.textContent).not.toContain(draft);
+		session(h.view).select(slot, { kind: "fixed", recipeId: "purpose" });
+		session(h.view).select(slot, { kind: "same" });
+		expect(rows(h.view)[0]!.textContent).not.toContain(draft);
+		expect(batch(h.view)).toBe(old);
+	});
+	it("rebuilds the rows for a new batch and keeps their elements for a regenerated row", async () => {
+		const h = await harness(); const old = await generate(h.view, 10, "named"); const before = rows(h.view);
+		await session(h.view).regenerate(old.rows[0]!.rowSlotId);
+		expect(rows(h.view).every((row, i) => row === before[i])).toBe(true);
+		const next = await generate(h.view, 10, "named");
+		expect(next.batchId).not.toBe(old.batchId);
+		expect(rows(h.view).some(row => before.includes(row))).toBe(false);
+	});
 	it("returns frozen viable options only for genuine batches", async () => {
 		const h = await harness("猫犬"); const current = await generate(h.view);
 		const options = unwrap(collisionBatchRecipeOptions(current));
@@ -301,6 +326,17 @@ describe("Collision lifecycle and asynchronous boundaries", () => {
 		expect(owner.read()).toBeNull(); expect(Reflect.get(owner, "host")).toBeNull(); expect(owner.changed).toBeNull();
 		expect(ui.contentEl.children).toHaveLength(0); expect(batch(b.view)).toBe(other);
 		expect(a.calls.copy).toEqual([]); expect(a.calls.collect).toEqual([]);
+	});
+	it("the plugin's disable hook disables Collision by itself, not only through the View it closes", async () => {
+		// disableAutomatic() closes the View, which closes the dialog too; with that and the Fake proverb hook set aside,
+		// only the Collision hook is left to refuse the late completion and a new dialog.
+		const a = await harness(); a.view.closeCollision(); const gates = stepping(); a.host.scheduler = gates.scheduler; a.view.openCollision();
+		const owner = session(a.view); const task = owner.generate(10, "named"); await gates.step(); await gates.step();
+		a.view.disableAutomatic = () => undefined; a.view.disableFakeProverb = () => undefined;
+		SemantropyPlugin.prototype.onunload.call({ automaticCoordinator: { dispose() {} }, semantropyViews: () => [a.view], settingTab: null, tokenizer: null, notices: new Map(), removeRibbon: () => undefined } as never);
+		expect(modal(a.view)).toBeNull(); a.view.openCollision(); expect(modal(a.view)).toBeNull();
+		await gates.drain(); await task;
+		expect(owner.read()).toBeNull(); expect(a.calls.copy).toEqual([]); expect(a.calls.collect).toEqual([]);
 	});
 	it("reopens with fresh identity and defaults, restores toolbar focus, and removes old event handlers", async () => {
 		const h = await harness(); h.view.closeCollision(); const entry = h.peek.contentEl.querySelector<HTMLButtonElement>(".semantropy-collision-open")!;

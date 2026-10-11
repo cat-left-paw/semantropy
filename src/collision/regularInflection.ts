@@ -173,8 +173,26 @@ export const COLLISION_REGULAR_ADJECTIVE_CONJUGATION_TYPES: readonly string[] =
  *     of which the allowlist names.
  *   - 一段: `くれる` also carries 一段・クレル, an excluded class; under plain
  *     一段 it is irregular only in the imperative, which this slice never builds.
+ *     SHORT-OKURIGANA-EXCLUDE1 (`Docs/max_realization_amendment2.md`) found eight
+ *     lexemes this survey had missed, because their spelling, not their class,
+ *     is the problem. Three are dictionary expansion artifacts that the
+ *     Shuffle's realizer already excluded (へるる, のぼりつめるる, 上り詰めるる:
+ *     another 一段 base form with る appended). Five are spellings with the
+ *     okurigana left out, held beside the full spelling and read with the same
+ *     sound: 恐る beside 恐れる, 流る beside 流れる, 割る beside 割れる, 仕掛る beside
+ *     仕掛ける, 組み立る beside 組み立てる. Their stem lacks its last kana, so the
+ *     paradigm builds 恐た, 割ない and 流ている, which are not words. Of the 82
+ *     independent 一段 verbs with a Han character directly before る, these five
+ *     are the ones whose written stem does not carry the reading of its last
+ *     mora; the other 77 stay (`tests/distribution/shortOkurigana.test.ts`
+ *     holds all 82). The production tokenizer reads the ordinary basic form 割る
+ *     as this 一段 lexeme, and 割れば too; 割った, 割らない, 割って and 割ります are
+ *     the 五段 verb 割る, a different lexeme that is not excluded.
  *   - No lexical exception was found in the remaining classes for the four
- *     forms built here.
+ *     forms built here. Short 五段 spellings (終る, 落す, 変る …) keep the
+ *     inflecting kana, so they build the older spellings of real words (終った,
+ *     落した), and the two short イ-adjectives (少い, 細い) are not built from
+ *     a stem at all.
  *
  * This survey is a targeted check of named lexemes, not a proof of
  * completeness: nothing mechanical decides which of the dictionary's 129,855
@@ -188,6 +206,7 @@ export const COLLISION_REGULAR_ADJECTIVE_CONJUGATION_TYPES: readonly string[] =
  */
 const IRREGULAR_VERB_LEXEMES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
 	["五段・ラ行", new Set(["ある", "有る", "在る"])],
+	["一段", new Set(["へるる", "のぼりつめるる", "上り詰めるる", "恐る", "流る", "割る", "仕掛る", "組み立る"])],
 ]);
 
 /** Read-only view of the exclusion set, for records and regressions. */

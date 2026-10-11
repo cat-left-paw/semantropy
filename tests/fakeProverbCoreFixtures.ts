@@ -1,5 +1,6 @@
 import type { JapaneseToken } from "../src/tokenizer/JapaneseTokenizer";
 import { analyzeManualMorphSource, buildManualMorphVocabulary } from "../src/transform/manualMorphology";
+import { enclosedTermSyntax } from "../src/vocabulary/enclosedTerms";
 import { compileFakeProverbRecipeSet, type CompiledFakeProverbRecipeSet, type CompileFakeProverbRecipeSetInput } from "../src/fakeProverb/compileRecipeSet";
 import {
 	STANDARD_FAKE_PROVERB_GLOSSES,
@@ -9,7 +10,8 @@ import {
 	STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION,
 	STANDARD_FAKE_PROVERB_RECIPE_SCHEMA_VERSION,
 } from "../src/fakeProverb/generated/standardFakeProverbRecipeEntries";
-import type { RawFakeProverbPart } from "../src/fakeProverb/recipeData";
+import { FAKE_PROVERB_RECIPE_SCHEMA_VERSION, type RawFakeProverbPart } from "../src/fakeProverb/recipeData";
+import { readPinnedFixture } from "./support/pinnedFixture";
 
 export function ok<T>(result: { ok: true; value: T } | { ok: false; reason: string }): T {
 	if (!result.ok) throw new Error(result.reason);
@@ -38,8 +40,11 @@ export const LEXICON: readonly JapaneseToken[] = [
 	particle("は"), particle("を"), particle("と"), period,
 ];
 
-/** Mints a genuine Manual Morph Vocabulary owner through the production analyzer, with a counting tokenizer. */
-export async function mintOwner(texts: readonly string[], drawMode: "uniform" | "frequency" = "uniform", lexicon = LEXICON) {
+/**
+ * Mints a genuine Manual Morph Vocabulary owner through the production analyzer, with a counting tokenizer.
+ * With `enclosed`, a `{{…}}` term is read as one noun, as a Vocabulary Source reads it.
+ */
+export async function mintOwner(texts: readonly string[], drawMode: "uniform" | "frequency" = "uniform", lexicon = LEXICON, enclosed = false) {
 	let calls = 0;
 	const sorted = [...lexicon].sort((a, b) => b.surface.length - a.surface.length);
 	const analyses = await Promise.all(texts.map(async (text, index) => {
@@ -53,7 +58,7 @@ export async function mintOwner(texts: readonly string[], drawMode: "uniform" | 
 				cursor += next.surface.length;
 			}
 			return await Promise.resolve(result);
-		} } });
+		} }, ...(enclosed ? { enclosedTerms: enclosedTermSyntax([]) } : {}) });
 		if (answer.status !== "ready") throw new Error("fixture-analysis");
 		return answer.analysis;
 	}));
@@ -79,6 +84,16 @@ export function compile(input: CompileFakeProverbRecipeSetInput): CompiledFakePr
 }
 export const standardSet = (): CompiledFakeProverbRecipeSet => compile(standardInput());
 
+/**
+ * Recipe data 2 (the nine proverbs and six glosses of versions 1 and 2), pinned. The file is the canonical payload
+ * itself, so its SHA-256 is the version 2 digest the lock keeps (`resources/fake-proverb/standard-recipes.lock.json`).
+ * The tests that pin what the algorithm draws use it: they say what the generator does with fixed data, and do not
+ * move when the standard document gains recipes (FAKE-PROVERB-RECIPES3).
+ */
+export const RECIPE_DATA_2_DIGEST = "232aeb4381fcb41bc00c6002daeb8ca792eba8b159227ef175bd1a6dad6ea01a";
+export const recipeData2Input = (): CompileFakeProverbRecipeSetInput => readPinnedFixture<CompileFakeProverbRecipeSetInput>("fakeProverbRecipes2", RECIPE_DATA_2_DIGEST);
+export const recipeData2Set = (): CompiledFakeProverbRecipeSet => compile(recipeData2Input());
+
 export const slot = (kind: string, slotId: string, profileId: string, exported = false): RawFakeProverbPart => ({ kind, slotId, profileId, exported });
 export const literal = (literalId: string): RawFakeProverbPart => ({ kind: "literal", literalId });
 export const reference = (slotKind: string, slotId: string): RawFakeProverbPart => ({ kind: "reference", slotKind, slotId });
@@ -92,7 +107,7 @@ export function customInput(options: {
 	extraProfiles?: CompileFakeProverbRecipeSetInput["profiles"];
 } = {}): CompileFakeProverbRecipeSetInput {
 	return {
-		schemaVersion: 1,
+		schemaVersion: FAKE_PROVERB_RECIPE_SCHEMA_VERSION,
 		dataVersion: 1,
 		proverbs: options.proverbs ?? [{ id: "p-one", enabled: true, weight: 1, parts: [slot("noun", "n1", "noun-p", true), literal("wa"), slot("predicate", "v1", "pred-p", true)] }],
 		glosses: options.glosses ?? [{ id: "g-one", enabled: true, weight: 1, requires: [{ kind: "noun", slotId: "n1" }],

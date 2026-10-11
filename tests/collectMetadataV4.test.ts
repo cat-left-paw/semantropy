@@ -131,7 +131,7 @@ describe("fake-proverb metadata", () => {
 		const json = JSON.parse(serializeFragmentMetadataV4(fragment.metadata)) as Record<string, unknown>;
 		expect(Object.keys(json)).toEqual([...FAKE_PROVERB_FRAGMENT_METADATA_KEY_ORDER_V4]);
 		expect(json).toEqual({
-			id: identityV4.id, metadataVersion: 4, type: "fake-proverb", created: identityV4.created, algorithmVersion: 1, recipeDataVersion: 1,
+			id: identityV4.id, metadataVersion: 4, type: "fake-proverb", created: identityV4.created, algorithmVersion: 2, recipeDataVersion: 1,
 			vocabulary: fakeProverbV4().vocabulary, proverbRecipeId: "offered-to", glossRecipeId: "misplaced-purpose",
 			batchId: FIXTURE_BATCH_ID, rowId: FIXTURE_ROW_ID, canonicalText: FIXTURE_CANONICAL,
 		});
@@ -208,7 +208,7 @@ describe("fake-proverb metadata", () => {
 
 	it("validates versions, recipe IDs and batch / row identity", () => {
 		const cases: [string, unknown, string][] = [
-			["algorithmVersion", 2, "invalid-algorithm-version"], ["algorithmVersion", "1", "invalid-algorithm-version"], ["algorithmVersion", 0, "invalid-algorithm-version"],
+			["algorithmVersion", 1, "invalid-algorithm-version"], ["algorithmVersion", "1", "invalid-algorithm-version"], ["algorithmVersion", 0, "invalid-algorithm-version"],
 			["recipeDataVersion", 0, "invalid-recipe-data-version"], ["recipeDataVersion", 1.5, "invalid-recipe-data-version"], ["recipeDataVersion", "1", "invalid-recipe-data-version"],
 			["recipeDataVersion", -1, "invalid-recipe-data-version"], ["recipeDataVersion", Number.MAX_SAFE_INTEGER + 1, "invalid-recipe-data-version"],
 			...["", "Upper", "a_b", "-a", "a-", "a--b", "1a", "a b", "a".repeat(49), 1, null].flatMap((id): [string, unknown, string][] =>
@@ -479,7 +479,7 @@ describe("a BATCH1 row record becomes a fake-proverb input", () => {
 		const getter = vi.fn(() => { throw new Error("SECRET"); });
 		const provenance = record.provenance;
 		const hostile: unknown[] = [
-			{ ...record, rowSlotId: "s" }, { ...record, draft: {} }, { ...record, recipeSchemaVersion: 2 },
+			{ ...record, rowSlotId: "s" }, { ...record, draft: {} }, { ...record, recipeSchemaVersion: 1 },
 			(({ rowId: _rowId, ...rest }) => rest)(record), { ...record, provenance: { ...provenance, target: null } },
 			{ ...record, provenance: { ...provenance, sources: provenance.sources.map(({ path, contentHash }) => ({ path, contentHash })) } },
 			{ ...record, provenance: { ...provenance, sources: provenance.sources.map((source) => ({ ...source, text: "SECRET" })) } },
@@ -493,7 +493,7 @@ describe("a BATCH1 row record becomes a fake-proverb input", () => {
 	it("is structural validation, not authentication: a hand-made record of the same shape is accepted", () => {
 		// VIEW1 must obtain the record from a committed batch through readFakeProverbRow().
 		const forged: FakeProverbRowRecord = {
-			batchId: FIXTURE_BATCH_ID, rowId: FIXTURE_ROW_ID, algorithmVersion: 1, recipeSchemaVersion: 1, recipeDataVersion: 1,
+			batchId: FIXTURE_BATCH_ID, rowId: FIXTURE_ROW_ID, algorithmVersion: 2, recipeSchemaVersion: 2, recipeDataVersion: 1,
 			proverbRecipeId: "offered-to", glossRecipeId: "misplaced-purpose", canonicalText: FIXTURE_CANONICAL,
 			provenance: { vocabularyFingerprint: fakeProverbV4().vocabulary.fingerprint, drawMode: "uniform",
 				sources: fakeProverbV4().vocabulary.sources.map((source) => ({ ...source, projectionPolicy: "p" })) },

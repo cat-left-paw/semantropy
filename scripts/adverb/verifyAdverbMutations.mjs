@@ -236,7 +236,23 @@ const probes = [
 const evidence = [];
 let failure = null;
 // Same reviewed temporary-copy runner; Manual probes never write into the checkout either.
-const selectedProbes = process.argv.includes("--max-view")
+const selectedProbes = process.argv.includes("--define-dialog")
+	? (await import("../defineDialog/mutationProbes.mjs")).probes
+	: process.argv.includes("--workbench")
+	? (await import("../workbench/mutationProbes.mjs")).probes
+	: process.argv.includes("--fake-dict-lexeme")
+	? (await import("../fakeDictionary/lexemeMutationProbes.mjs")).probes
+	: process.argv.includes("--fake-proverb-recipes3")
+	? (await import("../fakeProverb/recipes3MutationProbes.mjs")).probes
+	: process.argv.includes("--fake-proverb-na")
+	? (await import("../fakeProverb/naMutationProbes.mjs")).probes
+	: process.argv.includes("--fake-alert-view")
+	? (await import("../fakeAlert/viewMutationProbes.mjs")).probes
+	: process.argv.includes("--fake-alert-core")
+	? (await import("../fakeAlert/coreMutationProbes.mjs")).probes
+	: process.argv.includes("--fake-alert-recipes")
+	? (await import("../fakeAlert/recipeMutationProbes.mjs")).probes
+	: process.argv.includes("--max-view")
 	? (await import("../max/viewMutationProbes.mjs")).probes
 	: process.argv.includes("--max-core")
 	? (await import("../max/coreMutationProbes.mjs")).probes
@@ -288,6 +304,13 @@ try {
 		"scripts/lindera",
 		// `--max` probes run the SPIKE1 gate, which reads the dictionary itself.
 		"scripts/max",
+		// `--fake-proverb-na` and `--fake-proverb-recipes3` probes run the recipe source tests,
+		// which load the recipe document, the generators and the build options.
+		// `--fake-dict-lexeme` probes also run the template generator and read the web presets.
+		// `--workbench` probes include stylesheet rules, which a focused test reads from `styles.css`.
+		...(process.argv.includes("--workbench") ? ["styles.css"] : []),
+		...(process.argv.includes("--fake-proverb-na") || process.argv.includes("--fake-proverb-recipes3") ? ["scripts", "resources", ".gitattributes"] : []),
+		...(process.argv.includes("--fake-dict-lexeme") ? ["scripts", "resources", ".gitattributes", "web/presets"] : []),
 	]) {
 		const destination = join(directory, entry);
 		mkdirSync(dirname(destination), { recursive: true });

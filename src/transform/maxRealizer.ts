@@ -139,10 +139,17 @@ const ADMITS: Readonly<Record<MaxTargetFormKey, readonly string[]>> = {
  * base form. ある / 有る / 在る are suppletive under 五段・ラ行; へるる /
  * のぼりつめるる / 上り詰めるる are dictionary expansion artifacts, re-derived by
  * the distribution gate from the structural rule B = B' + E over every class.
+ *
+ * SHORT-OKURIGANA-EXCLUDE1 (`Docs/max_realization_amendment2.md`): 恐る / 流る / 割る /
+ * 仕掛る / 組み立る are 一段 lexemes the dictionary holds beside 恐れる / 流れる / 割れる /
+ * 仕掛ける / 組み立てる, with the stem's last kana left out of the spelling. "The base form
+ * less る, plus the ending" would build 恐た, 割ない and 流ます, which are not words. They
+ * are picked by reading each of the 82 independent 一段 verbs with a Han character before
+ * る; the distribution gate holds that decision against the dictionary.
  */
 const IRREGULAR_LEXEMES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
 	["五段・ラ行", new Set(["ある", "有る", "在る"])],
-	["一段", new Set(["へるる", "のぼりつめるる", "上り詰めるる"])],
+	["一段", new Set(["へるる", "のぼりつめるる", "上り詰めるる", "恐る", "流る", "割る", "仕掛る", "組み立る"])],
 ]);
 
 /** Canonical, frozen description of every rule. Bound into fingerprint 3 in place of a realizer version. */

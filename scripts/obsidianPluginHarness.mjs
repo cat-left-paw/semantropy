@@ -292,9 +292,13 @@ export function createObsidianStub(records) {
 		path = "";
 		name = "";
 	}
+	// DEFINE-DIALOG-FIX1: like Obsidian 1.14.4's Modal, which assigns the instance property `isOpen = false` in
+	// its constructor and uses it as the guard of open() and close() (the flag is flipped before onOpen / onClose
+	// run). A subclass method named `isOpen` is hidden by it, which the public typings do not show.
 	class StubModal {
 		constructor(app) {
 			this.app = app;
+			this.isOpen = false;
 			const doc = typeof document !== "undefined" ? document : null;
 			if (doc && doc.createElement) {
 				this.containerEl = doc.createElement("div");
@@ -313,12 +317,16 @@ export function createObsidianStub(records) {
 			}
 		}
 		open() {
+			if (this.isOpen) return;
+			this.isOpen = true;
 			if (typeof document !== "undefined" && this.containerEl.appendChild) {
 				document.body.appendChild(this.containerEl);
 			}
 			this.onOpen();
 		}
 		close() {
+			if (!this.isOpen) return;
+			this.isOpen = false;
 			this.onClose();
 			if (this.containerEl.parentNode) {
 				this.containerEl.remove();
@@ -330,6 +338,24 @@ export function createObsidianStub(records) {
 			if (this.titleEl && "textContent" in this.titleEl) {
 				this.titleEl.textContent = title;
 			}
+		}
+	}
+	// WORKBENCH-UI5: the target note chooser extends Obsidian's FuzzySuggestModal. Like the real one, a choice closes the
+	// modal first and reports the choice after.
+	class StubFuzzySuggestModal extends StubModal {
+		constructor(app) {
+			super(app);
+			this.limit = 100;
+			this.emptyStateText = "No results found.";
+			this.inputEl = typeof document !== "undefined" ? document.createElement("input") : {};
+			this.resultContainerEl = typeof document !== "undefined" ? document.createElement("div") : {};
+		}
+		setPlaceholder(placeholder) {
+			this.inputEl.placeholder = placeholder;
+		}
+		selectSuggestion(value, evt) {
+			this.close();
+			this.onChooseItem(value.item, evt);
 		}
 	}
 	class StubPluginSettingTab {
@@ -545,6 +571,7 @@ export function createObsidianStub(records) {
 		TFile: StubTFile,
 		TFolder: StubTFolder,
 		Modal: StubModal,
+		FuzzySuggestModal: StubFuzzySuggestModal,
 		PluginSettingTab: StubPluginSettingTab,
 		Setting: StubSetting,
 		SettingGroup: StubSettingGroup,
@@ -884,6 +911,9 @@ function semantropyView(loaded) {
  * tokenizer actually initializes, so the network traps installed by
  * `loadPluginArtifact` stay in place throughout — including inside the
  * asynchronous Open that starts after `onload` resolved.
+ *
+ * `options.generate: false` stops at the state the plugin leaves a note in
+ * (ready, nothing shuffled yet); by default the run also presses Generate.
  */
 export async function openHarnessNote(loaded, options = {}) {
 	const { records } = loaded;
@@ -904,6 +934,14 @@ export async function openHarnessNote(loaded, options = {}) {
 		}
 		const status = view?.session?.getState?.()?.status;
 		if (status === "ready" || status === "error") {
+			// WORKBENCH-UI4: the plugin opens a note without a Shuffle (the body shows Generate). Unless a test asks to see
+			// that state (`generate: false`), pressing Generate is part of opening, so a run still ends with a transformed body.
+			if (status === "ready" && options.generate !== false && view.targetBody?.awaitsFirstChunk?.() === true) {
+				const outcome = await view.generateBody();
+				if (outcome !== "applied") {
+					throw new Error(`Generate did not apply (${outcome}). Errors: ${JSON.stringify(records.errorCalls)}`);
+				}
+			}
 			const state = view.session?.getState?.();
 			const bodyText = (view.targetBody?.getTextNodes?.() ?? [])
 				.map((node) => node.nodeValue ?? "")

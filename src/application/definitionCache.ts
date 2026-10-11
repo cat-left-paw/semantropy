@@ -8,7 +8,11 @@ import type { VocabularySnapshot } from "../vocabulary/vocabularySnapshot";
 
 export type CachedFakeDefinition = {
 	readonly result: FakeDefinitionResult;
-	readonly target: DictionarySnapshotIdentity;
+	/**
+	 * The Target this definition was made for. `null` when it was made for a word of a Recompose sentence, which has
+	 * none: only the Shuffle side gives an entry a Target (FAKE-DICT-RECOMPOSE1, see `DefinitionCache.set`).
+	 */
+	readonly target: DictionarySnapshotIdentity | null;
 	readonly vocabulary: CollectVocabularyProvenance;
 };
 
@@ -17,6 +21,11 @@ export type CachedFakeDefinition = {
  * Vocabulary that generated it must be committed together. A later Target
  * Refresh can keep the same Vocabulary fingerprint, so the current snapshot
  * identity is not a substitute for `cached.target`.
+ *
+ * FAKE-DICT-RECOMPOSE1: `target` is `null` for an entry made for a Recompose sentence. The Shuffle side then
+ * commits the Target it has now (`provenance.target ?? current`), and remembering that definition writes the
+ * Target into the entry, so from then on it is an entry the Shuffle side made. The Recompose side never reads
+ * `target` and commits no Target at all.
  */
 export function cachedDefinitionCommit(
 	cached: CachedFakeDefinition | undefined,
@@ -36,7 +45,7 @@ export function definitionCacheKey(headword: FakeDictionaryHeadword, nonce: numb
 function freezeCached(value: CachedFakeDefinition): CachedFakeDefinition {
 	return Object.freeze({
 		result: value.result,
-		target: Object.freeze({
+		target: value.target === null ? null : Object.freeze({
 			sourcePath: value.target.sourcePath,
 			contentHash: value.target.contentHash,
 		}),
@@ -62,7 +71,9 @@ export class DefinitionCache {
   return value;
  }
  set(key: string, value: CachedFakeDefinition): void {
-  const frozen = freezeCached(value);
+  // A definition made for a Recompose sentence has no Target and never changes an entry the Shuffle side made.
+  const existing = this.entries.get(key);
+  const frozen = value.target === null && existing !== undefined && existing.target !== null ? existing : freezeCached(value);
   const world = this.worldKey(key), previous = this.latest.get(world);
   if (previous) this.entries.delete(previous);
   this.entries.delete(key); this.entries.set(key, frozen); this.latest.set(world, key);

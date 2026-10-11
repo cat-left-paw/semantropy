@@ -1,6 +1,6 @@
 {
 	"name": "semantropy",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "A desktop-only Obsidian plugin that creates meaning-disrupting variations of Japanese Markdown without changing the source note",
 	"main": "main.js",
 	"type": "module",
@@ -11,6 +11,8 @@
 		"generate:templates": "node scripts/fakeDictionary/generate.mjs",
 		"generate:collision-patterns": "node scripts/collision/generate.mjs",
 		"generate:fake-proverb-recipes": "node scripts/fakeProverb/generate.mjs",
+		"generate:fake-alert-recipes": "node scripts/fakeAlert/generate.mjs",
+		"preview:fake-proverb": "vitest run --config vitest.preview.config.ts",
 		"build:distribution": "tsc --noEmit --skipLibCheck && node scripts/buildDistribution.mjs",
 		"prepare:release-smoke": "node scripts/prepareReleaseSmokeVault.mjs",
 		"verify:distribution": "vitest run --config vitest.distribution.config.ts",

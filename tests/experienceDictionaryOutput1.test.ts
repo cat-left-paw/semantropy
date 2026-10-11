@@ -166,7 +166,7 @@ describe("Modal and hover write the same canonical text from the committed curre
 		const after = await writeBoth(h);
 		const current = world(h).getCurrent()!;
 		// Text, Target and Vocabulary all come from the one committed current, never a later Snapshot.
-		expect(after.collected.target).toEqual({ path: current.snapshot.sourcePath, contentHash: current.snapshot.contentHash });
+		expect(after.collected.target).toEqual({ path: current.snapshot!.sourcePath, contentHash: current.snapshot!.contentHash });
 		expect(after.collected.vocabulary).toEqual(current.vocabulary);
 		expect(after.copied).toBe(fakeDictionaryCanonicalText(current));
 		expect(after.collected.text).toBe(after.copied);

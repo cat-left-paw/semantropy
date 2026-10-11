@@ -88,4 +88,32 @@ describe("web host", () => {
 		await waitFor(() => document.querySelector(".semantropy-dictionary-modal .semantropy-definition-text")?.textContent !== "");
 		expect(document.querySelector(".semantropy-dictionary-modal .semantropy-definition-headword")?.textContent).toBe(word!.textContent);
 	});
+
+	it("opens a Fake Alert from the shared Toolbar with drawn icons, and Escape closes it (FAKE-ALERT-VIEW1)", async () => {
+		const { parent } = await openHost("駅前の森で猫と犬が雨を見た。");
+		const entry = parent.querySelector<HTMLButtonElement>(".semantropy-fake-alert-open");
+		expect(entry?.getAttribute("aria-label")).toBe("不条理警告");
+		// An id the page does not bundle would render an empty glyph.
+		expect(entry!.querySelector("svg")!.childElementCount).toBeGreaterThan(0);
+		// As from the keyboard: focus, then activate (jsdom does not move focus on click).
+		entry!.focus();
+		entry!.click();
+		const dialog = document.querySelector<HTMLElement>(".semantropy-fake-alert");
+		expect(dialog).not.toBeNull();
+		for (const selector of [".semantropy-fake-alert-icon svg", ".semantropy-fake-alert-brand-icon svg"]) {
+			expect(dialog!.querySelector(selector)!.childElementCount, selector).toBeGreaterThan(0);
+		}
+		expect(dialog!.querySelectorAll(".semantropy-fake-alert-buttons button").length).toBeGreaterThan(0);
+		document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+		expect(document.querySelector(".semantropy-fake-alert")).toBeNull();
+		expect(document.activeElement).toBe(entry);
+	});
+
+	it("bundles every icon a Fake Alert can show", async () => {
+		const { createIcon } = await import("../src/obsidian/icons");
+		const { FAKE_ALERT_BRAND_ICON, FAKE_ALERT_KIND_ICONS } = await import("../../src/view/FakeAlertModal");
+		for (const id of [FAKE_ALERT_BRAND_ICON, ...Object.values(FAKE_ALERT_KIND_ICONS), "message-square-warning"]) {
+			expect(createIcon(id).childElementCount, id).toBeGreaterThan(0);
+		}
+	});
 });

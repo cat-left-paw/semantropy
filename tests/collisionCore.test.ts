@@ -1465,13 +1465,21 @@ describe("inputs and isolation", () => {
 			"shortfallReason",
 			"status",
 		]);
+		// COLLISION-LOCK1 added `segments` (the parts `text` is joined from) and nothing else: the key list is the
+		// only thing of a result that changed, and the results of a generation that keeps nothing are the same.
 		expect(Object.keys(built.results[0]!).sort()).toEqual([
 			"limited",
 			"limitedReason",
 			"recipeId",
+			"segments",
 			"structureSignature",
 			"text",
 		]);
+		// A segment names its part and its text, a modifier its form, a Connector its id; no identity, no nonce.
+		const kinds = new Set(built.results.flatMap((result) => result.segments.map((segment) => Object.keys(segment).sort().join(","))));
+		for (const shape of kinds) {
+			expect(["kind,slotId,text", "connectorId,kind,slotId,text", "formId,kind,slotId,text"]).toContain(shape);
+		}
 		const serialized = JSON.stringify(built);
 		for (const forbidden of [
 			"batchId",
@@ -1493,7 +1501,8 @@ describe("inputs and isolation", () => {
 		expect(SEMANTROPY_ALGORITHM_VERSION).toBe(9);
 		expect(MANUAL_MORPH_POLICY_VERSION).toBe("manual-morph-2");
 		expect(FAKE_DICTIONARY_ALGORITHM_VERSION).toBe(1);
-		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(1);
+		// FAKE-DICT-LEXEME1 raised the standard template set to 2; Collision still changes none.
+		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(2);
 		expect(SEMANTROPY_SETTINGS_SCHEMA_VERSION).toBe(3);
 		expect(COLLECT_METADATA_VERSION).toBe(2);
 		expect(COLLECTION_DOCUMENT_VERSION).toBe(1);

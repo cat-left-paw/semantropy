@@ -9,6 +9,9 @@ src/collision/generated/*.ts                    text eol=lf
 resources/fake-proverb/standard-recipes.md        text eol=lf
 resources/fake-proverb/standard-recipes.lock.json text eol=lf
 src/fakeProverb/generated/*.ts                    text eol=lf
+resources/fake-alert/standard-recipes.md        text eol=lf
+resources/fake-alert/standard-recipes.lock.json text eol=lf
+src/fakeAlert/generated/*.ts                    text eol=lf
 
 # Recorded regression oracles are compared by SHA-256 of their exact bytes.
 tests/fixtures/regression/*.json                text eol=lf

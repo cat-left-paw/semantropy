@@ -73,7 +73,7 @@ describe("the Fake Proverb batch owner", () => {
 		expect(state.batch).toBe(batch);
 		expect(state.generation).toEqual({ pending: false, lastError: null });
 		expect([batch.status, batch.actualCount, batch.requestedCount, batch.shortfallReason]).toEqual(["complete", 10, 10, null]);
-		expect([batch.algorithmVersion, batch.recipeSchemaVersion, batch.recipeDataVersion]).toEqual([FAKE_PROVERB_ALGORITHM_VERSION, 1, 1]);
+		expect([batch.algorithmVersion, batch.recipeSchemaVersion, batch.recipeDataVersion]).toEqual([FAKE_PROVERB_ALGORITHM_VERSION, 2, 4]);
 		expect(batch.provenance.vocabularyFingerprint).toBe(vocabulary.snapshot.fingerprint);
 		expect(batch.provenance.sources.map((source) => source.path)).toEqual(["private-note-0.md"]);
 		expect(batch.rows.map((row) => row.rowSlotId)).toEqual(state.rowSlotIds);
@@ -392,7 +392,7 @@ describe("the committed-row read seam", () => {
 		const record = ok(readFakeProverbRow({ batch, rowSlotId: row.rowSlotId }));
 		expect(Object.keys(record).sort()).toEqual(["algorithmVersion", "batchId", "canonicalText", "glossRecipeId", "provenance",
 			"proverbRecipeId", "recipeDataVersion", "recipeSchemaVersion", "rowId"]);
-		expect(record).toEqual({ batchId: batch.batchId, rowId: row.committed!.rowId, algorithmVersion: 1, recipeSchemaVersion: 1, recipeDataVersion: 1,
+		expect(record).toEqual({ batchId: batch.batchId, rowId: row.committed!.rowId, algorithmVersion: 2, recipeSchemaVersion: 2, recipeDataVersion: 4,
 			proverbRecipeId: row.committed!.proverbRecipeId, glossRecipeId: row.committed!.glossRecipeId, canonicalText: row.committed!.canonicalText,
 			provenance: batch.provenance });
 		expect(JSON.stringify(record)).not.toMatch(/"(?:draft|bindings|rowSlotId|actualCount|shortfallReason|nonce)"/u);

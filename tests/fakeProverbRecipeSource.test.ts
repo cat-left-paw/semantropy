@@ -12,6 +12,8 @@ import {
 	STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN,
 	assertStandardFakeProverbRecipesGenerated,
 	describeFakeProverbSourceIssues,
+	explainFakeProverbSourceIssues,
+	fakeProverbLiteralId,
 	fakeProverbRecipeDataDigest,
 	generateStandardFakeProverbRecipes,
 	parseStandardFakeProverbRecipeMarkdown,
@@ -35,6 +37,7 @@ import {
 import {
 	FAKE_PROVERB_CANDIDATE_FORMS,
 	FAKE_PROVERB_LIMITS,
+	FAKE_PROVERB_SLOT_KINDS,
 	FAKE_PROVERB_RECIPE_SCHEMA_VERSION,
 	type RawFakeProverbGloss,
 	type RawFakeProverbPart,
@@ -51,6 +54,7 @@ import {
 } from "../src/fakeProverb/generated/standardFakeProverbRecipeEntries";
 import { bundleOptions } from "../scripts/buildDistribution.mjs";
 import { readPinnedFixture } from "./support/pinnedFixture";
+import { replaceFile } from "./support/replaceFile";
 
 type RecipeLock = { versions: { dataVersion: number; digest: string }[] };
 type Mutable<T> = { -readonly [K in keyof T]: T[K] extends readonly (infer U)[] ? U[] : T[K] };
@@ -60,6 +64,20 @@ const BASELINE = readPinnedFixture<ParsedFakeProverbRecipeDocument & { origin: s
 	"0072d166810daa83102872b2c37b198f4cd470f481a74fee3eec726cfa735106",
 );
 const V1_DIGEST = "1d329f91ba002ac0bb70ac5df3b036efa9730107b4b01ea0e8a2b3da7b0b1af1";
+/** FAKE-PROVERB-NA1: Recipe Schema 2 / data 2, the version 1 data plus the na-stem-na form in plain-modifier. */
+const V2_DIGEST = "232aeb4381fcb41bc00c6002daeb8ca792eba8b159227ef175bd1a6dad6ea01a";
+/**
+ * FAKE-PROVERB-RECIPES3: data 3, written in the one-line format. 63 proverbs, 32 glosses and 14 profiles; fixed text has
+ * no entry of its own, so the 136 literals are named by the parser. Recipe Schema stays 2.
+ */
+const V3_DIGEST = "4307f645377a64ea7d113516fbe110d28e66b76c4c13236ccaa22688f4484a25";
+/**
+ * CORRECTION-ROUND1 (B): data 4. One line differs from data 3: `heart-unknown` reads `{n1}の心、{n2}知らず`, so that a Han
+ * word right after 心 is not read as one word with it. The proverb's fixed text `の心` becomes `の心、` and its id follows.
+ */
+const V4_DIGEST = "638321fc91a98542479f0804089c28b0d8fee4b0152a7289c76a9b04945063ac";
+const HEART_V3 = "line: {n1}の心{n2}知らず\n";
+const HEART_V4 = "line: {n1}の心、{n2}知らず\n";
 const escapeRegExp = (value: string): string => value.replaceAll(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 const GENERATE_PATTERN = new RegExp(escapeRegExp(GENERATE_COMMAND), "u");
 
@@ -68,8 +86,21 @@ function dataOf(value: ParsedFakeProverbRecipeDocument): ParsedFakeProverbRecipe
 }
 const standardMarkdown = async (): Promise<string> => await readFile(STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN, "utf8");
 /** A same-kind semantic edit: one more proverb that pairs with the existing glosses. */
-const EXTRA_PROVERB = "\n## proverb extra-pair\nenabled: true\nweight: 3\npart: noun n1 plain-noun export\npart: literal to\npart: noun n2 plain-noun export\n";
-const bumped = (source: string, version: number): string => source.replace("data-version: 1", `data-version: ${version}`);
+const EXTRA_PROVERB = "\n## proverb extra-pair\nenabled: true\nweight: 3\nline: {n1}と{n2}\n";
+/** The next data version, which the edits below raise to; the checkout's lock records every version up to the current one. */
+const NEXT = STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION + 1;
+const bumped = (source: string, version: number): string => {
+	expect(source.match(/^data-version: \d+$/gmu)).toHaveLength(1);
+	return source.replace(/^data-version: \d+$/mu, `data-version: ${version}`);
+};
+/**
+ * Replaces text that occurs exactly once. The document's notes show example lines, and an edit that found its text in a
+ * note first would change nothing: every edit of the standard document names text the notes do not repeat.
+ */
+function once(source: string, before: string, after: string): string {
+	expect(source.split(before), before).toHaveLength(2);
+	return source.replace(before, after);
+}
 
 // ---------------------------------------------------------------------------
 // A small valid recipe set, as raw typed data, and its Markdown rendering, so
@@ -87,7 +118,7 @@ function reference(slotKind: string, slotId: string): RawFakeProverbPart {
 
 function baseInput(): Mutable<CompileFakeProverbRecipeSetInput> {
 	return {
-		schemaVersion: 1,
+		schemaVersion: FAKE_PROVERB_RECIPE_SCHEMA_VERSION,
 		dataVersion: 1,
 		proverbs: [{
 			id: "p-one", enabled: true, weight: 2,
@@ -107,26 +138,103 @@ function baseInput(): Mutable<CompileFakeProverbRecipeSetInput> {
 	};
 }
 
-function renderPart(part: RawFakeProverbPart): string {
-	if (part.kind === "literal") return `part: literal ${part.literalId}`;
-	if (part.kind === "reference") return `part: reference ${part.slotKind} ${part.slotId}`;
-	return `part: ${part.kind} ${part.slotId} ${part.profileId}${part.exported === true ? " export" : ""}`;
-}
+const TAGS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛"];
+const HOLE_LETTER: Readonly<Record<string, string>> = { noun: "n", modifier: "m", predicate: "v", adverbial: "a" };
 
-function render(input: CompileFakeProverbRecipeSetInput): string {
+/**
+ * The document that says `input`, or null when the one-line format cannot say it: a slot whose id is not its kind's
+ * letter and a number, a reference a proverb makes, two fixed texts in a row, a fixed text no line uses or one written
+ * under two ids, requirements other than the proverb holes the gloss uses in order, a gloss-local slot not named `g`
+ * and a number, one that is exported, or a reference to one before it stands. Every profile gets a tag, so each hole
+ * names its profile; a gloss-local slot is written `+`, its kind's letter and a number, in order of appearance.
+ *
+ * `lenient` is for the position rules, which only read what follows a part: two fixed texts in a row are written as one
+ * run, a gloss-local slot may have any name, and the requirements may be declared in any order. The document then says
+ * a set with the same parts in the same places, not the same ids.
+ */
+function render(input: CompileFakeProverbRecipeSetInput, lenient = false): string | null {
+	const tagOf = new Map(input.profiles.map((profile, index) => [profile.id, TAGS[index]!]));
+	const textOf = new Map(input.literals.map((entry) => [entry.id, entry.literal]));
+	const used = new Set<string>();
+	let sayable = true;
+	const no = (): string => { sayable = false; return ""; };
+	const fixed = (part: RawFakeProverbPart, previous: RawFakeProverbPart | undefined): string => {
+		const text = textOf.get(part.literalId ?? "");
+		if (text === undefined || text === "" || (previous?.kind === "literal" && !lenient) || Object.keys(part).length !== 2) return no();
+		used.add(part.literalId!);
+		return text;
+	};
+	const hole = (prefix: string, name: string, profileId: unknown): string => {
+		const tag = typeof profileId === "string" ? tagOf.get(profileId) : undefined;
+		return tag === undefined ? no() : `{${prefix}${name}:${tag}}`;
+	};
+	const named = (kind: unknown, slotId: unknown): slotId is string =>
+		typeof kind === "string" && typeof slotId === "string" && HOLE_LETTER[kind] !== undefined && new RegExp(`^${HOLE_LETTER[kind]}[1-9]$`, "u").test(slotId);
 	const lines = ["# Test recipes", "", `schema-version: ${input.schemaVersion}`, `data-version: ${input.dataVersion}`, ""];
 	for (const entry of input.proverbs) {
-		lines.push(`## proverb ${entry.id}`, `enabled: ${String(entry.enabled)}`, `weight: ${entry.weight}`, ...entry.parts.map(renderPart), "");
+		const text = entry.parts.map((part, index) => {
+			if (part === null || typeof part !== "object") return no();
+			if (part.kind === "literal") return fixed(part, entry.parts[index - 1]);
+			if (!named(part.kind, part.slotId) || typeof part.exported !== "boolean" || Object.keys(part).length !== 4) return no();
+			return hole(part.exported ? "" : "-", part.slotId, part.profileId);
+		}).join("");
+		lines.push(`## proverb ${entry.id}`, `enabled: ${String(entry.enabled)}`, `weight: ${entry.weight}`, `line: ${text}`, "");
 	}
 	for (const entry of input.glosses) {
-		lines.push(`## gloss ${entry.id}`, `enabled: ${String(entry.enabled)}`, `weight: ${entry.weight}`,
-			...entry.requires.map((required) => `requires: ${required.kind} ${required.slotId}`), ...entry.parts.map(renderPart), "");
+		const locals = new Map<string, { name: string; kind: string }>();
+		const counts: Record<string, number> = {};
+		const usedHoles: string[] = [];
+		const text = entry.parts.map((part, index) => {
+			if (part === null || typeof part !== "object") return no();
+			if (part.kind === "literal") return fixed(part, entry.parts[index - 1]);
+			if (part.kind === "reference") {
+				if (Object.keys(part).length !== 3) return no();
+				const local = locals.get(part.slotId ?? "");
+				if (local !== undefined) return local.kind === part.slotKind ? `{+${local.name}}` : no();
+				if (!named(part.slotKind, part.slotId)) return no();
+				if (!usedHoles.includes(part.slotId)) usedHoles.push(part.slotId);
+				return `{${part.slotId}}`;
+			}
+			const letter = HOLE_LETTER[part.kind];
+			if (letter === undefined || typeof part.slotId !== "string" || (!lenient && !/^g[1-9]$/u.test(part.slotId)) || locals.has(part.slotId) || part.exported !== false) return no();
+			counts[letter] = (counts[letter] ?? 0) + 1;
+			const name = `${letter}${counts[letter]}`;
+			locals.set(part.slotId, { name, kind: part.kind });
+			return hole("+", name, part.profileId);
+		}).join("");
+		// The document's requirements are the proverb holes its line uses, in order of first appearance.
+		const declared = entry.requires.map((required) => required.slotId);
+		if (JSON.stringify(lenient ? [...declared].sort() : declared) !== JSON.stringify(lenient ? [...usedHoles].sort() : usedHoles) ||
+			entry.requires.some((required) => !named(required.kind, required.slotId))) sayable = false;
+		lines.push(`## gloss ${entry.id}`, `enabled: ${String(entry.enabled)}`, `weight: ${entry.weight}`, `line: ${text}`, "");
 	}
-	for (const entry of input.literals) lines.push(`## literal ${entry.id}`, "", entry.literal, "");
-	for (const entry of input.profiles) {
-		lines.push(`## profile ${entry.id}`, `kind: ${entry.kind}`, ...entry.forms.map((form) => `form: ${form.form} ${form.weight}`), "");
+	if (input.literals.some((entry) => !used.has(entry.id)) || new Set(input.literals.map((entry) => entry.literal)).size !== input.literals.length) sayable = false;
+	// The document does not write a fixed text's id, so it cannot say that one collides with an entry's.
+	const entryIds = new Set([...input.proverbs, ...input.glosses, ...input.profiles].map((entry) => entry.id));
+	if (input.literals.some((entry) => entryIds.has(entry.id))) sayable = false;
+	for (const [index, entry] of input.profiles.entries()) {
+		lines.push(`## profile ${entry.id}`, `kind: ${entry.kind}`, `tag: ${TAGS[index]}`, ...entry.forms.map((form) => `form: ${form.form} ${form.weight}`), "");
 	}
-	return lines.join("\n");
+	return sayable ? lines.join("\n") : null;
+}
+
+/** `render()` for an input the format can say. */
+function document(input: CompileFakeProverbRecipeSetInput, lenient = false): string {
+	const source = render(input, lenient);
+	if (source === null) throw new Error("the one-line format cannot say this input");
+	return source;
+}
+
+/** The data with every literal id replaced by its text: what a recipe set means, whatever its literals are called. */
+function meaning(data: Pick<CompileFakeProverbRecipeSetInput, "proverbs" | "glosses" | "literals" | "profiles">): unknown {
+	const text = new Map(data.literals.map((entry) => [entry.id, entry.literal]));
+	const parts = (list: readonly RawFakeProverbPart[]) => list.map((part) => (part.kind === "literal" ? { kind: "literal", text: text.get(part.literalId ?? "") } : part));
+	return {
+		proverbs: data.proverbs.map((entry) => ({ ...entry, parts: parts(entry.parts) })),
+		glosses: data.glosses.map((entry) => ({ ...entry, parts: parts(entry.parts) })),
+		literals: [...text.values()].sort(),
+		profiles: data.profiles,
+	};
 }
 
 function compileCodes(input: unknown): readonly string[] {
@@ -137,6 +245,12 @@ function compileCodes(input: unknown): readonly string[] {
 function markdownCodes(source: string): readonly string[] {
 	const parsed = parseStandardFakeProverbRecipeMarkdown(source);
 	return parsed.ok ? [] : parsed.issues.map((entry) => entry.code);
+}
+
+/** What the parser says of the document for `input`; null when the one-line format cannot say the input at all. */
+function documentCodes(input: CompileFakeProverbRecipeSetInput): readonly string[] | null {
+	const source = render(input);
+	return source === null ? null : markdownCodes(source);
 }
 
 function withProverb(mutate: (proverb: Mutable<RawFakeProverbRecipe>) => void): Mutable<CompileFakeProverbRecipeSetInput> {
@@ -213,20 +327,59 @@ async function caught(action: () => Promise<unknown>): Promise<unknown> {
 // ===========================================================================
 
 describe("the standard Fake Proverb recipe document", () => {
-	it("parses to the pinned version 1 data, whose digest the lock records", async () => {
+	it("parses to recipe data 4, and the lock keeps the digests of all four versions", async () => {
 		const parsed = parseStandardFakeProverbRecipeMarkdown(await standardMarkdown());
-		expect(parsed.ok).toBe(true);
+		expect(parsed.ok, parsed.ok ? "" : describeFakeProverbSourceIssues(parsed.issues)).toBe(true);
 		if (!parsed.ok) return;
 		const data = dataOf(parsed);
+		// The version 1 fixture stays the record of version 1: its digest is still the lock's first entry.
 		const pinned = dataOf(BASELINE);
-		expect(data).toEqual(pinned);
-		expect([data.proverbs.length, data.glosses.length, data.literals.length, data.profiles.length]).toEqual([9, 6, 25, 6]);
-		expect(fakeProverbRecipeDataDigest(data)).toBe(V1_DIGEST);
-		expect(JSON.parse(await readFile(STANDARD_FAKE_PROVERB_RECIPES_LOCK, "utf8"))).toEqual({ versions: [{ dataVersion: 1, digest: V1_DIGEST }] });
+		expect([pinned.schemaVersion, pinned.dataVersion, fakeProverbRecipeDataDigest(pinned)]).toEqual([1, 1, V1_DIGEST]);
+		// FAKE-PROVERB-RECIPES3 wrote data 3 in this format; CORRECTION-ROUND1 (B) raised it to 4 with one changed line.
+		expect([data.schemaVersion, data.dataVersion]).toEqual([2, 4]);
+		expect([data.proverbs.length, data.glosses.length, data.literals.length, data.profiles.length]).toEqual([63, 32, 136, 14]);
+		expect(fakeProverbRecipeDataDigest(data)).toBe(V4_DIGEST);
+		expect(JSON.parse(await readFile(STANDARD_FAKE_PROVERB_RECIPES_LOCK, "utf8"))).toEqual({
+			versions: [{ dataVersion: 1, digest: V1_DIGEST }, { dataVersion: 2, digest: V2_DIGEST }, { dataVersion: 3, digest: V3_DIGEST }, { dataVersion: 4, digest: V4_DIGEST }],
+		});
 		expect([STANDARD_FAKE_PROVERB_RECIPE_SCHEMA_VERSION, STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION, STANDARD_FAKE_PROVERB_RECIPE_DATA_DIGEST])
-			.toEqual([1, 1, V1_DIGEST]);
+			.toEqual([2, 4, V4_DIGEST]);
+		// Data 4 is data 3 and that one line: put the line back, and the version, and data 3's own digest comes out.
+		const source = await standardMarkdown();
+		expect(source.split(HEART_V4)).toHaveLength(2);
+		const back = parseStandardFakeProverbRecipeMarkdown(bumped(source.replace(HEART_V4, HEART_V3), 3));
+		expect(back.ok, back.ok ? "" : describeFakeProverbSourceIssues(back.issues)).toBe(true);
+		if (back.ok) {
+			expect(fakeProverbRecipeDataDigest(dataOf(back))).toBe(V3_DIGEST);
+			const ids = (entries: readonly { readonly id: string }[]) => entries.map((entry) => entry.id);
+			expect(ids(back.proverbs)).toEqual(ids(data.proverbs));
+			expect(ids(back.glosses)).toEqual(ids(data.glosses));
+			// The only fixed text that differs is the one next to 心, and its id is named from the text.
+			expect(data.literals.filter((entry) => !back.literals.some((other) => other.id === entry.id)))
+				.toEqual([{ id: fakeProverbLiteralId("の心、"), literal: "の心、" }]);
+			expect(back.literals.filter((entry) => !data.literals.some((other) => other.id === entry.id)))
+				.toEqual([{ id: fakeProverbLiteralId("の心"), literal: "の心" }]);
+		}
 		expect([STANDARD_FAKE_PROVERB_PROVERBS, STANDARD_FAKE_PROVERB_GLOSSES, STANDARD_FAKE_PROVERB_LITERALS, STANDARD_FAKE_PROVERB_PROFILES])
-			.toEqual([pinned.proverbs, pinned.glosses, pinned.literals, pinned.profiles]);
+			.toEqual([data.proverbs, data.glosses, data.literals, data.profiles]);
+		// The 15 recipes of versions 1 and 2 keep their ids, at the head of each list and in their order.
+		expect(data.proverbs.slice(0, 9).map((entry) => entry.id)).toEqual(BASELINE.proverbs.map((entry) => entry.id));
+		expect(data.glosses.slice(0, 6).map((entry) => entry.id)).toEqual(BASELINE.glosses.map((entry) => entry.id));
+		expect(data.profiles.slice(0, 6).map((entry) => entry.id)).toEqual(BASELINE.profiles.map((entry) => entry.id));
+		// Every fixed text is named from its text, and each recipe's line is returned as written, beside the data.
+		for (const entry of data.literals) expect(entry.id).toBe(fakeProverbLiteralId(entry.literal));
+		expect([parsed.authored["topic-object"], parsed.authored["misplaced-purpose"]])
+			.toEqual(["{n1}は{n2}を{v1}", "{n1}が{n2}において{+n1}を{+v1:動}ことのたとえ。"]);
+		expect(Object.keys(parsed.authored)).toHaveLength(63 + 32);
+	});
+
+	it("gives the four recipes with a variable verb after を or に half the weight of the others, and every gloss the same weight", async () => {
+		const parsed = parseStandardFakeProverbRecipeMarkdown(await standardMarkdown());
+		if (!parsed.ok) throw new Error("the standard document does not parse");
+		expect(parsed.proverbs.filter((entry) => entry.weight !== 4).map((entry) => [entry.id, entry.weight]))
+			.toEqual([["topic-object", 2], ["genitive-destination", 2], ["modified-topic", 2], ["pursuer", 2]]);
+		expect(new Set(parsed.glosses.map((entry) => entry.weight))).toEqual(new Set([4]));
+		expect([...parsed.proverbs, ...parsed.glosses].every((entry) => entry.enabled)).toBe(true);
 	});
 
 	it("pins every proverb and gloss structure as actual fixture data", () => {
@@ -241,19 +394,26 @@ describe("the standard Fake Proverb recipe document", () => {
 		]);
 	});
 
-	it("pairs every enabled proverb with at least one gloss, by typed signature alone", async () => {
+	it("pairs every proverb with glosses by typed signature alone, and a proverb without a noun with the glosses that use its predicate alone", async () => {
 		const { compiled } = await generateStandardFakeProverbRecipes({ rootDir: process.cwd() });
-		const matrix = Object.fromEntries(compiled.proverbs.map((proverb) => [proverb.id,
-			compiled.glosses.filter((gloss) => isFakeProverbGlossCompatible(proverb, gloss)).map((gloss) => gloss.id)]));
-		const common = ["misplaced-purpose", "eventual-sameness", "powerless-before", "mistaken-belief"];
-		const withPredicate = ["misplaced-purpose", "eventual-sameness", "even-so", "powerless-before", "mistaken-belief"];
-		expect(matrix).toEqual({
-			"topic-object": withPredicate, "genitive-destination": withPredicate, "rather-than": common, "offered-to": common,
-			"modified-topic": withPredicate, "born-of": common, pursuer: withPredicate,
-			"ear-prayer": ["misplaced-purpose", "eventual-sameness", "only-measure", "powerless-before", "mistaken-belief"], "origin-of": common,
-		});
-		// genitive-destination declares n3 without exporting it, so only-measure cannot pair with it.
-		expect(compiled.proverbs.find((entry) => entry.id === "genitive-destination")!.exports.map((entry) => entry.slotId)).toEqual(["n1", "n2", "v1"]);
+		const glossesOf = (id: string) => compiled.glosses.filter((gloss) => isFakeProverbGlossCompatible(compiled.proverbs.find((entry) => entry.id === id)!, gloss)).map((gloss) => gloss.id);
+		const proverbsOf = (id: string) => compiled.proverbs.filter((proverb) => isFakeProverbGlossCompatible(proverb, compiled.glosses.find((entry) => entry.id === id)!)).map((proverb) => proverb.id);
+		const nounless = compiled.proverbs.filter((proverb) => !proverb.parts.some((part) => part.kind === "noun")).map((proverb) => proverb.id);
+		expect(nounless).toEqual(["wins", "easier-done", "easy-and-hard", "no-match-for-not"]);
+		for (const id of nounless) expect(glossesOf(id)).toEqual(["same-as-doing", "seems-to", "think-of-when", "thanks-to"]);
+		// Every proverb has several glosses to draw from, and every gloss several proverbs.
+		expect(Math.min(...compiled.proverbs.map((proverb) => glossesOf(proverb.id).length))).toBe(4);
+		expect(Math.min(...compiled.glosses.map((gloss) => proverbsOf(gloss.id).length))).toBe(2);
+		// The three glosses that use three nouns pair with the two proverbs that export three: recipe data 3 exports
+		// genitive-destination's third noun, which versions 1 and 2 kept from the glosses.
+		const threeNouns = compiled.glosses.filter((gloss) => gloss.requires.length === 3).map((gloss) => gloss.id);
+		expect(threeNouns).toEqual(["only-measure", "likewise-has", "in-turn"]);
+		for (const id of threeNouns) expect(proverbsOf(id)).toEqual(["genitive-destination", "ear-prayer"]);
+		expect(compiled.proverbs.find((entry) => entry.id === "genitive-destination")!.exports.map((entry) => entry.slotId)).toEqual(["n1", "n2", "n3", "v1"]);
+		// The only slots a gloss does not get are the two modifiers versions 1 and 2 already kept back.
+		expect(compiled.proverbs.flatMap((proverb) => proverb.parts.flatMap((part) => (part.kind !== "literal" && !part.exported ? [`${proverb.id}:${part.slotId}`] : []))))
+			.toEqual(["modified-topic:m1", "pursuer:m1"]);
+		expect(Math.max(...compiled.proverbs.map((proverb) => proverb.exports.length))).toBe(4);
 	});
 
 	it("is read the same way with LF, CRLF, CR and a byte-order mark", async () => {
@@ -275,28 +435,48 @@ describe("the standard Fake Proverb recipe document", () => {
 
 describe("Markdown-only edits reach the typed data", () => {
 	it.each([
-		["a proverb part", (s: string) => s.replace("part: literal yori\n", "part: literal yori\npart: modifier m1 plain-modifier\n")],
-		["an export", (s: string) => s.replace("part: noun n3 plain-noun\n", "part: noun n3 plain-noun export\n")],
-		["a requirement", (s: string) => s.replace("requires: noun n2\npart: literal dorehodo-no", "requires: noun n1\npart: literal dorehodo-no").replace("part: reference noun n2\npart: literal mo-comma", "part: reference noun n1\npart: literal mo-comma")],
-		["a literal body", (s: string) => s.replace("\nのもと\n", "\nのはじまり\n")],
-		["a recipe weight", (s: string) => s.replace("weight: 10\npart: noun n1 plain-noun export\npart: literal yori", "weight: 11\npart: noun n1 plain-noun export\npart: literal yori")],
-		["a form weight", (s: string) => s.replace("form: adjective-basic 3", "form: adjective-basic 4")],
-		["a disabled gloss", (s: string) => s.replace("## gloss only-measure\nenabled: true", "## gloss only-measure\nenabled: false")],
+		["a hole added to a line", (s: string) => once(s, "line: {n1}より{n2}\n", "line: {n1}より{m1}{n2}\n")],
+		["a slot the gloss gets", (s: string) => once(s, "line: {-m1}{n1}は{n2}を{v1:否}", "line: {m1}{n1}は{n2}を{v1:否}")],
+		["the proverb's word a gloss uses", (s: string) => once(s, "line: どれほどの{n2}も、", "line: どれほどの{n1}も、")],
+		["fixed text", (s: string) => once(s, "line: {n1}は{n2}のもと", "line: {n1}は{n2}のはじまり")],
+		["a hole's tag", (s: string) => once(s, "line: {n1}より先に{v1:動}べし", "line: {n1}より先に{v1:肯}べし")],
+		["a recipe weight", (s: string) => once(s, "## proverb rather-than\nenabled: true\nweight: 4", "## proverb rather-than\nenabled: true\nweight: 5")],
+		["a form weight", (s: string) => once(s, "## profile plain-modifier\nkind: modifier\nform: adjective-basic 3", "## profile plain-modifier\nkind: modifier\nform: adjective-basic 4")],
+		["a disabled gloss", (s: string) => once(s, "## gloss only-measure\nenabled: true", "## gloss only-measure\nenabled: false")],
 		["an added proverb", (s: string) => s + EXTRA_PROVERB],
 	] as const)("changes the digest for %s, and a raised data-version generates and passes the guard", async (_name, mutate) => {
-		const edited = bumped(mutate(await standardMarkdown()), 2);
+		const edited = bumped(mutate(await standardMarkdown()), NEXT);
 		const parsed = parseStandardFakeProverbRecipeMarkdown(edited);
 		expect(parsed.ok, parsed.ok ? "" : describeFakeProverbSourceIssues(parsed.issues)).toBe(true);
 		if (!parsed.ok) return;
-		expect(fakeProverbRecipeDataDigest(parsed)).not.toBe(V1_DIGEST);
+		expect(fakeProverbRecipeDataDigest(parsed)).not.toBe(V4_DIGEST);
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("markdown-edit");
 		try {
 			await writeStandardFakeProverbRecipes({ markdown: edited, generatedPath: outfile, lockPath });
 			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: edited, generatedPath: outfile, lockPath }))
-				.resolves.toEqual({ schemaVersion: 1, dataVersion: 2 });
+				.resolves.toEqual({ schemaVersion: 2, dataVersion: NEXT });
 			const lock = JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock;
-			expect(lock.versions).toEqual([{ dataVersion: 1, digest: V1_DIGEST }, { dataVersion: 2, digest: fakeProverbRecipeDataDigest(parsed) }]);
+			expect(lock.versions).toEqual([
+				{ dataVersion: 1, digest: V1_DIGEST }, { dataVersion: 2, digest: V2_DIGEST }, { dataVersion: 3, digest: V3_DIGEST }, { dataVersion: 4, digest: V4_DIGEST }, { dataVersion: NEXT, digest: fakeProverbRecipeDataDigest(parsed) },
+			]);
 		} finally { await rm(scratch, { recursive: true, force: true }); }
+	});
+});
+
+describe("edits that are not data", () => {
+	it("leaves the digest alone when only a tag or a note changes", async () => {
+		const source = await standardMarkdown();
+		const digest = (text: string) => {
+			const parsed = parseStandardFakeProverbRecipeMarkdown(text);
+			expect(parsed.ok, parsed.ok ? "" : describeFakeProverbSourceIssues(parsed.issues)).toBe(true);
+			return parsed.ok ? fakeProverbRecipeDataDigest(parsed) : "";
+		};
+		// A tag is how a line names a profile; the data holds the profile's id.
+		const retagged = once(source, "kind: predicate\ntag: 肯", "kind: predicate\ntag: 可").replaceAll(":肯}", ":可}");
+		expect(retagged).not.toBe(source);
+		expect(digest(retagged)).toBe(V4_DIGEST);
+		expect(digest(`${source}\n> a note at the end\n`)).toBe(V4_DIGEST);
+		expect(digest(once(source, "## proverb rather-than\n", "> a note before an entry\n\n## proverb rather-than\n"))).toBe(V4_DIGEST);
 	});
 });
 
@@ -305,7 +485,10 @@ describe("the Fake Proverb recipe compiler", () => {
 		const input = baseInput();
 		const result = compileFakeProverbRecipeSet(input);
 		expect(result.ok).toBe(true);
-		expect(parseStandardFakeProverbRecipeMarkdown(render(input)).ok).toBe(true);
+		// The document says exactly this set: only the ids of the fixed texts differ.
+		const parsed = parseStandardFakeProverbRecipeMarkdown(document(input));
+		expect(parsed.ok).toBe(true);
+		if (parsed.ok) expect(meaning(parsed)).toEqual(meaning(input));
 		if (!result.ok) return;
 		const set = result.set;
 		expect(set.proverbs[0]!.exports).toEqual([{ kind: "noun", slotId: "n1" }, { kind: "noun", slotId: "n2" }, { kind: "predicate", slotId: "v1" }]);
@@ -332,9 +515,41 @@ describe("the Fake Proverb recipe compiler", () => {
 		const result = compileFakeProverbRecipeSet(input);
 		expect(result.ok).toBe(true);
 		if (result.ok) expect(result.set.glosses[0]!.parts.at(-1)).toEqual({ kind: "reference", slotKind: "noun", slotId: "g2", source: "local" });
-		expect(markdownCodes(render(input))).toEqual([]);
+		expect(documentCodes(input)).toEqual([]);
 	});
 
+	/**
+	 * The compiler's rules, by whether the one-line format can write an input that breaks them. A rule a document cannot
+	 * break is still the compiler's: the generated data and a caller's own set pass through it, not through the parser.
+	 */
+	const DOCUMENT_REACH = {
+		// The document says it, and the parser reports the compiler's code for it.
+		sameCode: [
+			"a requirement no proverb declares", "a duplicate proverb slot", "a duplicate export", "a gloss without requirements", "a proverb without exports",
+			"an unused profile", "a form of another kind", "an unknown form", "a duplicate form", "a profile without forms", "an invalid entry id",
+			"an unpaired proverb", "no enabled gloss", "no enabled proverb", "a zero weight", "a fractional weight", "an unsafe weight", "a zero form weight",
+			"an unsupported schema version", "a future schema version", "too many proverb predicates", "too many gloss-local nouns", "too many exports",
+			"too many requirements", "too many references", "too many proverbs",
+		],
+		// The format has no words for it: a hole's letter is its kind, a gloss's holes are its requirements and its
+		// references, a new word is named by the parser, and fixed text has no id and no entry of its own.
+		unsayable: [
+			"an unknown gloss reference", "a requirement typed differently from the export", "a reference typed differently from its requirement",
+			"a reference typed differently from its local slot", "a duplicate requirement", "a gloss-local slot reusing a requirement",
+			"a duplicate gloss-local slot", "a gloss-local slot wearing a proverb slot ID", "a forward reference to a later local slot",
+			"a proverb reference to a gloss slot (cycle)", "a proverb reference to its own slot", "a gloss re-export", "an unused requirement",
+			"a dangling literal", "an unused literal", "a duplicate literal surface", "an unknown part kind", "an unknown requirement kind",
+			"an unknown reference kind", "an unknown profile", "a duplicate id across kinds", "an invalid slot id", "an over-long slot id",
+			// Two fixed texts in a row are one run of text in a line; a line with too many holes and texts is refused (the line syntax tests).
+			"too many proverb parts", "too many gloss parts",
+		],
+		// The document says something close, and the parser names it its own way before the compiler sees it.
+		otherCode: [
+			["a slot whose profile has another kind", ["unknown-tag"]],
+			["an unknown profile kind", ["unknown-tag", "unknown-tag", "unknown-tag"]],
+			["an empty proverb", ["invalid-line"]],
+		],
+	};
 	const failures: [string, Mutable<CompileFakeProverbRecipeSetInput>, string][] = [
 		// references and signatures
 		["an unknown gloss reference", withGloss((g) => { g.parts.push(reference("noun", "zz")); }), "unknown-reference"],
@@ -356,7 +571,6 @@ describe("the Fake Proverb recipe compiler", () => {
 		["an unused requirement", withGloss((g) => { g.parts.splice(5, 1); }), "unused-require"],
 		["a gloss without requirements", withGloss((g) => { g.requires = []; g.parts = [slot("noun", "g2", "noun-p"), literal("tatoe")]; }), "missing-require"],
 		["a proverb without exports", withProverb((p) => { p.parts = p.parts.map((part) => (part.kind === "literal" ? part : { ...part, exported: false })); }), "missing-export"],
-		["a proverb without a noun slot", withProverb((p) => { p.parts = [slot("predicate", "v1", "pred-p", true)]; }), "missing-noun"],
 		// literals and profiles
 		["a dangling literal", withProverb((p) => { p.parts.push(literal("missing")); }), "dangling-literal"],
 		["an unused literal", (() => { const input = baseInput(); input.literals.push({ id: "spare", literal: "余り" }); return input; })(), "unused-literal"],
@@ -383,7 +597,8 @@ describe("the Fake Proverb recipe compiler", () => {
 		["a fractional weight", withGloss((g) => { g.weight = 1.5; }), "invalid-weight"],
 		["an unsafe weight", withProverb((p) => { p.weight = Number.MAX_SAFE_INTEGER + 1; }), "invalid-weight"],
 		["a zero form weight", (() => { const input = baseInput(); input.profiles[0] = { ...input.profiles[0]!, forms: [{ form: "independent-noun", weight: 0 }] }; return input; })(), "invalid-weight"],
-		["an unsupported schema version", (() => { const input = baseInput(); input.schemaVersion = 2; return input; })(), "unsupported-schema-version"],
+		["an unsupported schema version", (() => { const input = baseInput(); input.schemaVersion = 1; return input; })(), "unsupported-schema-version"],
+		["a future schema version", (() => { const input = baseInput(); input.schemaVersion = 3; return input; })(), "unsupported-schema-version"],
 		// limits
 		["too many proverb parts", withProverb((p) => { p.parts.push(...Array.from({ length: 6 }, () => literal("wa"))); }), "part-limit"],
 		["too many gloss parts", withGloss((g) => { g.parts.push(...Array.from({ length: 8 }, () => literal("wa"))); }), "part-limit"],
@@ -395,20 +610,53 @@ describe("the Fake Proverb recipe compiler", () => {
 		["too many references", withGloss((g) => { g.parts.push(...Array.from({ length: 5 }, () => reference("noun", "n1"))); }), "reference-limit"],
 		["too many proverbs", (() => { const input = baseInput(); input.proverbs = Array.from({ length: FAKE_PROVERB_LIMITS.proverbs + 1 }, (_, i) => ({ ...input.proverbs[0]!, id: `p-${i}` })); return input; })(), "entry-limit"],
 	];
-	it.each(failures)("refuses %s in both the compiler and the parser", (_name, input, code) => {
+	it.each(failures)("refuses %s", (name, input, code) => {
 		expect(compileCodes(input)).toContain(code);
-		expect(markdownCodes(render(input))).toContain(code);
+		// Where the one-line format can say the input at all, the parser refuses its document too.
+		const codes = documentCodes(input);
+		if (codes !== null) expect(codes.length, name).toBeGreaterThan(0);
+	});
+
+	it("a document can break these rules, which it reports with the compiler's own code; it has no way to write the others", () => {
+		const sameCode = failures.filter(([, input, code]) => documentCodes(input)?.includes(code) === true).map(([name]) => name);
+		const unsayable = failures.filter(([, input]) => documentCodes(input) === null).map(([name]) => name);
+		const otherCode = failures.filter(([name]) => !sameCode.includes(name) && !unsayable.includes(name)).map(([name, input]) => [name, documentCodes(input)]);
+		expect({ sameCode, unsayable, otherCode }).toEqual(DOCUMENT_REACH);
+	});
+
+	it("accepts a proverb without a noun slot, which exports its predicate (FAKE-PROVERB-RECIPES3)", () => {
+		const input = baseInput();
+		input.proverbs.push({ id: "p-verb", enabled: true, weight: 1, parts: [slot("predicate", "v1", "pred-p", true), literal("wo")] });
+		input.glosses.push({ id: "g-verb", enabled: true, weight: 1, requires: [{ kind: "predicate", slotId: "v1" }], parts: [reference("predicate", "v1"), literal("tatoe")] });
+		const result = compileFakeProverbRecipeSet(input);
+		expect(result.ok).toBe(true);
+		expect(documentCodes(input)).toEqual([]);
+		if (!result.ok) return;
+		const verbOnly = result.set.proverbs[1]!;
+		expect(verbOnly.parts.some((part) => part.kind === "noun")).toBe(false);
+		expect(verbOnly.exports).toEqual([{ kind: "predicate", slotId: "v1" }]);
+		// It pairs by what it exports: with the gloss that uses the predicate alone, not with the one that also uses a noun.
+		expect(result.set.glosses.map((gloss) => [gloss.id, isFakeProverbGlossCompatible(verbOnly, gloss)])).toEqual([["g-one", false], ["g-verb", true]]);
+		// It still has to hand the gloss something.
+		const silent = baseInput();
+		silent.proverbs.push({ id: "p-verb", enabled: true, weight: 1, parts: [slot("predicate", "v1", "pred-p", false), literal("wo")] });
+		expect(compileCodes(silent)).toContain("missing-export");
+		expect(documentCodes(silent)).toContain("missing-export");
+		// And without the gloss that uses the predicate alone it has no gloss at all.
+		const alone = baseInput();
+		alone.proverbs.push({ id: "p-verb", enabled: true, weight: 1, parts: [slot("predicate", "v1", "pred-p", true), literal("wo")] });
+		expect(compileCodes(alone)).toEqual(["unpaired-proverb"]);
 	});
 
 	it("names an unexported requirement and an unpaired gloss precisely", () => {
 		const unexported = withProverb((p) => { p.parts[4] = slot("predicate", "v1", "pred-p", false); });
 		expect(compileCodes(unexported)).toContain("unexported-reference");
-		expect(markdownCodes(render(unexported))).toContain("unexported-reference");
+		expect(documentCodes(unexported)).toContain("unexported-reference");
 		// Two proverbs each export one of the two requirements; neither exports both.
 		const split = baseInput();
 		split.proverbs = [
 			{ id: "p-a", enabled: true, weight: 1, parts: [slot("noun", "n1", "noun-p", true)] },
-			{ id: "p-b", enabled: true, weight: 1, parts: [slot("noun", "n2", "noun-p", true), literal("wa"), literal("wo"), slot("predicate", "v1", "pred-p", true)] },
+			{ id: "p-b", enabled: true, weight: 1, parts: [slot("noun", "n2", "noun-p", true), literal("wa"), slot("predicate", "v1", "pred-p", true)] },
 		];
 		split.glosses = [
 			{ ...split.glosses[0]!, id: "g-both", requires: [{ kind: "noun", slotId: "n1" }, { kind: "predicate", slotId: "v1" }] },
@@ -416,7 +664,7 @@ describe("the Fake Proverb recipe compiler", () => {
 			{ id: "g-b", enabled: true, weight: 1, requires: [{ kind: "noun", slotId: "n2" }], parts: [reference("noun", "n2"), literal("tatoe")] },
 		];
 		expect(compileCodes(split)).toEqual(["unpaired-gloss"]);
-		expect(markdownCodes(render(split))).toEqual(["unpaired-gloss"]);
+		expect(documentCodes(split)).toEqual(["unpaired-gloss"]);
 		// Disabled entries are validated but never paired.
 		split.glosses[0] = { ...split.glosses[0]!, enabled: false };
 		expect(compileCodes(split)).toEqual([]);
@@ -427,7 +675,8 @@ describe("the Fake Proverb recipe compiler", () => {
 		const input = baseInput();
 		input.proverbs.push({ id: "p-two", enabled: true, weight: 1, parts: [slot("noun", "n1", "noun-p", true), literal("wa"), slot("noun", "v1", "noun-p", true)] });
 		expect(compileCodes(input)).toEqual(["unpaired-proverb"]);
-		expect(markdownCodes(render(input))).toEqual(["unpaired-proverb"]);
+		// A hole's letter is its kind, so no document gives the name v1 to a noun.
+		expect(render(input)).toBeNull();
 		const gloss = { requires: [{ kind: "noun", slotId: "n1" }, { kind: "predicate", slotId: "v1" }] } as const;
 		expect(isFakeProverbGlossCompatible({ exports: [{ kind: "noun", slotId: "n1" }, { kind: "noun", slotId: "v1" }] }, gloss)).toBe(false);
 		expect(isFakeProverbGlossCompatible({ exports: [{ kind: "noun", slotId: "n1" }, { kind: "predicate", slotId: "v1" }] }, gloss)).toBe(true);
@@ -439,7 +688,10 @@ describe("the Fake Proverb recipe compiler", () => {
 		const input = baseInput();
 		input.literals[0] = { id: "wa", literal: body };
 		expect(compileCodes(input)).toContain("invalid-literal");
-		expect(parseStandardFakeProverbRecipeMarkdown(render(input)).ok).toBe(false);
+		// An empty text is no text in a line; every other body is written into the line, and the document is refused.
+		const source = render(input);
+		if (body === "") expect(source).toBeNull();
+		else expect(parseStandardFakeProverbRecipeMarkdown(source!).ok).toBe(false);
 	});
 
 	it("accepts the literal grammar boundaries", () => {
@@ -455,7 +707,7 @@ describe("the Fake Proverb recipe compiler", () => {
 		] };
 		expect(input.proverbs[0].parts).toHaveLength(FAKE_PROVERB_LIMITS.parts.proverb);
 		expect(compileCodes(input)).toEqual([]);
-		expect(markdownCodes(render(input))).toEqual([]);
+		expect(documentCodes(input)).toEqual([]);
 	});
 
 	it("does not trust typed callers: wrong field types, extra fields and non-arrays are refused", () => {
@@ -482,14 +734,237 @@ describe("the Fake Proverb recipe compiler", () => {
 	});
 });
 
-describe("the Fake Proverb recipe line syntax", () => {
-	const valid = render(baseInput());
+describe("Recipe Schema 2 positions: a stem plus な and the adverbial slot (FAKE-PROVERB-NA1)", () => {
+	/** baseInput() with the gloss modifier profile allowing a stem plus な, and the given changes. */
+	function withNa(mutate: (input: Mutable<CompileFakeProverbRecipeSetInput>) => void = () => undefined): Mutable<CompileFakeProverbRecipeSetInput> {
+		const input = baseInput();
+		input.profiles[1] = { ...input.profiles[1]!, forms: [...input.profiles[1]!.forms, { form: "na-stem-na", weight: 2 }] };
+		mutate(input);
+		return input;
+	}
+	/** The gloss with its local noun g2 replaced by one literal, after the na-capable modifier g1. */
+	function naBefore(body: string): Mutable<CompileFakeProverbRecipeSetInput> {
+		return withNa((input) => {
+			input.literals.push({ id: "after", literal: body });
+			input.glosses[0] = { ...input.glosses[0]!, parts: input.glosses[0]!.parts.map((part) => (part.kind === "noun" && part.slotId === "g2" ? literal("after") : part)) };
+		});
+	}
+	const adverbialProfile = { id: "adv-p", kind: "adverbial", forms: [{ form: "na-stem-ni", weight: 1 }] };
+	/** baseInput() with an adverbial slot a1 placed in the proverb at `index`. */
+	function withAdverbial(index: number, mutate: (input: Mutable<CompileFakeProverbRecipeSetInput>) => void = () => undefined): Mutable<CompileFakeProverbRecipeSetInput> {
+		const input = baseInput();
+		input.profiles.push(adverbialProfile);
+		const parts = [...input.proverbs[0]!.parts];
+		parts.splice(index, 0, slot("adverbial", "a1", "adv-p"));
+		input.proverbs[0] = { ...input.proverbs[0]!, parts };
+		mutate(input);
+		return input;
+	}
+	const both = (input: CompileFakeProverbRecipeSetInput) => [compileCodes(input), markdownCodes(document(input, true))];
+
+	it("adds the two forms to their kinds and nothing else", () => {
+		expect(FAKE_PROVERB_SLOT_KINDS).toEqual(["noun", "modifier", "predicate", "adverbial"]);
+		expect(FAKE_PROVERB_CANDIDATE_FORMS.modifier).toContain("na-stem-na");
+		expect(FAKE_PROVERB_CANDIDATE_FORMS.adverbial).toEqual(["na-stem-ni"]);
+		expect(FAKE_PROVERB_CANDIDATE_FORMS.predicate).not.toContain("na-stem-na");
+		expect([FAKE_PROVERB_LIMITS.slots.proverb.adverbial, FAKE_PROVERB_LIMITS.slots.gloss.adverbial]).toEqual([1, 1]);
+	});
+
 	it.each([
-		["requires after a part", valid.replace("requires: predicate v1\n", "").replace("part: literal tatoe", "part: literal tatoe\nrequires: predicate v1"), "requires-after-part"],
-		["a field after a part", valid.replace("weight: 1\nrequires:", "requires:").replace("part: literal tatoe", "part: literal tatoe\nweight: 1"), "misplaced-field"],
-		["a field after requires", valid.replace("weight: 1\nrequires: noun n1", "requires: noun n1\nweight: 1"), "misplaced-field"],
-		["requires in a proverb", valid.replace("weight: 2\n", "weight: 2\nrequires: noun n1\n"), "unknown-field"],
+		["a noun slot", withNa()],
+		["a Han literal", naBefore("者は")],
+		["a Katakana literal", naBefore("ネコを")],
+		["a listed noun with a particle", naBefore("ことは")],
+		["a listed noun ending the literal", naBefore("もの")],
+		["a listed noun with a mark", naBefore("ところ。")],
+		["a noun reference", withNa((input) => {
+			input.glosses[0] = { ...input.glosses[0]!, parts: [reference("noun", "n1"), literal("wa"), slot("modifier", "g1", "mod-p"), reference("noun", "n1"), literal("wo"), reference("predicate", "v1"), literal("tatoe")] };
+		})],
+	] as const)("lets a stem plus な stand before %s", (_name, input) => {
+		expect(both(input)).toEqual([[], []]);
+	});
+
+	it.each([
+		["a particle", naBefore("のは")],
+		["a listed noun that only begins a word", naBefore("ものすごく")],
+		["a listed noun followed by kana", naBefore("ことさら")],
+		["a hiragana word", naBefore("ねこ")],
+		["a predicate reference", withNa((input) => {
+			input.glosses[0] = { ...input.glosses[0]!, parts: [reference("noun", "n1"), literal("wa"), slot("noun", "g2", "noun-p"), literal("wo"), slot("modifier", "g1", "mod-p"), reference("predicate", "v1"), literal("tatoe")] };
+		})],
+		["the end of the recipe", withNa((input) => {
+			input.glosses[0] = { ...input.glosses[0]!, parts: [reference("noun", "n1"), literal("wa"), slot("noun", "g2", "noun-p"), literal("wo"), reference("predicate", "v1"), literal("tatoe"), slot("modifier", "g1", "mod-p")] };
+		})],
+		["a modifier", withNa((input) => {
+			input.glosses[0] = { ...input.glosses[0]!, parts: [reference("noun", "n1"), literal("wa"), slot("modifier", "g1", "mod-p"), slot("modifier", "g3", "mod-p"), slot("noun", "g2", "noun-p"), literal("wo"), reference("predicate", "v1"), literal("tatoe")] };
+		})],
+		["a particle, through a reference to a local slot", withNa((input) => {
+			input.glosses[0] = { ...input.glosses[0]!, parts: [...input.glosses[0]!.parts, reference("modifier", "g1"), literal("wa")] };
+		})],
+	] as const)("refuses a stem plus な before %s", (_name, input) => {
+		for (const codes of both(input)) expect(codes).toContain("na-follower");
+	});
+
+	it("judges a required modifier by the profiles the proverbs export it with", () => {
+		// The proverb exports m1 before a noun; the gloss references it before は.
+		const exported = (forms: { form: string; weight: number }[]) => {
+			const input = baseInput();
+			input.profiles.push({ id: "pm-p", kind: "modifier", forms });
+			input.proverbs[0] = { ...input.proverbs[0]!, parts: [slot("modifier", "m1", "pm-p", true), ...input.proverbs[0]!.parts] };
+			input.glosses[0] = {
+				...input.glosses[0]!, requires: [...input.glosses[0]!.requires, { kind: "modifier", slotId: "m1" }],
+				parts: [...input.glosses[0]!.parts, reference("modifier", "m1"), literal("wa")],
+			};
+			return input;
+		};
+		expect(both(exported([{ form: "adjective-basic", weight: 1 }]))).toEqual([[], []]);
+		for (const codes of both(exported([{ form: "adjective-basic", weight: 1 }, { form: "na-stem-na", weight: 1 }]))) {
+			expect(codes).toEqual(["na-follower"]);
+		}
+	});
+
+	it.each([
+		["a predicate slot", withAdverbial(4)],
+		["a modifier that cannot hold な", withAdverbial(0, (input) => {
+			input.proverbs[0] = { ...input.proverbs[0]!, parts: [slot("adverbial", "a1", "adv-p"), slot("modifier", "m1", "mod-p"), ...input.proverbs[0]!.parts.slice(1)] };
+		})],
+		["a predicate reference", (() => {
+			const input = baseInput();
+			input.profiles.push(adverbialProfile);
+			input.glosses[0] = { ...input.glosses[0]!, parts: [reference("noun", "n1"), literal("wa"), slot("modifier", "g1", "mod-p"), slot("noun", "g2", "noun-p"), literal("wo"), slot("adverbial", "a1", "adv-p"), reference("predicate", "v1"), literal("tatoe")] };
+			return input;
+		})()],
+	] as const)("lets an adverbial slot stand before %s", (_name, input) => {
+		expect(both(input)).toEqual([[], []]);
+	});
+
+	it.each([
+		["a noun slot", withAdverbial(2)],
+		["a literal", withAdverbial(1)],
+		["the end of the recipe", withAdverbial(5)],
+		["a modifier that may hold な", withAdverbial(0, (input) => {
+			input.profiles[1] = { ...input.profiles[1]!, forms: [...input.profiles[1]!.forms, { form: "na-stem-na", weight: 1 }] };
+			input.proverbs[0] = { ...input.proverbs[0]!, parts: [slot("adverbial", "a1", "adv-p"), slot("modifier", "m1", "mod-p"), ...input.proverbs[0]!.parts.slice(1)] };
+		})],
+	] as const)("refuses an adverbial slot before %s", (_name, input) => {
+		for (const codes of both(input)) expect(codes).toContain("adverbial-follower");
+	});
+
+	it.each([
+		["a second adverbial slot", withAdverbial(4, (input) => {
+			const parts = [...input.proverbs[0]!.parts];
+			parts.splice(4, 0, slot("adverbial", "a2", "adv-p"));
+			input.proverbs[0] = { ...input.proverbs[0]!, parts };
+		}), "kind-limit"],
+		["an adverbial profile with a modifier form", (() => { const input = withAdverbial(4); input.profiles[3] = { ...adverbialProfile, forms: [{ form: "na-stem-na", weight: 1 }] }; return input; })(), "invalid-form"],
+		["a modifier profile with the adverbial form", (() => { const input = baseInput(); input.profiles[1] = { ...input.profiles[1]!, forms: [{ form: "na-stem-ni", weight: 1 }] }; return input; })(), "invalid-form"],
+		["an adverbial slot with a modifier profile", withAdverbial(4, (input) => {
+			input.proverbs[0] = { ...input.proverbs[0]!, parts: input.proverbs[0]!.parts.map((part) => (part.kind === "adverbial" ? slot("adverbial", "a1", "mod-p") : part)) };
+		}), "type-mismatch"],
+	] as const)("refuses %s", (_name, input, code) => {
+		expect(compileCodes(input)).toContain(code);
+		// A hole's tag is looked up among the profiles of the hole's own kind, so a document that names another kind's
+		// profile names a tag that kind does not have.
+		expect(markdownCodes(document(input, true))).toContain(code === "type-mismatch" ? "unknown-tag" : code);
+	});
+
+	it("lets a gloss require and reference an exported adverbial slot", () => {
+		const input = withAdverbial(4, (draft) => {
+			draft.proverbs[0] = { ...draft.proverbs[0]!, parts: draft.proverbs[0]!.parts.map((part) => (part.kind === "adverbial" ? slot("adverbial", "a1", "adv-p", true) : part)) };
+			draft.glosses[0] = {
+				...draft.glosses[0]!, requires: [...draft.glosses[0]!.requires, { kind: "adverbial", slotId: "a1" }],
+				parts: [reference("noun", "n1"), literal("wa"), slot("modifier", "g1", "mod-p"), slot("noun", "g2", "noun-p"), literal("wo"), reference("adverbial", "a1"), reference("predicate", "v1"), literal("tatoe")],
+			};
+		});
+		expect(both(input)).toEqual([[], []]);
+		const refused = { ...input, glosses: [{ ...input.glosses[0]!, parts: [...input.glosses[0]!.parts.slice(0, 5), reference("predicate", "v1"), reference("adverbial", "a1"), literal("tatoe")] }] };
+		for (const codes of both(refused)) expect(codes).toContain("adverbial-follower");
+	});
+});
+
+describe("the Fake Proverb recipe line syntax", () => {
+	const valid = document(baseInput());
+	const PROVERB = "line: {n1:甲}は{n2:甲}を{v1:丙}";
+	const GLOSS = "line: {n1}は{+m1:乙}{+n1:甲}を{v1}ことのたとえ。";
+	const parse = (source: string) => {
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		if (!parsed.ok) throw new Error(describeFakeProverbSourceIssues(parsed.issues));
+		return parsed;
+	};
+	/** The reference document with every `{n…}` hole untagged and the noun profile the kind's default. */
+	const untagged = valid.replace("kind: noun\ntag: 甲", "kind: noun").replaceAll(":甲}", "}");
+
+	it("writes each recipe of the reference set as one line", () => {
+		expect(valid.split("\n").filter((line) => line.startsWith("line: "))).toEqual([PROVERB, GLOSS]);
+	});
+
+	it("uses the kind's profile without a tag when a hole names none, and keeps a slot written with - from the gloss", () => {
+		const slots = (source: string) => parse(source).proverbs[0]!.parts.filter((part) => part.kind !== "literal").map((part) => [part.kind, part.slotId, part.profileId, part.exported]);
+		expect(slots(untagged)).toEqual([["noun", "n1", "noun-p", true], ["noun", "n2", "noun-p", true], ["predicate", "v1", "pred-p", true]]);
+		expect(slots(untagged.replace("は{n2}を{v1:丙}", "は{-n2}を{v1:丙}"))).toEqual([["noun", "n1", "noun-p", true], ["noun", "n2", "noun-p", false], ["predicate", "v1", "pred-p", true]]);
+		// The letter is the kind and the number is part of the name: m, v and a are the other three kinds.
+		const kinds = parse(valid.replace(PROVERB, "line: {m1:乙}{n1:甲}は{n2:甲}を{v1:丙}")).proverbs[0]!.parts.filter((part) => part.kind !== "literal").map((part) => [part.kind, part.slotId]);
+		expect(kinds).toEqual([["modifier", "m1"], ["noun", "n1"], ["noun", "n2"], ["predicate", "v1"]]);
+	});
+
+	it("reads a gloss's holes as requirements, references and new slots named g1, g2 … in order of appearance", () => {
+		const gloss = parse(valid.replace(GLOSS, "line: {v1}なら{+n1:甲}は{n1}の{+m1:乙}{+n2:甲}、{+n1}ことのたとえ。")).glosses[0]!;
+		// A proverb hole is a requirement in order of first appearance, however often the line uses it.
+		expect(gloss.requires).toEqual([{ kind: "predicate", slotId: "v1" }, { kind: "noun", slotId: "n1" }]);
+		expect(gloss.parts.filter((part) => part.kind !== "literal")).toEqual([
+			{ kind: "reference", slotKind: "predicate", slotId: "v1" },
+			{ kind: "noun", slotId: "g1", profileId: "noun-p", exported: false },
+			{ kind: "reference", slotKind: "noun", slotId: "n1" },
+			{ kind: "modifier", slotId: "g2", profileId: "mod-p", exported: false },
+			{ kind: "noun", slotId: "g3", profileId: "noun-p", exported: false },
+			// The same + name again is the same new word: a reference to the slot, not another slot.
+			{ kind: "reference", slotKind: "noun", slotId: "g1" },
+		]);
+	});
+
+	it("makes one literal of each run of fixed text, names it from the text, and shares equal text", () => {
+		const parsed = parse(valid);
+		// は stands in both recipes and is one literal; the three are in order of first appearance.
+		expect(parsed.literals).toEqual(["は", "を", "ことのたとえ。"].map((text) => ({ id: fakeProverbLiteralId(text), literal: text })));
+		expect(fakeProverbLiteralId("は")).toBe("l-de77c92e");
+		for (const entry of parsed.literals) expect(entry.id).toMatch(/^l-[0-9a-f]{8}$/u);
+		// The id is the text's own: it does not move when the text stands somewhere else or other text comes before it.
+		const moved = parse(valid.replace(PROVERB, "line: {n1:甲}を{n2:甲}は{v1:丙}なり"));
+		expect(moved.literals.map((entry) => entry.literal)).toEqual(["を", "は", "なり", "ことのたとえ。"]);
+		for (const entry of moved.literals) expect(entry.id).toBe(fakeProverbLiteralId(entry.literal));
+		// A run is everything between two holes, at the start of the line and at its end.
+		const runs = parse(valid.replace(PROVERB, "line: 昔、{n1:甲}は{n2:甲}を{v1:丙}という。")).proverbs[0]!;
+		expect(structure(runs.parts, parse(valid.replace(PROVERB, "line: 昔、{n1:甲}は{n2:甲}を{v1:丙}という。")).literals)).toBe("昔、{n1}は{n2}を{v1}という。");
+		expect(runs.parts.map((part) => part.kind)).toEqual(["literal", "noun", "literal", "noun", "literal", "predicate", "literal"]);
+	});
+
+	it("stops when two different fixed texts get the same id, and says which two", () => {
+		// Eight hexadecimal digits are 32 bits. きぱの and じてい are two of the pairs a search of 161,800 three-letter
+		// texts found; either alone is an ordinary fixed text.
+		expect([fakeProverbLiteralId("きぱの"), fakeProverbLiteralId("じてい")]).toEqual(["l-85f9640c", "l-85f9640c"]);
+		for (const text of ["きぱの", "じてい"]) expect(parseStandardFakeProverbRecipeMarkdown(valid.replace(PROVERB, `line: {n1:甲}${text}{n2:甲}を{v1:丙}`)).ok).toBe(true);
+		const source = valid.replace(PROVERB, "line: {n1:甲}きぱの{n2:甲}じてい{v1:丙}");
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		expect(parsed.ok).toBe(false);
+		if (parsed.ok) return;
+		expect(parsed.issues.map((entry) => [entry.code, entry.detail])).toContainEqual(["literal-id-collision", "p-one: l-85f9640c"]);
+		expect(explainFakeProverbSourceIssues(parsed.issues)).toContain("（proverb p-one）: 固定の文字「じてい」と「きぱの」が、同じ id（l-85f9640c）になりました。");
+	});
+
+	it("returns each recipe's line as written, beside the data", () => {
+		expect(parse(valid).authored).toEqual({ "p-one": PROVERB.slice(6), "g-one": GLOSS.slice(6) });
+	});
+
+	const refused: [string, string, string][] = [
+		// the entry's own lines
+		["a field after the line", valid.replace(`weight: 2\n${PROVERB}`, `${PROVERB}\nweight: 2`), "misplaced-field"],
+		["a second line", valid.replace(`${PROVERB}\n`, `${PROVERB}\nline: {n1:甲}\n`), "duplicate-line"],
+		["a recipe without a line", valid.replace(`${PROVERB}\n`, ""), "missing-line"],
+		["an empty line", valid.replace(PROVERB, "line: "), "invalid-line"],
+		["the old part field", valid.replace("weight: 2\n", "weight: 2\npart: noun n1 noun-p export\n"), "unknown-field"],
+		["the old requires field", valid.replace(`weight: 1\n${GLOSS}`, `weight: 1\nrequires: noun n1\n${GLOSS}`), "unknown-field"],
 		["an unknown field", valid.replace("weight: 2\n", "weight: 2\nlabel: Test\n"), "unknown-field"],
+		["a tag in a recipe", valid.replace("weight: 2\n", "weight: 2\ntag: 甲\n"), "unknown-field"],
 		["a duplicate field", valid.replace("weight: 2\n", "weight: 2\nweight: 3\n"), "duplicate-field"],
 		["a missing weight", valid.replace("weight: 2\n", ""), "missing-field"],
 		["a missing enabled flag", valid.replace("## proverb p-one\nenabled: true\n", "## proverb p-one\n"), "missing-field"],
@@ -501,51 +976,171 @@ describe("the Fake Proverb recipe line syntax", () => {
 		["an unsafe weight", valid.replace("weight: 2", `weight: ${Number.MAX_SAFE_INTEGER + 1}`), "invalid-weight"],
 		["a form weight word", valid.replace("form: verb-past 1", "form: verb-past high"), "invalid-weight"],
 		["a form line with extra words", valid.replace("form: verb-past 1", "form: verb-past 1 always"), "invalid-form-line"],
-		["a slot with an unknown trailing word", valid.replace("part: noun n1 noun-p export", "part: noun n1 noun-p exported"), "invalid-part"],
-		["a slot without a profile", valid.replace("part: noun n1 noun-p export", "part: noun n1"), "invalid-part"],
-		["a slot with double spaces", valid.replace("part: noun n1 noun-p export", "part: noun  n1 noun-p export"), "invalid-part"],
-		["a literal part with an inline body", valid.replace("part: literal wa\npart: noun n2", "part: literal wa \"は\"\npart: noun n2"), "invalid-part"],
-		["a reference without a kind", valid.replace("part: reference noun n1", "part: reference n1"), "invalid-part"],
-		["an unknown part kind", valid.replace("part: literal tatoe", "part: adverb a1 noun-p"), "unknown-part-kind"],
-		["a conditional part", valid.replace("part: literal tatoe", "part: if n1 literal tatoe"), "unknown-part-kind"],
-		["a malformed requirement", valid.replace("requires: noun n1", "requires: noun n1 optional"), "invalid-requires"],
-		["an unknown entry kind", valid.replace("## literal wa", "## template wa"), "unknown-entry-kind"],
-		["an unknown heading", valid.replace("## literal wa", "### literal wa"), "unknown-heading"],
+		["a field after a form", valid.replace("kind: noun\ntag: 甲\nform: independent-noun 1", "kind: noun\nform: independent-noun 1\ntag: 甲"), "misplaced-field"],
+		["a line that is not a field", valid.replace("weight: 2\n", "weight 2\n"), "invalid-field"],
+		["a blank line inside a recipe", valid.replace("weight: 2\n", "weight: 2\n\n"), "unexpected-content"],
+		["text under a recipe", valid.replace(`${PROVERB}\n`, `${PROVERB}\n\nことわざ\n`), "unexpected-content"],
+		// holes
+		["too many holes and fixed texts in a line", valid.replace(PROVERB, "line: 昔、{n1:甲}は{n2:甲}を{-n3:甲}に{-n4:甲}へ{v1:丙}という"), "part-limit"],
+		["an unclosed hole", valid.replace(PROVERB, "line: {n1:甲}は{n2:甲}を{v1:丙"), "invalid-line"],
+		["a hole of an unknown kind", valid.replace("{n2:甲}を", "{x2:甲}を"), "invalid-hole"],
+		["a hole numbered zero", valid.replace("{n2:甲}を", "{n0:甲}を"), "invalid-hole"],
+		["a hole with two digits", valid.replace("{n2:甲}を", "{n10:甲}を"), "invalid-hole"],
+		["a hole with a word", valid.replace("{n2:甲}を", "{noun}を"), "invalid-hole"],
+		["a hole with spaces", valid.replace("{n2:甲}を", "{ n2:甲 }を"), "invalid-hole"],
+		["a hole without a number", valid.replace("{n2:甲}を", "{n:甲}を"), "invalid-hole"],
+		["an empty hole", valid.replace("{n2:甲}を", "{}を"), "invalid-hole"],
+		["a doubled brace", valid.replace("{n2:甲}を", "{{n2:甲}}を"), "invalid-hole"],
+		["a plus hole in a proverb", valid.replace("{n2:甲}を", "{+n2:甲}を"), "local-hole-in-proverb"],
+		["a minus hole in a gloss", valid.replace("line: {n1}は{+m1", "line: {-n1}は{+m1"), "private-hole-in-gloss"],
+		["a tag on a proverb's word in a gloss", valid.replace("を{v1}ことのたとえ。", "を{v1:丙}ことのたとえ。"), "tag-on-reference"],
+		["a tag on the second use of a new word", valid.replace("を{v1}ことのたとえ。", "を{v1}こと{+n1:甲}のたとえ。"), "tag-on-reference"],
+		["an unknown tag", valid.replace("{n2:甲}を", "{n2:癸}を"), "unknown-tag"],
+		["a tag of another kind's profile", valid.replace("{n2:甲}を", "{n2:丙}を"), "unknown-tag"],
+		["a hole without a tag when its kind has no default profile", valid.replace("{n2:甲}を", "{n2}を"), "no-default-profile"],
+		["an empty tag", valid.replace("{n2:甲}を", "{n2:}を"), "invalid-tag"],
+		["a tag that is too long", valid.replace("{n2:甲}を", "{n2:甲乙丙丁戊}を"), "invalid-tag"],
+		["an ASCII tag", valid.replace("{n2:甲}を", "{n2:a}を"), "invalid-tag"],
+		// profiles
+		["an ASCII profile tag", valid.replace("tag: 甲", "tag: A"), "invalid-tag"],
+		["a tag used twice in one kind", `${valid}\n## profile noun-q\nkind: noun\ntag: 甲\nform: independent-noun 1\n`, "duplicate-tag"],
+		["two default profiles of one kind", `${valid}\n## profile noun-q\nkind: noun\nform: independent-noun 1\n\n## profile noun-r\nkind: noun\nform: independent-noun 1\n`, "duplicate-default-profile"],
+		// the entries and the head of the document
+		["a literal entry, which the old format had", `${valid}\n## literal wa\n\nは\n`, "unknown-entry-kind"],
+		["an unknown entry kind", valid.replace("## profile noun-p", "## template noun-p"), "unknown-entry-kind"],
+		["an unknown heading", valid.replace("## profile noun-p", "### profile noun-p"), "unknown-heading"],
 		["a second title", `${valid}\n# Another title\n`, "unexpected-title"],
-		["orphan content", valid.replace("schema-version: 1", "schema-version: 1\nhello"), "orphan-content"],
-		["an unknown metadata key", valid.replace("schema-version: 1", "schema-version: 1\nalgorithm-version: 1"), "unknown-metadata"],
+		["orphan content", valid.replace("schema-version: 2", "schema-version: 2\nhello"), "orphan-content"],
+		["an unknown metadata key", valid.replace("schema-version: 2", "schema-version: 2\nalgorithm-version: 1"), "unknown-metadata"],
 		["a duplicate metadata key", valid.replace("data-version: 1", "data-version: 1\ndata-version: 1"), "duplicate-metadata"],
 		["a missing data version", valid.replace("data-version: 1\n", ""), "missing-metadata"],
 		["a non-integer data version", valid.replace("data-version: 1", "data-version: v1"), "invalid-metadata"],
-		["a missing literal body", valid.replace("\nは\n", "\n"), "missing-body"],
-		["a literal body with padding", valid.replace("\nは\n", "\n は\n"), "body-whitespace"],
-		["a second literal body", valid.replace("\nは\n", "\nは\nが\n"), "duplicate-body"],
-		["a body under a recipe", valid.replace("part: literal tatoe\n", "part: literal tatoe\n\nことわざ\n"), "unexpected-body"],
-		["a blank line inside recipe fields", valid.replace("weight: 2\n", "weight: 2\n\n"), "unexpected-body"],
-		["a stale schema version", valid.replace("schema-version: 1", "schema-version: 2"), "unsupported-schema-version"],
-	] as const)("refuses %s", (_name, source, code) => {
+		["a stale schema version", valid.replace("schema-version: 2", "schema-version: 1"), "unsupported-schema-version"],
+		["a future schema version", valid.replace("schema-version: 2", "schema-version: 3"), "unsupported-schema-version"],
+	];
+	it.each(refused)("refuses %s", (_name, source, code) => {
 		expect(source).not.toBe(valid);
-		expect(markdownCodes(source)).toContain(code);
-	});
-
-	it("reports every problem in document order with line numbers, without leaking a path", () => {
-		const source = valid.replace("weight: 2", "weight: 0").replace("part: literal tatoe", "part: literal missing").replace("form: verb-past 1", "form: verb-past x");
 		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
 		expect(parsed.ok).toBe(false);
 		if (parsed.ok) return;
-		const lines = parsed.issues.map((entry) => entry.line);
-		expect(lines).toEqual([...lines].sort((a, b) => a - b));
-		expect(parsed.issues.map((entry) => entry.code)).toEqual(["invalid-weight", "invalid-weight"]);
-		expect(describeFakeProverbSourceIssues(parsed.issues)).not.toMatch(/[A-Za-z]:\\|\/Users\/|\/home\//u);
-		// Line syntax first; once it passes, compiler issues are mapped back to entry lines.
-		const semantic = parseStandardFakeProverbRecipeMarkdown(valid.replace("weight: 2", "weight: 3").replace("part: literal tatoe", "part: literal missing"));
-		expect(semantic.ok ? [] : semantic.issues.map((entry) => [entry.code, entry.line])).toEqual([["dangling-literal", valid.split("\n").indexOf("## gloss g-one") + 1], ["unused-literal", valid.split("\n").indexOf("## literal tatoe") + 1]]);
+		expect(parsed.issues.map((entry) => entry.code)).toContain(code);
+		// Each of these is something a person can write into the document, and each is explained in Japanese.
+		for (const entry of parsed.issues) expect(entry.ja, entry.code).toEqual(expect.any(String));
 	});
 
-	it("has no inline executable data: regex, JavaScript or placeholders in a body are refused", () => {
+	it("reports every problem in document order with the line it is on, without leaking a path", () => {
+		const lineOf = (source: string, text: string) => source.split("\n").indexOf(text) + 1;
+		const source = valid.replace("weight: 2", "weight: 0").replace("を{v1:丙}", "を{w1:丙}").replace("form: verb-past 1", "form: verb-past x");
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		expect(parsed.ok).toBe(false);
+		if (parsed.ok) return;
+		expect(parsed.issues.map((entry) => [entry.code, entry.line])).toEqual([
+			["invalid-weight", lineOf(source, "weight: 0")], ["invalid-hole", lineOf(source, "line: {n1:甲}は{n2:甲}を{w1:丙}")], ["invalid-weight", lineOf(source, "form: verb-past x")],
+		]);
+		expect(describeFakeProverbSourceIssues(parsed.issues)).not.toMatch(/[A-Za-z]:\\|\/Users\/|\/home\//u);
+		// Line syntax first; once it passes, a compiler issue names the recipe's `line:`, not its heading.
+		const twice = valid.replace(PROVERB, "line: {n1:甲}は{n2:甲}を{n2:甲}{v1:丙}");
+		const semantic = parseStandardFakeProverbRecipeMarkdown(twice);
+		const line = lineOf(twice, "line: {n1:甲}は{n2:甲}を{n2:甲}{v1:丙}");
+		expect(line).toBeGreaterThan(lineOf(twice, "## proverb p-one"));
+		expect(semantic.ok ? [] : semantic.issues.map((entry) => [entry.code, entry.line, entry.entry])).toEqual([
+			["duplicate-slot-id", line, "proverb p-one"], ["duplicate-export", line, "proverb p-one"],
+		]);
+		// A profile's problem names the profile's heading.
+		const unused = `${valid}\n## profile spare-p\nkind: noun\ntag: 己\nform: independent-noun 1\n`;
+		const spare = parseStandardFakeProverbRecipeMarkdown(unused);
+		expect(spare.ok ? [] : spare.issues.map((entry) => [entry.code, entry.line, entry.entry])).toEqual([["unused-profile", lineOf(unused, "## profile spare-p"), "profile spare-p"]]);
+	});
+
+	it("has no inline executable data: regex, JavaScript or placeholders in a line are refused", () => {
 		for (const body of ["/(は|が)/u", "function(){}", "{{noun}}", "${n1}", "[a-z]+", "<script>"]) {
-			expect(parseStandardFakeProverbRecipeMarkdown(valid.replace("\nことのたとえ。\n", `\n${body}\n`)).ok).toBe(false);
+			expect(parseStandardFakeProverbRecipeMarkdown(valid.replace("ことのたとえ。", body)).ok).toBe(false);
 		}
+	});
+});
+
+describe("the Japanese explanation of a document's problems", () => {
+	const valid = document(baseInput());
+	const explain = (source: string): string => {
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		if (parsed.ok) throw new Error("the document was accepted");
+		return explainFakeProverbSourceIssues(parsed.issues);
+	};
+	const lineOf = (source: string, start: string) => source.split("\n").findIndex((line) => line.startsWith(start)) + 1;
+
+	it("names the line, the entry, the hole as written and the code", () => {
+		const source = valid.replace("を{v1:丙}", "を{w1:丙}");
+		const text = explain(source);
+		expect(text.split("\n")[0]).toBe(`${STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN} に、直すところがあります。`);
+		expect(text).toContain(`${lineOf(source, "line: {n1:甲}は")} 行目（proverb p-one）: 穴 {w1:丙} の書き方が違います。`);
+		expect(text).toMatch(/\(invalid-hole\)$/u);
+	});
+
+	it("shows a gloss's new word as it was written, not as the slot the compiler names", () => {
+		// The gloss's own modifier may hold a stem plus な, and here a particle follows it.
+		const source = valid.replace("form: verb-past 1", "form: verb-past 1\nform: na-stem-na 2").replace("{+m1:乙}{+n1:甲}を", "{+m1:乙}を{+n1:甲}");
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		expect(parsed.ok ? [] : parsed.issues.map((entry) => [entry.code, entry.detail])).toEqual([["na-follower", "g-one: g1"]]);
+		const text = explain(source);
+		expect(text).toContain(`${lineOf(source, "line: {n1}は")} 行目（gloss g-one）: {+m1} の直後に置けません。`);
+		expect(text).toContain("(na-follower)");
+		expect(text).not.toContain("g1");
+		// A proverb's word keeps its name.
+		const exported = valid.replace("kind: noun\ntag: 甲", "kind: noun\ntag: 甲").replace("を{v1:丙}", "を{-v1:丙}");
+		expect(explain(exported)).toContain("{v1} は、どのことわざも解説に渡していません");
+	});
+
+	it("says which characters may follow こと もの and the like after a modifier that can hold a stem plus な", () => {
+		// 「ものなり」: もの is a listed noun, but its next character な is not one the tail list allows.
+		const source = valid.replace("form: verb-past 1", "form: verb-past 1\nform: na-stem-na 2").replace("{+m1:乙}{+n1:甲}を", "{+m1:乙}ものなり{+n1:甲}を");
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		expect(parsed.ok ? [] : parsed.issues.map((entry) => [entry.code, entry.detail])).toEqual([["na-follower", "g-one: g1"]]);
+		const text = explain(source);
+		expect(text).toContain("{+m1} の直後に置けません。");
+		expect(text).toContain("こと もの ところ ため はず わけ ほう");
+		expect(text).toContain("次の字は、文字の終わりか、が を に は も で の と か だ 、 。 のどれかだけです（「ものなり」の「な」は使えません）。");
+		// The same word followed by a listed character is accepted.
+		const accepted = valid.replace("form: verb-past 1", "form: verb-past 1\nform: na-stem-na 2").replace("{+m1:乙}{+n1:甲}を", "{+m1:乙}ものを{+n1:甲}を");
+		expect(parseStandardFakeProverbRecipeMarkdown(accepted).ok).toBe(true);
+	});
+
+	it("shows the fixed text itself, never the id the parser gave it", () => {
+		const text = explain(valid.replace("ことのたとえ。", 'ことの"たとえ"。'));
+		expect(text).toContain('固定の文字「ことの"たとえ"。」に、使えない字があるか、長すぎます。');
+		expect(text).toContain("24 字まで");
+		expect(text).not.toMatch(/l-[0-9a-f]{8}/u);
+		expect(text).toContain("(invalid-literal)");
+	});
+
+	it("explains the limits with the schema's own numbers", () => {
+		const many = valid.replace("line: {n1:甲}は{n2:甲}を{v1:丙}", "line: {n1:甲}{n2:甲}{n3:甲}{n4:甲}{n5:甲}は{v1:丙}");
+		expect(explain(many)).toContain(`名詞の穴が多すぎます。ことわざでは、${FAKE_PROVERB_LIMITS.slots.proverb.noun} 個までです。`);
+		expect(explain(many)).toContain(`解説に渡す穴が多すぎます（${FAKE_PROVERB_LIMITS.exports} 個まで）`);
+	});
+
+	it("says one mistake once when the compiler reports it under two codes", () => {
+		// The same word twice in a proverb is a duplicate slot and a duplicate export.
+		const source = valid.replace("line: {n1:甲}は{n2:甲}を{v1:丙}", "line: {n1:甲}は{n1:甲}を{v1:丙}");
+		const parsed = parseStandardFakeProverbRecipeMarkdown(source);
+		expect(parsed.ok ? [] : parsed.issues.map((entry) => entry.code)).toEqual(["duplicate-slot-id", "duplicate-export"]);
+		const text = explain(source);
+		expect(text.split("\n").filter((line) => line !== "")).toEqual([
+			`${STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN} に、直すところがあります。`,
+			`${lineOf(source, "line: {n1:甲}は")} 行目（proverb p-one）: 同じ穴 {n1:甲} を 2 回書いています。ことわざの中では、1 つの穴は 1 回だけ書けます。 (duplicate-slot-id, duplicate-export)`,
+		]);
+	});
+
+	it("keeps the code alone for a problem no Japanese sentence is written for", () => {
+		expect(explainFakeProverbSourceIssues([{ code: "invalid-structure", line: 1, detail: "proverbs" }]))
+			.toContain("1 行目: （日本語の説明の無い誤りです: proverbs） (invalid-structure)");
+	});
+
+	it("is what a failed generation says after the line that names the codes", async () => {
+		const error = await caught(() => generateStandardFakeProverbRecipes({ markdown: valid.replace("を{v1:丙}", "を{w1:丙}") }));
+		const [first, , third] = (error as Error).message.split("\n");
+		expect(first).toMatch(/^resources\/fake-proverb\/standard-recipes\.md is not a valid recipe document: invalid-hole \(line \d+\): p-one: \{w1:丙\}$/u);
+		expect(third).toBe(`${STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN} に、直すところがあります。`);
+		expect((error as Error).message).toContain("(invalid-hole)");
 	});
 });
 
@@ -553,7 +1148,7 @@ describe("the generated Fake Proverb recipe module", () => {
 	it("is exactly what the document implies, and the guard accepts the checkout", async () => {
 		const { source } = await generateStandardFakeProverbRecipes({ rootDir: process.cwd() });
 		expect(await readFile(STANDARD_FAKE_PROVERB_RECIPES_GENERATED, "utf8")).toBe(source);
-		await expect(assertStandardFakeProverbRecipesGenerated({ rootDir: process.cwd() })).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+		await expect(assertStandardFakeProverbRecipesGenerated({ rootDir: process.cwd() })).resolves.toEqual({ schemaVersion: 2, dataVersion: STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION });
 	});
 
 	it("renders byte-identical output with no timestamp or absolute path", async () => {
@@ -599,25 +1194,39 @@ describe("the generated Fake Proverb recipe module", () => {
 		expect(statements).not.toMatch(/\bimport\b|\brequire\b|STANDARD_FAKE_PROVERB_/u);
 		expect(compiler.match(/from "([^"]+)"/gu)).toEqual(['from "./recipeData"', 'from "./recipeData"']);
 		expect(STANDARD_FAKE_PROVERB_RECIPES_LOCK).not.toBe(STANDARD_COLLISION_PATTERNS_LOCK);
-		expect(FAKE_PROVERB_RECIPE_SCHEMA_VERSION).toBe(1);
+		expect(FAKE_PROVERB_RECIPE_SCHEMA_VERSION).toBe(2);
 	});
 });
 
 describe("Fake Proverb recipe generation, lock and publication", () => {
-	it("allows first generation only at data-version 1 when both destinations are absent", async () => {
+	it("allows first generation only at data-version 1 when both destinations are absent, then each next version on top", async () => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("first", { copyLock: false });
 		try {
-			const written = await writeStandardFakeProverbRecipes({ generatedPath: outfile, lockPath });
-			expect(written).toEqual({ outfile: STANDARD_FAKE_PROVERB_RECIPES_GENERATED, schemaVersion: 1, dataVersion: 1, proverbs: 9, glosses: 6, literals: 25, profiles: 6 });
+			// The checkout's versions 1 and 2 were written in formats the parser no longer reads, so the history here is
+			// the current document at data-version 1, an edit of it at 2, data 3 (the document with `heart-unknown` as
+			// it read before CORRECTION-ROUND1) at 3, and the checkout's own module at version 4.
+			const source = await standardMarkdown();
+			const written = await writeStandardFakeProverbRecipes({ markdown: bumped(source, 1), generatedPath: outfile, lockPath });
+			expect(written).toEqual({ outfile: STANDARD_FAKE_PROVERB_RECIPES_GENERATED, schemaVersion: 2, dataVersion: 1, proverbs: 63, glosses: 32, literals: 136, profiles: 14 });
+			const first = (JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock).versions;
+			expect(first.map((entry) => entry.dataVersion)).toEqual([1]);
+			await writeStandardFakeProverbRecipes({ markdown: bumped(source, 2) + EXTRA_PROVERB, generatedPath: outfile, lockPath });
+			const second = (JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock).versions;
+			expect(second.map((entry) => entry.dataVersion)).toEqual([1, 2]);
+			expect(second[0]).toEqual(first[0]);
+			await writeStandardFakeProverbRecipes({ markdown: bumped(source.replace(HEART_V4, HEART_V3), 3), generatedPath: outfile, lockPath });
+			const third = (JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock).versions;
+			expect(third).toEqual([...second, { dataVersion: 3, digest: V3_DIGEST }]);
+			await writeStandardFakeProverbRecipes({ generatedPath: outfile, lockPath });
 			expect(await readFile(outfile, "utf8")).toBe(await readFile(STANDARD_FAKE_PROVERB_RECIPES_GENERATED, "utf8"));
-			expect(await readFile(lockPath, "utf8")).toBe(await readFile(STANDARD_FAKE_PROVERB_RECIPES_LOCK, "utf8"));
+			expect((JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock).versions).toEqual([...third, { dataVersion: 4, digest: V4_DIGEST }]);
 			expect((await readdir(scratch)).sort()).toEqual(["standard-recipes.lock.json", "standardFakeProverbRecipeEntries.ts"]);
 		} finally { await rm(scratch, { recursive: true, force: true }); }
 	});
 
 	it.each([
 		["first generation at version 2", { copyLock: false }, 2],
-		["a skipped version after 1", { copyLock: true }, 3],
+		["a skipped version after the lock's last", { copyLock: true }, NEXT + 1],
 	] as const)("refuses %s before staging incomplete history", async (_name, options, version) => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("gap", options);
 		try {
@@ -630,10 +1239,12 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 	});
 
 	it.each([
-		["a literal", (s: string) => s.replace("\nのもと\n", "\nのはじまり\n")],
-		["a weight", (s: string) => s.replace("form: verb-basic 3", "form: verb-basic 4")],
-		["an export flag", (s: string) => s.replace("part: noun n3 plain-noun\n", "part: noun n3 plain-noun export\n")],
-		["part order", (s: string) => s.replace("part: literal wa\npart: noun n2 plain-noun export\npart: literal no-moto", "part: literal no-moto\npart: noun n2 plain-noun export\npart: literal wa")],
+		["fixed text", (s: string) => once(s, "line: {n1}は{n2}のもと", "line: {n1}は{n2}のはじまり")],
+		["a weight", (s: string) => once(s, "form: verb-basic 3", "form: verb-basic 4")],
+		["a slot the gloss gets", (s: string) => once(s, "line: {-m1}{n1}は{n2}を{v1:否}", "line: {m1}{n1}は{n2}を{v1:否}")],
+		["the order of a line", (s: string) => once(s, "line: {n1}は{n2}のもと", "line: {n2}は{n1}のもと")],
+		["the order of two entries", (s: string) => once(s, "## proverb rather-than\nenabled: true\nweight: 4\nline: {n1}より{n2}\n\n## proverb offered-to\nenabled: true\nweight: 4\nline: {n1}に{n2}\n",
+			"## proverb offered-to\nenabled: true\nweight: 4\nline: {n1}に{n2}\n\n## proverb rather-than\nenabled: true\nweight: 4\nline: {n1}より{n2}\n")],
 		["an added entry", (s: string) => s + EXTRA_PROVERB],
 		["a deletion", (s: string) => s.replace(/## proverb offered-to[\s\S]*?(?=## proverb modified-topic)/u, "")],
 	] as const)("refuses a same-version meaning change to %s, then accepts it at the next version while keeping history", async (_name, mutate) => {
@@ -646,10 +1257,10 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 			await expect(writeStandardFakeProverbRecipes({ markdown: edited, generatedPath: outfile, lockPath })).rejects.toThrow(/data-version-unchanged/u);
 			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: edited, generatedPath: outfile, lockPath })).rejects.toThrow(GENERATE_PATTERN);
 			expect([await readFile(outfile, "utf8"), await readFile(lockPath, "utf8")]).toEqual([generated, lockBefore]);
-			await writeStandardFakeProverbRecipes({ markdown: bumped(edited, 2), generatedPath: outfile, lockPath });
+			await writeStandardFakeProverbRecipes({ markdown: bumped(edited, NEXT), generatedPath: outfile, lockPath });
 			const after = JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock;
 			expect(after.versions[0]).toEqual({ dataVersion: 1, digest: V1_DIGEST });
-			expect(after.versions.map((entry) => entry.dataVersion)).toEqual([1, 2]);
+			expect(after.versions.map((entry) => entry.dataVersion)).toEqual([1, 2, 3, 4, NEXT]);
 			// The previous meaning is not re-approvable at a lower version either.
 			await expect(writeStandardFakeProverbRecipes({ generatedPath: outfile, lockPath })).rejects.toThrow(/data-version-unchanged/u);
 			await expectNoGeneratingFiles(scratch);
@@ -682,7 +1293,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 			await expect(assertStandardFakeProverbRecipesGenerated({ generatedPath: outfile, lockPath })).rejects.toThrow(/does not match/u);
 			await writeStandardFakeProverbRecipes({ generatedPath: outfile, lockPath });
 			expect(await readFile(outfile, "utf8")).toBe(original);
-			await expect(assertStandardFakeProverbRecipesGenerated({ generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			await expect(assertStandardFakeProverbRecipesGenerated({ generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 2, dataVersion: STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION });
 		} finally { await rm(scratch, { recursive: true, force: true }); }
 	});
 
@@ -728,7 +1339,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 	it("refuses a lock that has lost version 1, and a lock that is missing beside a generated module", async () => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("lost-history");
 		try {
-			const next = bumped(await standardMarkdown(), 2) + EXTRA_PROVERB;
+			const next = bumped(await standardMarkdown(), NEXT) + EXTRA_PROVERB;
 			await writeStandardFakeProverbRecipes({ markdown: next, generatedPath: outfile, lockPath });
 			const lock = JSON.parse(await readFile(lockPath, "utf8")) as RecipeLock;
 			await writeFile(lockPath, JSON.stringify({ versions: lock.versions.slice(1) }));
@@ -747,7 +1358,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 			const target = which === "generated" ? outfile : lockPath;
 			const readText = readTextWithFailures(new Map([[target, injectedFsError("EACCES")]]));
 			const before = [await readFile(outfile, "utf8"), await readFile(lockPath, "utf8")];
-			const markdown = bumped(await standardMarkdown(), 2) + EXTRA_PROVERB;
+			const markdown = bumped(await standardMarkdown(), NEXT) + EXTRA_PROVERB;
 			const writeError = await caught(() => writeStandardFakeProverbRecipes({ markdown, generatedPath: outfile, lockPath, readText }));
 			expect((writeError as NodeJS.ErrnoException).code).toBe("EACCES");
 			const guardError = await caught(() => assertStandardFakeProverbRecipesGenerated({ generatedPath: outfile, lockPath, readText }));
@@ -766,7 +1377,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 		try {
 			const before = [await readFile(outfile, "utf8"), await readFile(lockPath, "utf8")];
 			await expect(writeStandardFakeProverbRecipes({
-				markdown: bumped(await standardMarkdown(), 2) + EXTRA_PROVERB, generatedPath: outfile, lockPath,
+				markdown: bumped(await standardMarkdown(), NEXT) + EXTRA_PROVERB, generatedPath: outfile, lockPath,
 				beforePublish: (current) => { if (current === phase) throw new Error(`injected ${phase} failure`); },
 			})).rejects.toThrow(`injected ${phase} failure`);
 			expect([await readFile(outfile, "utf8"), await readFile(lockPath, "utf8")]).toEqual(before);
@@ -778,7 +1389,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths(`first-fail-${phase}`, { copyLock: false });
 		try {
 			await expect(writeStandardFakeProverbRecipes({
-				generatedPath: outfile, lockPath,
+				markdown: bumped(await standardMarkdown(), 1), generatedPath: outfile, lockPath,
 				beforePublish: (current) => { if (current === phase) throw new Error(`injected ${phase} failure`); },
 			})).rejects.toThrow(`injected ${phase} failure`);
 			expect(await readdir(scratch)).toEqual([]);
@@ -789,7 +1400,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("rollback");
 		try {
 			const lockBefore = await readFile(lockPath, "utf8");
-			const next = bumped(await standardMarkdown(), 2) + EXTRA_PROVERB;
+			const next = bumped(await standardMarkdown(), NEXT) + EXTRA_PROVERB;
 			const { source: nextSource } = await generateStandardFakeProverbRecipes({ markdown: next });
 			const error = await caught(() => writeStandardFakeProverbRecipes({
 				markdown: next, generatedPath: outfile, lockPath,
@@ -802,7 +1413,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: next, generatedPath: outfile, lockPath })).rejects.toThrow(/does not record the current recipe data/u);
 			await expectNoGeneratingFiles(scratch);
 			await writeStandardFakeProverbRecipes({ markdown: next, generatedPath: outfile, lockPath });
-			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: next, generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 1, dataVersion: 2 });
+			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: next, generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 2, dataVersion: NEXT });
 		} finally { await rm(scratch, { recursive: true, force: true }); }
 	});
 
@@ -811,7 +1422,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 		try {
 			const before = [await readFile(outfile, "utf8"), await readFile(lockPath, "utf8")];
 			const error = await caught(async () => writeStandardFakeProverbRecipes({
-				markdown: bumped(await standardMarkdown(), 2) + EXTRA_PROVERB, generatedPath: outfile, lockPath,
+				markdown: bumped(await standardMarkdown(), NEXT) + EXTRA_PROVERB, generatedPath: outfile, lockPath,
 				beforePublish: (phase) => { if (phase === "lock") throw new Error("injected lock failure"); },
 				beforeCleanup: (filePath) => { if (filePath.endsWith("standard-recipes.lock.json.generating")) throw new Error("injected cleanup failure"); },
 			}));
@@ -825,7 +1436,7 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("rollback-rename");
 		try {
 			const error = await caught(async () => writeStandardFakeProverbRecipes({
-				markdown: bumped(await standardMarkdown(), 2) + EXTRA_PROVERB, generatedPath: outfile, lockPath,
+				markdown: bumped(await standardMarkdown(), NEXT) + EXTRA_PROVERB, generatedPath: outfile, lockPath,
 				beforePublish: (phase) => { if (phase === "lock") throw new Error("injected lock failure"); },
 				beforeRollbackRename: () => { throw new Error("injected rollback rename failure"); },
 				beforeCleanup: (filePath) => { if (filePath === `${outfile}.generating`) throw new Error("injected rollback cleanup failure"); },
@@ -840,16 +1451,17 @@ describe("Fake Proverb recipe generation, lock and publication", () => {
 	it("reports a first-generation removal failure and succeeds after the leftover is removed", async () => {
 		const { scratch, outfile, lockPath } = await isolatedWritePaths("first-rollback", { copyLock: false });
 		try {
+			const first = bumped(await standardMarkdown(), 1);
 			const error = await caught(() => writeStandardFakeProverbRecipes({
-				generatedPath: outfile, lockPath,
+				markdown: first, generatedPath: outfile, lockPath,
 				beforePublish: (phase) => { if (phase === "lock") throw new Error("injected lock failure"); },
 				beforeRollback: () => { throw new Error("injected rollback failure"); },
 			}));
 			expectAggregated(error, "rollback-failed", ["injected lock failure", "injected rollback failure"]);
-			await expect(assertStandardFakeProverbRecipesGenerated({ generatedPath: outfile, lockPath })).rejects.toThrow(/standard-recipes\.lock\.json is missing/u);
+			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: first, generatedPath: outfile, lockPath })).rejects.toThrow(/standard-recipes\.lock\.json is missing/u);
 			await rm(outfile);
-			await writeStandardFakeProverbRecipes({ generatedPath: outfile, lockPath });
-			await expect(assertStandardFakeProverbRecipesGenerated({ generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			await writeStandardFakeProverbRecipes({ markdown: first, generatedPath: outfile, lockPath });
+			await expect(assertStandardFakeProverbRecipesGenerated({ markdown: first, generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 2, dataVersion: 1 });
 		} finally { await rm(scratch, { recursive: true, force: true }); }
 	});
 });
@@ -862,7 +1474,7 @@ describe("the Fake Proverb recipe build guard", () => {
 			await writeFile(outfile, generated.replaceAll("\n", "\r\n"));
 			await writeFile(lockPath, (await readFile(lockPath, "utf8")).replaceAll("\n", "\r\n"));
 			const markdown = (await standardMarkdown()).replaceAll("\n", "\r\n");
-			await expect(assertStandardFakeProverbRecipesGenerated({ markdown, generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			await expect(assertStandardFakeProverbRecipesGenerated({ markdown, generatedPath: outfile, lockPath })).resolves.toEqual({ schemaVersion: 2, dataVersion: STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION });
 			// A same-version rewrite from a CRLF checkout is a no-op for the lock.
 			const lockCrlf = await readFile(lockPath, "utf8");
 			await writeStandardFakeProverbRecipes({ markdown, generatedPath: outfile, lockPath });
@@ -901,7 +1513,7 @@ describe("the Fake Proverb recipe build guard", () => {
 				markdownPath: path.join(scratch, STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN),
 				generatedPath: path.join(scratch, STANDARD_FAKE_PROVERB_RECIPES_GENERATED),
 				lockPath: path.join(scratch, STANDARD_FAKE_PROVERB_RECIPES_LOCK),
-			})).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			})).resolves.toEqual({ schemaVersion: 2, dataVersion: STANDARD_FAKE_PROVERB_RECIPE_DATA_VERSION });
 		} finally { await rm(scratch, { recursive: true, force: true }); }
 	});
 
@@ -1044,8 +1656,8 @@ describe("automatic watch detection, composed with the Collision guard that load
 	});
 
 	const cases = [
-		{ label: "a Markdown recipe", file: STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN, mutate: (s: string) => s.replace("form: verb-basic 3", "form: verb-basic 4"), error: /does not match/u },
-		{ label: "a malformed Markdown line", file: STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN, mutate: (s: string) => s.replace("part: literal yori", "part: literal yori extra"), error: /invalid-part/u },
+		{ label: "a Markdown recipe", file: STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN, mutate: (s: string) => once(s, "form: verb-basic 3", "form: verb-basic 4"), error: /does not match/u },
+		{ label: "a malformed Markdown line", file: STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN, mutate: (s: string) => once(s, "line: {n1}より{n2}\n", "line: {n1}より{n2\n"), error: /invalid-line/u },
 		{ label: "the generated module", file: STANDARD_FAKE_PROVERB_RECIPES_GENERATED, mutate: (s: string) => s.replace("Do not edit this file.", "hand-edited"), error: /does not match/u },
 		{ label: "a malformed lock", file: STANDARD_FAKE_PROVERB_RECIPES_LOCK, mutate: () => "{}", error: /malformed-lock/u },
 		{ label: "the compiler validator", file: "src/fakeProverb/compileRecipeSet.ts", mutate: (s: string) => s.replace("input.schemaVersion !== FAKE_PROVERB_RECIPE_SCHEMA_VERSION", "input.schemaVersion !== -1"), error: /unsupported-schema-version/u },
@@ -1067,9 +1679,9 @@ describe("automatic watch detection, composed with the Collision guard that load
 			const source = await readFile(sourcePath, "utf8");
 			const changed = mutate(source);
 			expect(changed).not.toBe(source);
-			expect((await watched.event(() => writeFile(sourcePath, changed))).join("\n")).toMatch(error);
+			expect((await watched.event(() => replaceFile(sourcePath, changed))).join("\n")).toMatch(error);
 			expect(await readFile(sourcePath, "utf8")).toBe(changed);
-			expect(await watched.event(() => writeFile(sourcePath, source))).toEqual([]);
+			expect(await watched.event(() => replaceFile(sourcePath, source))).toEqual([]);
 			expect(await readFile(path.join(scratch, "out.js"), "utf8")).toBe(output);
 		} finally { await watched?.context.dispose(); await rm(scratch, { recursive: true, force: true }); }
 	}, 60_000);
@@ -1087,8 +1699,8 @@ describe("automatic watch detection, composed with the Collision guard that load
 				const source = await readFile(file, "utf8");
 				const changed = relative.endsWith(".md") ? source.replace("label: Standard", "label: Watch") : source.replace("COLLISION_PATTERN_SCHEMA_VERSION = 2", "COLLISION_PATTERN_SCHEMA_VERSION = 3");
 				expect(changed).not.toBe(source);
-				expect((await watched.event(() => writeFile(file, changed))).join("\n")).toMatch(/standardCollisionPatternEntries|unsupported-schema-version/u);
-				expect(await watched.event(() => writeFile(file, source))).toEqual([]);
+				expect((await watched.event(() => replaceFile(file, changed))).join("\n")).toMatch(/standardCollisionPatternEntries|unsupported-schema-version/u);
+				expect(await watched.event(() => replaceFile(file, source))).toEqual([]);
 			}
 		} finally { await watched?.context.dispose(); await rm(scratch, { recursive: true, force: true }); }
 	}, 60_000);
@@ -1110,8 +1722,9 @@ describe("the Fake Proverb recipe source stays out of the plugin", () => {
 			for (const name of inputs) expect(name).not.toMatch(/scripts\/|resources\/|\.md$|\.json$/u);
 			const code = result.outputFiles[0]!.text;
 			expect(code).not.toMatch(/standard-recipes|generate:fake-proverb-recipes|STANDARD_FAKE_PROVERB_RECIPE_DATA_JSON|STANDARD_FAKE_PROVERB_RECIPE_DATA_DIGEST|1d329f91ba002ac0|"proverbs\\":/u);
-			// The typed recipes and literals are runtime data now.
-			expect(code).toContain("koto-no-tatoe");
+			// The typed recipes and literals are runtime data now: a recipe id and a literal's id, which no source file spells.
+			expect(code).toContain("misplaced-purpose");
+			expect(code).toContain(fakeProverbLiteralId("ことのたとえ。"));
 		}
 	});
 

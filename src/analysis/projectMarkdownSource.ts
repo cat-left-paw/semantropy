@@ -9,8 +9,11 @@ import {
 } from "./activeContinuation";
 
 export const SOURCE_PROJECTION_POLICY_VERSION = "source-projection-1";
-/** 2: per-line recovery from local unsupported notation (FIX1); 1 was the SAFE-RENDER1 prototype. */
-export const TARGET_PRESENTATION_POLICY_VERSION = "target-presentation-2";
+/**
+ * 3: the half-width spaces and tabs at the end of a line are not part of it (TRAILING-SPACE1); 2: per-line recovery from
+ * local unsupported notation (FIX1); 1 was the SAFE-RENDER1 prototype.
+ */
+export const TARGET_PRESENTATION_POLICY_VERSION = "target-presentation-3";
 
 /** Adapter-owned strings, just like DOM Text bindings, with exact raw offsets. */
 export type MarkdownSourceBinding = SourceTextInput & { rawRange: Utf16Range };
@@ -53,7 +56,18 @@ const STRUCTURAL_INTERRUPT = /^ {0,3}(?:>|[-+*]\s|\d+[.)]\s|[-=_]{3})/u;
 const AOZORA_ANNOTATION = /^※?［＃[^［］\r\n]*］(?:《[^《》｜\r\n]+》)?/u;
 /** One line-local allowlist gate, shared by whole parsing and certified replay. */
 function unsupportedTargetLine(text: string, heading: boolean): boolean {
-	return (!heading && /^[ \t]/.test(text)) || /^\[/.test(text) || / $/.test(text);
+	return (!heading && /^[ \t]/.test(text)) || /^\[/.test(text);
+}
+/**
+ * Where the half-width spaces and tabs at the end of a line begin (TRAILING-SPACE1). They are not part of what the line
+ * says: Markdown reads two of them as a hard break, and this display already ends every soft line, so a line is read as if it
+ * ended before them, and they are syntax (shown, copied and collected as nothing). Pasted web articles often carry them.
+ * Shared by whole parsing and certified replay, like the gate above.
+ */
+function contentLength(text: string): number {
+	let end = text.length;
+	while (end > 0 && (text[end - 1] === " " || text[end - 1] === "\t")) end -= 1;
+	return end;
 }
 
 const HAN_BASE = /^(?:\p{Script=Han}|[々〆ヶヵ])$/u;
@@ -125,9 +139,11 @@ export function projectTargetFragments(markdown: string, fragments: readonly Tar
 				else pieces.push({ kind: "break", start: previousEnd, end: at },
 					{ kind: "inline", input: { kind: "text", ...bind(previousEnd, at) } });
 				const text = markdown.slice(at, lineEnd);
-				const unsupported = unsupportedTargetLine(text, !!heading);
-				const child = unsupported ? null : inline(contentStart, lineEnd);
-				if (child && rubyValid(child)) pieces.push(...child);
+				// A line with nothing after its marker and its trailing blank (an empty heading) stays protected, as it was.
+				const contentEnd = at + contentLength(text);
+				const unsupported = unsupportedTargetLine(text, !!heading) || contentEnd <= contentStart;
+				const child = unsupported ? null : inline(contentStart, contentEnd);
+				if (child && rubyValid(child)) { syntax(contentEnd, lineEnd); pieces.push(...child); }
 				else pieces.push({ kind: "protected", start: at, end: lineEnd, visibleStart: at, visibleEnd: lineEnd, tag: "span", placeholder: false });
 				previousEnd = lineEnd; at = next;
 			}
@@ -446,9 +462,12 @@ function project(markdown: string, mode: "source" | "target-prototype", replay?:
 				// interrupt a paragraph.
 				if (m > k && (heading || HEADING.test(line.text) || STRUCTURAL_INTERRUPT.test(line.text))) break;
 				const contentStart = m === k ? line.start + (heading?.[0].length ?? 0) : line.start;
-				const unsupported = unsupportedTargetLine(line.text, m === k && !!heading);
-				const child = unsupported ? null : inline(contentStart, line.end);
+				// The blank at the end of the line is syntax (see `contentLength`); an empty heading stays protected, as it was.
+				const contentEnd = line.start + contentLength(line.text);
+				const unsupported = unsupportedTargetLine(line.text, m === k && !!heading) || contentEnd <= contentStart;
+				const child = unsupported ? null : inline(contentStart, contentEnd);
 				if (child && rubyValid(child)) {
+					syntax(contentEnd, line.end);
 					// A soft line is an explicit br boundary; no token or ruby spans it.
 					if (m > k) pieces.push({ kind: "break", start: lines[m - 1]!.end, end: lines[m - 1]!.next },
 						{ kind: "inline", input: { kind: "text", ...bind(lines[m - 1]!.end, lines[m - 1]!.next) } });

@@ -50,7 +50,7 @@ describe("the shipped Fake Proverb recipe contract", () => {
 		for (const marker of [
 			STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN, "standard-recipes.md", "standard-recipes.lock.json", "resources/fake-proverb",
 			"parseStandardFakeProverbRecipeMarkdown", "standardFakeProverbRecipeEntries", GENERATE_COMMAND,
-			"STANDARD_FAKE_PROVERB_RECIPE_DATA_JSON", "STANDARD_FAKE_PROVERB_RECIPE_DATA_DIGEST", "1d329f91ba002ac0", "schemaVersion\\\":1",
+			"STANDARD_FAKE_PROVERB_RECIPE_DATA_JSON", "STANDARD_FAKE_PROVERB_RECIPE_DATA_DIGEST", "1d329f91ba002ac0", "232aeb4381fcb41b", "schemaVersion\\\":2",
 		]) {
 			expect(bundle).not.toContain(marker);
 		}
@@ -61,8 +61,10 @@ describe("the shipped Fake Proverb recipe contract", () => {
 	it("keeps the guard inside every bundle, so a watch rebuild cannot skip it", () => {
 		const plugins = bundleOptions(rootDir, { outfile: path.join(rootDir, outDir, "unused.js"), banner: "", dictionaryDir: undefined, minify: true, sourcemap: false })
 			.plugins.map((plugin: { name: string }) => plugin.name);
+		// FAKE-ALERT-TEMPLATES1 adds the Fake Alert guard after the guards that own the entry point.
 		expect(plugins).toEqual([
-			"semantropy-standard-templates", "semantropy-standard-collision-patterns", "semantropy-standard-fake-proverb-recipes", "semantropy-lindera",
+			"semantropy-standard-templates", "semantropy-standard-collision-patterns", "semantropy-standard-fake-proverb-recipes",
+			"semantropy-standard-fake-alert-recipes", "semantropy-lindera",
 		]);
 	});
 
@@ -88,7 +90,7 @@ describe("the shipped Fake Proverb recipe contract", () => {
 	});
 
 	it("accepts the checkout, and refuses a stale generated module in a scratch copy without touching it", async () => {
-		await expect(assertStandardFakeProverbRecipesGenerated({ rootDir })).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+		await expect(assertStandardFakeProverbRecipesGenerated({ rootDir })).resolves.toEqual({ schemaVersion: 2, dataVersion: 4 });
 		const scratch = await mkdtemp(path.join(tmpdir(), "semantropy-fake-proverb-stale-"));
 		try {
 			const stale = path.join(scratch, "standardFakeProverbRecipeEntries.ts");
@@ -96,7 +98,7 @@ describe("the shipped Fake Proverb recipe contract", () => {
 			await writeFile(stale, source.replace("topic-object", "topic-object-x"));
 			await expect(assertStandardFakeProverbRecipesGenerated({ rootDir, generatedPath: stale })).rejects.toThrow(/does not match/u);
 			await writeFile(stale, source.replaceAll("\n", "\r\n"));
-			await expect(assertStandardFakeProverbRecipesGenerated({ rootDir, generatedPath: stale })).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			await expect(assertStandardFakeProverbRecipesGenerated({ rootDir, generatedPath: stale })).resolves.toEqual({ schemaVersion: 2, dataVersion: 4 });
 			expect(await readFile(path.join(rootDir, STANDARD_FAKE_PROVERB_RECIPES_GENERATED), "utf8")).toBe(source);
 		} finally { await rm(scratch, { recursive: true, force: true }); }
 	});
@@ -125,7 +127,7 @@ describe("every build entry refuses stale Fake Proverb input without publishing"
 			const sameVersionMeaning = markdown.replace("form: verb-basic 3", "form: verb-basic 4");
 			const edits: [string, string, string, RegExp][] = [
 				[markdownPath, markdown, sameVersionMeaning, /does not match/u],
-				[markdownPath, markdown, markdown.replace("part: literal yori", "part: literal yori extra"), /invalid-part/u],
+				[markdownPath, markdown, markdown.replace("line: {n1}より{n2}\n", "line: {n1}より{n2\n"), /invalid-line/u],
 				[generatedPath, generated, `${generated}// hand edit\n`, /does not match/u],
 				[path.join(scratch, STANDARD_FAKE_PROVERB_RECIPES_LOCK), await readFile(path.join(scratch, STANDARD_FAKE_PROVERB_RECIPES_LOCK), "utf8"), "{}", /malformed-lock/u],
 			];
@@ -167,7 +169,8 @@ describe("watching through the real bundle plugin list", () => {
 			// The real guards, in the real order. Only the dictionary payload is
 			// left external; it has no hook on src/main.ts.
 			const guards = options.plugins.filter((plugin: { name: string }) => plugin.name !== "semantropy-lindera") as Plugin[];
-			expect(guards.map((plugin) => plugin.name)).toEqual(["semantropy-standard-templates", "semantropy-standard-collision-patterns", "semantropy-standard-fake-proverb-recipes"]);
+			expect(guards.map((plugin) => plugin.name)).toEqual(["semantropy-standard-templates", "semantropy-standard-collision-patterns", "semantropy-standard-fake-proverb-recipes",
+				"semantropy-standard-fake-alert-recipes"]);
 			context = await esbuildContext({ ...options, banner: undefined, external: [...(options.external as string[]), "virtual:semantropy-lindera-*"], logLevel: "silent",
 				plugins: [...guards, { name: "record-watch", setup(build) { build.onEnd((result) => {
 					// Warnings travel with errors, so every clean rebuild is also warning-free.

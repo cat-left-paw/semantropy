@@ -1,6 +1,7 @@
 export declare const STANDARD_TEMPLATES_MARKDOWN: string;
 export declare const STANDARD_TEMPLATES_GENERATED: string;
 export declare const GENERATE_COMMAND: string;
+export declare const FAKE_DICTIONARY_TEMPLATE_VALIDATORS: readonly string[];
 export declare const TEMPLATE_SCHEMA_VERSION: number;
 
 export type TemplateSourceIssue = {

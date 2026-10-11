@@ -6,10 +6,23 @@ import { UiLabels } from "../i18n/uiLabels";
 import { iconLabel } from "./controlIcon";
 
 type RowUI = {
+	/** COLLISION-LOCK1: the row whose text is built, and the words of it that can be locked, by part name. */
+	rowId: string | null; words: Map<string, HTMLElement>;
 	root: HTMLElement; text: HTMLElement; pattern: HTMLElement; status: HTMLElement;
 	regenerate: HTMLButtonElement; cancel: HTMLButtonElement;
 	copy: HTMLButtonElement; collect: HTMLButtonElement; off: (() => void)[]; labels: UiLabels;
 };
+
+/** COLLISION-LOCK1: where a selection stood, to tell a selection a drag made from one that was already there. */
+type SelectionMark = { readonly anchor: Node | null; readonly anchorOffset: number; readonly focus: Node | null; readonly focusOffset: number; readonly empty: boolean };
+function markSelection(selection: Selection | null): SelectionMark {
+	if (!selection) return { anchor: null, anchorOffset: 0, focus: null, focusOffset: 0, empty: true };
+	return { anchor: selection.anchorNode, anchorOffset: selection.anchorOffset, focus: selection.focusNode, focusOffset: selection.focusOffset,
+		empty: selection.isCollapsed || selection.toString() === "" };
+}
+function sameSelection(a: SelectionMark, b: SelectionMark): boolean {
+	return a.empty === b.empty && a.anchor === b.anchor && a.anchorOffset === b.anchorOffset && a.focus === b.focus && a.focusOffset === b.focusOffset;
+}
 
 /**
  * LOCALE1: a recipe's label in the current language. Labels are pattern data and
@@ -93,6 +106,8 @@ export class CollisionModal extends Modal {
 		});
 		this.cancel = this.button(controls, () => ui().common.cancelGenerate, () => { this.session?.cancel("generate"); this.generate?.focus(); });
 		this.button(controls, () => ui().common.close, () => this.close());
+		// COLLISION-LOCK1: the one line that says a word can be locked.
+		const hint = this.element(this.contentEl, "p"); hint.className = "semantropy-collision-hint"; this.labels.text(hint, () => ui().collision.lockHint);
 		this.captured = this.element(this.contentEl, "p");
 		this.status = this.element(this.contentEl, "p"); this.status.setAttribute("role", "status");
 		this.status.setAttribute("aria-live", "polite");
@@ -104,16 +119,61 @@ export class CollisionModal extends Modal {
 		const labels = new UiLabels();
 		const root = this.element(this.list!, "li"); root.className = "semantropy-collision-row";
 		const text = this.element(root, "p"); text.className = "semantropy-collision-text";
+		// COLLISION-LOCK1: three listeners for the whole text, never one per word. They go with the row.
+		// A pointer press remembers the selection it found. A click that ends with another, non-empty selection of this
+		// text was a drag over the words (to select them), not a click on one; a selection that was already there when
+		// the pointer was pressed does not make it a drag.
+		let pressed: SelectionMark | null = null;
+		const press = () => { pressed = markSelection(text.ownerDocument.getSelection()); };
+		const lock = (event: Event) => {
+			const word = event.target instanceof Element ? event.target.closest<HTMLElement>(".semantropy-collision-word") : null;
+			const name = word?.getAttribute("data-slot-id");
+			if (!word || !name || !text.contains(word)) return;
+			if (event.type === "click") {
+				const before = pressed; pressed = null;
+				const now = markSelection(text.ownerDocument.getSelection());
+				if (before !== null && !now.empty && text.contains(now.anchor) && !sameSelection(before, now)) return;
+			}
+			if (event.type === "keydown") {
+				const key = (event as KeyboardEvent).key;
+				if (key !== "Enter" && key !== " ") return;
+				event.preventDefault();
+			}
+			this.session?.toggleLock(slot, name);
+		};
+		text.addEventListener("pointerdown", press); text.addEventListener("click", lock); text.addEventListener("keydown", lock);
+		off.push(() => { text.removeEventListener("pointerdown", press); text.removeEventListener("click", lock); text.removeEventListener("keydown", lock); });
 		// 0.1.0 S1: the pattern and the row's actions share one line; a row regenerates with its own pattern.
 		const meta = this.element(root, "div"); meta.className = "semantropy-collision-meta";
 		const pattern = this.element(meta, "span"); pattern.className = "semantropy-collision-pattern";
 		const controls = this.element(meta, "div"); controls.className = "semantropy-modal-row-actions";
-		const regenerate = this.iconButton(controls, "dices", () => ui().collision.regenerate, () => { void this.session?.regenerate(slot); }, off, labels);
+		const regenerate = this.iconButton(controls, "dices", () => this.session && this.session.lockedNames(slot).length > 0 ? ui().collision.regenerateKeeping : ui().collision.regenerate,
+			() => { void this.session?.regenerate(slot); }, off, labels);
 		const cancel = this.iconButton(controls, "x", () => ui().common.cancel, () => { this.session?.cancel(slot); regenerate.focus(); }, off, labels);
 		const copy = this.iconButton(controls, "copy", () => ui().common.copy, () => { void this.session?.write(slot, "copy"); }, off, labels);
 		const collect = this.iconButton(controls, "inbox", () => ui().common.collect, () => { void this.session?.write(slot, "collect"); }, off, labels);
 		const status = this.element(root, "p"); status.setAttribute("role", "status"); status.setAttribute("aria-live", "polite");
-		return { root, text, pattern, regenerate, cancel, copy, collect, status, off, labels };
+		return { rowId: null, words: new Map(), root, text, pattern, regenerate, cancel, copy, collect, status, off, labels };
+	}
+	/**
+	 * COLLISION-LOCK1: a row's text, one piece per part. A noun, a modifier and a predicate are words that can be
+	 * locked (a button in the text, named by the word); the rest is plain text. Everything is a text node.
+	 * Built when the row's result is replaced, never for a lock: a lock only changes the words' state, so the word
+	 * a writer is on keeps the focus.
+	 */
+	private renderText(row: RowUI, committed: { readonly rowId: string; readonly segments: readonly { readonly kind: string; readonly slotId: string; readonly text: string }[] }) {
+		const doc = row.text.ownerDocument;
+		row.text.replaceChildren(); row.words.clear();
+		for (const segment of committed.segments) {
+			if (segment.text === "") continue;
+			if (segment.kind !== "noun" && segment.kind !== "modifier" && segment.kind !== "predicate") { row.text.append(doc.createTextNode(segment.text)); continue; }
+			const word = doc.createElement("span");
+			word.className = "semantropy-collision-word"; word.textContent = segment.text;
+			word.setAttribute("role", "button"); word.setAttribute("tabindex", "0"); word.setAttribute("aria-pressed", "false");
+			word.setAttribute("data-slot-id", segment.slotId);
+			row.text.append(word); row.words.set(segment.slotId, word);
+		}
+		row.rowId = committed.rowId;
 	}
 	sync() {
 		const session = this.session, state = session?.read();
@@ -138,10 +198,19 @@ export class CollisionModal extends Modal {
 			let ui = this.rows.get(row.rowSlotId);
 			if (!ui) { ui = this.row(row.rowSlotId); this.rows.set(row.rowSlotId, ui); }
 			const draft = state!.rowDrafts.find(draft => draft.rowSlotId === row.rowSlotId)!;
-			if (ui.text.textContent !== row.committed.text) ui.text.textContent = row.committed.text;
+			if (ui.rowId !== row.committed.rowId || ui.text.textContent !== row.committed.text) this.renderText(ui, row.committed);
+			// COLLISION-LOCK1: which words are locked, and whether they can change now.
+			const locked = new Set(session.lockedNames(row.rowSlotId)), changeable = session.canToggleLock(row.rowSlotId);
+			for (const [name, word] of ui.words) {
+				const on = locked.has(name);
+				if (word.getAttribute("aria-pressed") !== String(on)) word.setAttribute("aria-pressed", String(on));
+				word.classList.toggle("is-locked", on);
+				if (word.getAttribute("aria-disabled") !== String(!changeable)) word.setAttribute("aria-disabled", String(!changeable));
+			}
 			const pattern = t.collision.currentPattern(collisionRecipeLabel(batch!.patternSet.recipes.find(recipe => recipe.id === row.committed.recipeId)!));
 			if (ui.pattern.textContent !== pattern) ui.pattern.textContent = pattern;
-			ui.regenerate.disabled = !!state?.generation.pending;
+			ui.regenerate.disabled = !!state?.generation.pending || !session.canRegenerate(row.rowSlotId);
+			ui.labels.apply(); // The Regenerate name follows the locks.
 			const shown = this.pendingShown(row.rowSlotId, draft.pending);
 			ui.cancel.hidden = !shown;
 			ui.copy.disabled = ui.collect.disabled = !session.canWrite(row.rowSlotId);

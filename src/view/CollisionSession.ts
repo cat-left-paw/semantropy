@@ -1,4 +1,4 @@
-import { createCollisionBatchController, collisionFragmentFromBatch, collisionBatchRecipeOptions,
+import { createCollisionBatchController, collisionFragmentFromBatch, collisionBatchRecipeOptions, collisionLockableSlots,
 	type CollisionBatchController, type CollisionBatchReason, type CollisionOperationTicket,
 	type CollisionRowSelector } from "../collision/collisionBatch";
 import { compileCollisionPatternSet, type CompiledCollisionPatternSet } from "../collision/compilePatternSet";
@@ -40,6 +40,8 @@ export class CollisionSession {
 	private tickets = new Map<string, CollisionOperationTicket>();
 	private writes = new Map<string, object>();
 	private feedback = new Map<string, { rowId: string; message: string }>();
+	/** COLLISION-LOCK1: per row, the names of the words it keeps when it is regenerated, for the recipe they were chosen in. Never saved. */
+	private locks = new Map<string, { recipeId: string; names: Set<string> }>();
 	private stale = false;
 	private optionsBatch: string | null = null;
 	private options: readonly { readonly id: string; readonly label: string }[] = [];
@@ -96,10 +98,50 @@ export class CollisionSession {
 			await this.run("generate", begun.value, vocabulary);
 		} catch { this.error = collisionMessage("invalid-request"); this.changed?.(); }
 	}
+	private committedRow(slot: string) {
+		return this.read()?.batch?.rows.find(row => row.rowSlotId === slot) ?? null;
+	}
+	/** COLLISION-LOCK1: the parts of a row a writer can keep (a noun, a modifier or a predicate), by name, in the row's order. */
+	lockableNames(slot: string): readonly string[] {
+		const row = this.committedRow(slot);
+		return row ? collisionLockableSlots(row) : [];
+	}
+	/** The names this row keeps now. Names from another recipe, or for a part the row no longer has, count for nothing. */
+	lockedNames(slot: string): readonly string[] {
+		const row = this.committedRow(slot), entry = this.locks.get(slot);
+		if (!row || !entry || entry.recipeId !== row.committed.recipeId) return [];
+		const lockable = new Set(this.lockableNames(slot));
+		return [...entry.names].filter(name => lockable.has(name));
+	}
+	/** A lock changes while nothing is being generated for the row, nor for the list. */
+	canToggleLock(slot: string): boolean {
+		const state = this.read();
+		return !!this.committedRow(slot) && !state?.generation.pending && !state?.rowDrafts.find(row => row.rowSlotId === slot)?.pending;
+	}
+	/** Keeping every part that can be kept leaves nothing to draw. */
+	canRegenerate(slot: string): boolean {
+		const lockable = this.lockableNames(slot).length;
+		return lockable === 0 || this.lockedNames(slot).length < lockable;
+	}
+	/** Keeps the word of a part, or lets it go. Returns whether the lock changed. */
+	toggleLock(slot: string, name: string): boolean {
+		const row = this.committedRow(slot);
+		if (!row || !this.canToggleLock(slot) || !this.lockableNames(slot).includes(name)) return false;
+		let entry = this.locks.get(slot);
+		if (!entry || entry.recipeId !== row.committed.recipeId) { entry = { recipeId: row.committed.recipeId, names: new Set() }; this.locks.set(slot, entry); }
+		if (entry.names.has(name)) entry.names.delete(name); else entry.names.add(name);
+		if (entry.names.size === 0) this.locks.delete(slot);
+		this.changed?.();
+		return true;
+	}
 	async regenerate(slot: string): Promise<void> {
-		if (!this.host || !this.controller) return;
+		if (!this.host || !this.controller || !this.canRegenerate(slot)) return;
 		try {
-			const begun = this.controller.beginRegenerate({ rowSlotId: slot, operationMaterial: this.host.material() });
+			// COLLISION-LOCK1: with words kept, the row keeps its shape; without, the whole row is drawn again, as it always was.
+			const kept = this.lockedNames(slot);
+			const begun = kept.length > 0
+				? this.controller.beginRegenerateWithLocks({ rowSlotId: slot, lockedSlotIds: kept, operationMaterial: this.host.material() })
+				: this.controller.beginRegenerate({ rowSlotId: slot, operationMaterial: this.host.material() });
 			if (!begun.ok) { this.error = collisionMessage(begun.reason); this.changed?.(); return; }
 			this.tickets.set(slot, begun.value); await this.run(slot, begun.value);
 		} catch { this.error = collisionMessage("invalid-request"); this.changed?.(); }
@@ -118,7 +160,7 @@ export class CollisionSession {
 			if (vocabulary && host.active() !== vocabulary) { this.cancel(key); return; }
 			if (prepared.ok) {
 				const completed = owner.complete(ticket, prepared.value);
-				if (completed.ok && vocabulary) { this.stale = false; this.feedback.clear(); }
+				if (completed.ok && vocabulary) { this.stale = false; this.feedback.clear(); this.locks.clear(); }
 			} else owner.cancel(ticket);
 		} catch { if (current()) { owner.cancel(ticket); this.error = collisionMessage("invalid-request"); } }
 		finally { if (current()) { this.tickets.delete(key); this.changed?.(); } }
@@ -156,6 +198,6 @@ export class CollisionSession {
 	dispose() {
 		this.controller?.close(); this.controller?.dispose(); this.controller = null;
 		this.host = null; this.patterns = null; this.changed = null;
-		this.tickets.clear(); this.writes.clear(); this.feedback.clear(); this.options = []; this.optionsBatch = null;
+		this.tickets.clear(); this.writes.clear(); this.feedback.clear(); this.locks.clear(); this.options = []; this.optionsBatch = null;
 	}
 }

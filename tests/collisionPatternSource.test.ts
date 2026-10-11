@@ -40,6 +40,7 @@ import {
 	STANDARD_COLLISION_RECIPES,
 } from "../src/collision/generated/standardCollisionPatternEntries";
 import { readPinnedFixture } from "./support/pinnedFixture";
+import { replaceFile } from "./support/replaceFile";
 
 type PatternLock = { versions: { dataVersion: number; digest: string }[] };
 
@@ -2322,9 +2323,9 @@ describe("automatic watch detection without relying on a Collision runtime impor
 			const source = await readFile(sourcePath, "utf8");
 			const changed = mutate(source);
 			expect(changed).not.toBe(source);
-			expect((await watchEvent(() => writeFile(sourcePath, changed))).join("\n")).toMatch(error);
+			expect((await watchEvent(() => replaceFile(sourcePath, changed))).join("\n")).toMatch(error);
 			expect(await readFile(sourcePath, "utf8")).toBe(changed);
-			expect(await watchEvent(() => writeFile(sourcePath, source))).toEqual([]);
+			expect(await watchEvent(() => replaceFile(sourcePath, source))).toEqual([]);
 			expect(await readFile(path.join(scratch, "out.js"), "utf8")).toBe(output);
 		} finally { await context?.dispose(); await rm(scratch, { recursive: true, force: true }); }
 	}, 60_000);

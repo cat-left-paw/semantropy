@@ -38,6 +38,7 @@ import {
 } from "../src/dictionary/generateFakeDefinition";
 import type { FakeDictionaryHeadword } from "../src/dictionary/headword";
 import type { DictionaryVocabularyPool } from "../src/dictionary/vocabularyPool";
+import { TEMPLATE_SET_1 } from "./support/fakeDictionaryTemplateSet1";
 import { readPinnedFixture } from "./support/pinnedFixture";
 
 type RawEntry = { id: string; family?: string; category?: string; text: string };
@@ -78,6 +79,19 @@ const BASELINE = readPinnedFixture<Baseline>(
 
 const markdown = async () => await readFile(STANDARD_TEMPLATES_MARKDOWN, "utf8");
 
+/**
+ * FAKE-DICT-LEXEME1 stage B (template set 2) adds one core template to 18
+ * families, each the family's fourth. The fixture above stays the record of
+ * template set 1, and the set it describes is compiled here to show that its
+ * 180 definitions still come out unchanged.
+ */
+const ADDED_IN_SET_2 = [
+	"classification-04", "instrument-04", "action-04", "state-04", "quality-04", "person-04", "place-04", "organism-04",
+	"custom-04", "food-04", "theory-04", "slang-04", "figurative-04", "idiom-04", "technical-04", "measure-04", "method-04",
+	"uncertain-04",
+] as const;
+const SET_1 = TEMPLATE_SET_1;
+
 /** A document built from parts, so one rule at a time can be broken. */
 function document(options: {
 	schema?: string | null;
@@ -86,7 +100,7 @@ function document(options: {
 	extra?: string;
 } = {}): string {
 	const lines = ["# Templates", ""];
-	if (options.schema !== null) lines.push(`schema-version: ${options.schema ?? "1"}`);
+	if (options.schema !== null) lines.push(`schema-version: ${options.schema ?? "2"}`);
 	if (options.data !== null) lines.push(`data-version: ${options.data ?? "1"}`);
 	if (options.extra !== undefined) lines.push(options.extra);
 	lines.push("");
@@ -110,20 +124,20 @@ describe("the standard template document", () => {
 		expect(parsed.ok).toBe(true);
 		if (!parsed.ok) return;
 		expect(parsed.schemaVersion).toBe(TEMPLATE_SCHEMA_VERSION);
-		expect(parsed.dataVersion).toBe(1);
-		expect(parsed.coreTemplates).toHaveLength(90);
+		expect(parsed.dataVersion).toBe(2);
+		expect(parsed.coreTemplates).toHaveLength(108);
 		expect(parsed.optionalClauses).toHaveLength(31);
 	});
 
-	it("gives every family exactly three core templates and names only known families", async () => {
+	it("gives every family its three core templates, a fourth in the 18 template set 2 added, and names only known families", async () => {
 		const parsed = parseStandardTemplateMarkdown(await markdown());
 
 		expect(parsed.ok).toBe(true);
 		if (!parsed.ok) return;
+		const added: readonly string[] = ADDED_IN_SET_2;
 		for (const family of TEMPLATE_FAMILIES) {
-			expect(
-				parsed.coreTemplates.filter((entry: RawEntry) => entry.family === family),
-			).toHaveLength(3);
+			const ids = parsed.coreTemplates.filter((entry: RawEntry) => entry.family === family).map((entry: RawEntry) => entry.id);
+			expect(ids).toEqual([`${family}-01`, `${family}-02`, `${family}-03`, ...(added.includes(`${family}-04`) ? [`${family}-04`] : [])]);
 		}
 		const families = new Set(parsed.coreTemplates.map((entry: RawEntry) => entry.family));
 		expect([...families].sort()).toEqual([...TEMPLATE_FAMILIES].sort());
@@ -133,7 +147,7 @@ describe("the standard template document", () => {
 		expect([...categories].sort()).toEqual([...OPTIONAL_CLAUSE_CATEGORIES].sort());
 	});
 
-	it("keeps all 121 ids unique", async () => {
+	it("keeps all 139 ids unique", async () => {
 		const parsed = parseStandardTemplateMarkdown(await markdown());
 
 		expect(parsed.ok).toBe(true);
@@ -142,8 +156,8 @@ describe("the standard template document", () => {
 			...parsed.coreTemplates.map((entry: RawEntry) => entry.id),
 			...parsed.optionalClauses.map((entry: RawEntry) => entry.id),
 		];
-		expect(ids).toHaveLength(121);
-		expect(new Set(ids).size).toBe(121);
+		expect(ids).toHaveLength(139);
+		expect(new Set(ids).size).toBe(139);
 	});
 
 	it("is read the same way whatever line endings the checkout uses", async () => {
@@ -194,7 +208,8 @@ describe("the standard template document validator", () => {
 		["a duplicate data version", { extra: "data-version: 2" }, "duplicate-metadata"],
 		["a non-numeric data version", { data: "one" }, "invalid-metadata"],
 		["an unknown metadata key", { extra: "author: someone" }, "unknown-metadata"],
-		["a future schema version", { schema: "2" }, "unsupported-schema-version"],
+		["a future schema version", { schema: "3" }, "unsupported-schema-version"],
+		["the schema version 1 that had no lexical placeholders", { schema: "1" }, "unsupported-schema-version"],
 		["content outside any entry", { extra: "just some prose" }, "orphan-content"],
 	])("refuses %s", (_name, options, code) => {
 		expect(codesOf(document(options))).toContain(code);
@@ -290,9 +305,9 @@ describe("the standard template document validator", () => {
 describe("the generated template module", () => {
 	it("carries the document's schema and data versions", () => {
 		expect(STANDARD_TEMPLATE_SCHEMA_VERSION).toBe(TEMPLATE_SCHEMA_VERSION);
-		expect(STANDARD_TEMPLATE_DATA_VERSION).toBe(1);
+		expect(STANDARD_TEMPLATE_DATA_VERSION).toBe(2);
 		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(STANDARD_TEMPLATE_DATA_VERSION);
-		expect(STANDARD_TEMPLATE_SET.version).toBe(1);
+		expect(STANDARD_TEMPLATE_SET.version).toBe(2);
 	});
 
 	it("is exactly what the document implies, so stale data cannot be bundled", async () => {
@@ -302,7 +317,7 @@ describe("the generated template module", () => {
 		expect(onDisk).toBe(source);
 		await expect(
 			assertStandardTemplatesGenerated({ rootDir: process.cwd() }),
-		).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+		).resolves.toEqual({ schemaVersion: 2, dataVersion: 2 });
 	});
 
 	it("says how to refresh itself when a hand edit makes it stale", async () => {
@@ -349,7 +364,7 @@ describe("the generated template module", () => {
 			// Line endings are presentation: a Windows checkout is not stale.
 			await expect(
 				assertStandardTemplatesGenerated({ rootDir: process.cwd(), generatedPath: crlf }),
-			).resolves.toEqual({ schemaVersion: 1, dataVersion: 1 });
+			).resolves.toEqual({ schemaVersion: 2, dataVersion: 2 });
 			// Normalising them does not blunt the check itself.
 			await expect(
 				assertStandardTemplatesGenerated({ rootDir: process.cwd(), generatedPath: edited }),
@@ -387,7 +402,7 @@ describe("the generated template module", () => {
 				generatedPath: outfile,
 			});
 			const { source } = await generateStandardTemplates({ rootDir: process.cwd() });
-			expect(written.coreTemplates).toBe(90);
+			expect(written.coreTemplates).toBe(108);
 			expect(await readFile(outfile, "utf8")).toBe(source);
 			// The sibling the write staged through is gone once it succeeded.
 			expect(await readdir(scratch)).toEqual(["standardTemplateEntries.ts"]);
@@ -453,8 +468,11 @@ describe("the bundle-time guard", () => {
 		const generated = path.resolve(process.cwd(), STANDARD_TEMPLATES_GENERATED);
 		const loaded = await callback({ path: generated });
 		expect(loaded?.loader).toBe("ts");
+		// FAKE-DICT-LEXEME1 review 1: the validators the generator bundles are watch inputs too.
 		expect(loaded?.watchFiles).toEqual([
 			path.resolve(process.cwd(), STANDARD_TEMPLATES_MARKDOWN),
+			...["template.ts", "templateData.ts", "placeholders.ts", "lexicalFollowers.ts"]
+				.map((file) => path.resolve(process.cwd(), "src", "dictionary", file)),
 		]);
 		expect(loaded?.contents).toBe(await readFile(generated, "utf8"));
 
@@ -464,18 +482,21 @@ describe("the bundle-time guard", () => {
 });
 
 describe("the migrated template set equals the one it replaces", () => {
-	it("keeps all 121 raw entries, their order, family, category and wording", () => {
-		expect(STANDARD_CORE_TEMPLATES.map((entry) => ({ ...entry }))).toEqual(
+	it("keeps all 121 raw entries of template set 1, their order, family, category and wording, and only adds the 18", () => {
+		const added: readonly string[] = ADDED_IN_SET_2;
+		expect(STANDARD_CORE_TEMPLATES.filter((entry) => !added.includes(entry.id)).map((entry) => ({ ...entry }))).toEqual(
 			BASELINE.raw.coreTemplates,
 		);
+		expect(STANDARD_CORE_TEMPLATES.filter((entry) => added.includes(entry.id)).map((entry) => entry.id)).toEqual([...ADDED_IN_SET_2]);
 		expect(STANDARD_OPTIONAL_CLAUSES.map((entry) => ({ ...entry }))).toEqual(
 			BASELINE.raw.optionalClauses,
 		);
 	});
 
-	it("keeps every compiled segment list and required placeholder list", () => {
+	it("keeps every compiled segment list and required placeholder list of template set 1", () => {
+		const added: readonly string[] = ADDED_IN_SET_2;
 		expect(
-			STANDARD_TEMPLATE_SET.coreTemplates.map((entry) => ({
+			STANDARD_TEMPLATE_SET.coreTemplates.filter((entry) => !added.includes(entry.id)).map((entry) => ({
 				id: entry.id,
 				family: entry.family,
 				segments: entry.segments,
@@ -490,10 +511,15 @@ describe("the migrated template set equals the one it replaces", () => {
 				requiredPlaceholders: entry.requiredPlaceholders,
 			})),
 		).toEqual(BASELINE.compiled.optionalClauses);
-		expect(STANDARD_TEMPLATE_SET.version).toBe(BASELINE.compiled.version);
+		expect([STANDARD_TEMPLATE_SET.version, BASELINE.compiled.version, SET_1.version]).toEqual([2, 1, 1]);
+		// Every added template uses a lexical placeholder, and no template of set 1 does.
+		for (const entry of STANDARD_TEMPLATE_SET.coreTemplates) {
+			expect(entry.requiredPlaceholders.some((placeholder) => ["verb", "iAdjective", "naStem"].includes(placeholder)), entry.id)
+				.toBe(added.includes(entry.id));
+		}
 	});
 
-	it("generates the same definition for every recorded headword, pool, value and nonce", () => {
+	it("generates the same definition with template set 1 for every recorded headword, pool, value and nonce", () => {
 		expect(BASELINE.definitions.length).toBe(180);
 		const outcomes = new Set<string>();
 		for (const recorded of BASELINE.definitions) {
@@ -507,6 +533,7 @@ describe("the migrated template set equals the one it replaces", () => {
 				pool: BASELINE.pools[recorded.pool]!,
 				dictionarySeed: recorded.dictionarySeed,
 				dictionarySemantropy: recorded.dictionarySemantropy,
+				templateSet: SET_1,
 			});
 			outcomes.add(result.outcome);
 			expect(result).toEqual(recorded.result);
@@ -520,9 +547,9 @@ describe("the migrated template set equals the one it replaces", () => {
 		]);
 	});
 
-	it("leaves the algorithm and template set versions where they were", () => {
+	it("keeps algorithm 1, and records template set 1 for the recorded definitions while the standard set is 2", () => {
 		expect(FAKE_DICTIONARY_ALGORITHM_VERSION).toBe(1);
-		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(1);
+		expect(STANDARD_TEMPLATE_SET_VERSION).toBe(2);
 		for (const recorded of BASELINE.definitions) {
 			if (recorded.result.outcome !== "generated") continue;
 			expect(recorded.result.templateSetVersion).toBe(1);
@@ -578,6 +605,7 @@ it("rejects mutations of cached prepared pools without changing subsequent defin
   Object.freeze(Object.fromEntries(Object.entries(pool).map(([key, surfaces]) => [key, Object.freeze([...surfaces])]))) as DictionaryVocabularyPool]));
  for (const pool of Object.values(pools)) {
   const prepared = prepareFakeDictionaryGeneration(pool);
+  // The standard (set 2) preparation is what production caches; set 1 is recompiled for the comparison below.
   expect(Reflect.set(prepared, "families", [])).toBe(false);
   expect(Reflect.set(prepared, "clauses", [])).toBe(false);
   expect(Reflect.set(prepared, "missing", [])).toBe(false);
@@ -600,7 +628,7 @@ it("rejects mutations of cached prepared pools without changing subsequent defin
  // including all Semantropy buckets, optional clauses and insufficient pools.
  for (const item of BASELINE.definitions) {
   const headword = BASELINE.headwords.find(headword => headword.surface === item.headword)!;
-  expect(generateFakeDefinition({ headword, pool: pools[item.pool]!, dictionarySeed: item.dictionarySeed, dictionarySemantropy: item.dictionarySemantropy })).toEqual(item.result);
+  expect(generateFakeDefinition({ headword, pool: pools[item.pool]!, dictionarySeed: item.dictionarySeed, dictionarySemantropy: item.dictionarySemantropy, templateSet: SET_1 })).toEqual(item.result);
  }
 });
 
@@ -609,6 +637,90 @@ it("keeps all 180 definitions identical with immutable prepared pool memoization
   Object.freeze(Object.fromEntries(Object.entries(pool).map(([key, surfaces]) => [key, Object.freeze([...surfaces])]))) as DictionaryVocabularyPool]));
  for (const item of BASELINE.definitions) {
   const headword = BASELINE.headwords.find(headword => headword.surface === item.headword)!;
+  expect(generateFakeDefinition({ headword, pool: pools[item.pool]!, dictionarySeed: item.dictionarySeed, dictionarySemantropy: item.dictionarySemantropy, templateSet: SET_1 })).toEqual(item.result);
+ }
+});
+
+/*
+ * FAKE-DICT-LEXEME1 stage B: template set 2 has its own pinned oracle. It
+ * holds the raw entries of set 2, the three pools of set 1 plus a pool with
+ * lexical lists and one whose lexical lists are empty, and 311 recorded results:
+ * 300 over four headwords, five values, three nonces and five pools, and 11 more
+ * with the lexical pool (review 1) so that each of the 18 new templates is pinned
+ * as a generated definition.
+ */
+type Baseline2 = {
+	readonly version: number;
+	readonly raw: Baseline["raw"];
+	readonly pools: Readonly<Record<string, DictionaryVocabularyPool>>;
+	readonly headwords: readonly FakeDictionaryHeadword[];
+	readonly definitions: Baseline["definitions"];
+};
+const BASELINE_2 = readPinnedFixture<Baseline2>(
+	"fakeDictionaryTemplates2",
+	"4420b7dbb6a06477050f9b2fb6272778c16744ba824ecb4fa04aa1675f7663b3",
+);
+
+describe("template set 2", () => {
+	it("is the set the document now generates", () => {
+		expect(BASELINE_2.version).toBe(STANDARD_TEMPLATE_SET_VERSION);
+		expect(STANDARD_CORE_TEMPLATES.map((entry) => ({ ...entry }))).toEqual(BASELINE_2.raw.coreTemplates);
+		expect(STANDARD_OPTIONAL_CLAUSES.map((entry) => ({ ...entry }))).toEqual(BASELINE_2.raw.optionalClauses);
+	});
+
+	it("generates the recorded definition for every headword, pool, value and nonce", () => {
+		expect(BASELINE_2.definitions).toHaveLength(311);
+		const usedLexical = new Set<string>();
+		for (const recorded of BASELINE_2.definitions) {
+			const headword = BASELINE_2.headwords.find((entry) => entry.surface === recorded.headword)!;
+			const pool = Object.freeze(Object.fromEntries(Object.entries(BASELINE_2.pools[recorded.pool]!)
+				.map(([key, surfaces]) => [key, Object.freeze([...surfaces])]))) as DictionaryVocabularyPool;
+			const result = generateFakeDefinition({ headword, pool, dictionarySeed: recorded.dictionarySeed, dictionarySemantropy: recorded.dictionarySemantropy });
+			expect(result).toEqual(recorded.result);
+			if (result.outcome === "generated" && result.templateId.endsWith("-04")) usedLexical.add(recorded.pool);
+		}
+		// Only the pool that carries lexical words ever reaches a template of set 2's new kind,
+		// and every one of the 18 new templates is pinned as a generated definition.
+		expect([...usedLexical]).toEqual(["lexical"]);
+		const pinned = new Set(BASELINE_2.definitions.flatMap((item) =>
+			item.result.outcome === "generated" && item.result.templateId.endsWith("-04") ? [item.result.templateId] : []));
+		expect([...pinned].sort()).toEqual(STANDARD_TEMPLATE_SET.coreTemplates.map((entry) => entry.id).filter((id) => id.endsWith("-04")).sort());
+	});
+});
+
+// FAKE-DICT-LEXEME1 review 1: the prepared-pool cache holds the standard set only, which is now set 2.
+// The two cache checks above compare with set 1, which is not cached; these repeat them for set 2.
+const frozenPools2 = () => Object.fromEntries(Object.entries(BASELINE_2.pools).map(([name, pool]) => [name,
+ Object.freeze(Object.fromEntries(Object.entries(pool).map(([key, surfaces]) => [key, Object.freeze([...surfaces])]))) as DictionaryVocabularyPool]));
+const expectSet2Definitions = (pools: Readonly<Record<string, DictionaryVocabularyPool>>) => {
+ for (const item of BASELINE_2.definitions) {
+  const headword = BASELINE_2.headwords.find(entry => entry.surface === item.headword)!;
   expect(generateFakeDefinition({ headword, pool: pools[item.pool]!, dictionarySeed: item.dictionarySeed, dictionarySemantropy: item.dictionarySemantropy })).toEqual(item.result);
  }
+};
+
+it("rejects mutations of cached prepared pools of the standard set 2 without changing subsequent definitions", () => {
+ const pools = frozenPools2();
+ for (const pool of Object.values(pools)) {
+  const prepared = prepareFakeDictionaryGeneration(pool);
+  expect(prepareFakeDictionaryGeneration(pool, STANDARD_TEMPLATE_SET)).toBe(prepared);
+  expect(Reflect.set(prepared, "families", [])).toBe(false);
+  expect(Reflect.set(prepared, "clauses", [])).toBe(false);
+  expect(Reflect.set(prepared, "missing", [])).toBe(false);
+  for (const family of prepared.families) {
+   expect(Reflect.set(family, "templates", [])).toBe(false);
+   expect(() => { Reflect.apply(Array.prototype.splice, family.templates, [0]); }).toThrow(TypeError);
+  }
+  for (const array of [prepared.families, prepared.clauses, prepared.missing]) {
+   expect(() => { Reflect.apply(Array.prototype.splice, array, [0]); }).toThrow(TypeError);
+  }
+ }
+ expectSet2Definitions(pools);
+});
+
+it("keeps all 311 set 2 definitions identical with immutable prepared pool memoization", () => {
+ const pools = frozenPools2();
+ expectSet2Definitions(pools);
+ // A second pass reads the cached preparations.
+ expectSet2Definitions(pools);
 });

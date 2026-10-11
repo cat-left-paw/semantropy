@@ -1,4 +1,5 @@
 import { cachedDefinitionCommit, DefinitionCache, definitionCacheKey } from "../application/definitionCache";
+import { SnapshotPoolCache } from "../application/snapshotPoolCache";
 import type { AutomaticPosCoordinator, AutomaticSettingsChange, AutomaticViewParticipant, AutomaticViewClaim } from "../application/AutomaticPosCoordinator";
 import { AutomaticPosSettingsController } from "../settings/AutomaticPosSettingsController";
 import { DEFAULT_AUTOMATIC_POS } from "../settings/automaticPosSettings";
@@ -20,18 +21,23 @@ import { CooperativeSlice } from "../render/cooperativeScheduler";
 import { ItemView, Platform, type IconName, type WorkspaceLeaf } from "obsidian";
 import type { ManualMorphVocabulary } from "../transform/manualMorphology";
 import { CollisionSession } from "./CollisionSession";
-import { ui } from "../i18n/catalog";
+import { EN_MESSAGES, ui } from "../i18n/catalog";
 import { localize } from "../i18n/messages";
 import { UiLabels } from "../i18n/uiLabels";
 import { CollisionModal } from "./CollisionModal";
 import { FakeProverbSession } from "./FakeProverbSession";
 import { FakeProverbModal } from "./FakeProverbModal";
-import { RecomposeModal } from "./RecomposeModal";
+import { RecomposePane } from "./RecomposePane";
+import { RecomposeSession, type RecomposeHost } from "./RecomposeSession";
+import { FakeAlertModal } from "./FakeAlertModal";
+import { DictionaryHelpModal } from "./DictionaryHelpModal";
+import { generateFakeAlert, type FakeAlertPage } from "../fakeAlert/fakeAlertCore";
 import { ANALYZE_ERROR_MESSAGE } from "../application/analyzeNoteTexts";
 import { bodyFragmentFromAutomatic } from "../application/bodyFragmentFromAutomatic";
 import { collectVocabularyFromSnapshot } from "../application/collectVocabulary";
 import {
 	RESHUFFLE_ERROR_MESSAGE,
+	RESHUFFLE_UNAVAILABLE_MESSAGE,
 	RESHUFFLING_MESSAGE,
 } from "../application/reshuffleNote";
 import {
@@ -120,6 +126,7 @@ import {
 import { isSelectableDictionarySemantropy, supportedDictionarySemantropy, type DictionarySemantropy } from "../settings/dictionarySemantropy";
 import { BusyGate } from "./busyGate";
 import { bindExclusiveClick } from "./bindExclusiveClick";
+import { WorkbenchTabs, type WorkbenchTab } from "./workbenchTabs";
 import { FakeDefinitionModal } from "./FakeDefinitionModal";
 import { toFakeDefinitionViewModel } from "./fakeDefinitionViewModel";
 import type { BodySelection, BodySelectionSource } from "./readBodySelection";
@@ -144,9 +151,13 @@ import {
 	SemantropyToolbar,
 } from "./SemantropyToolbar";
 import {
+	OPEN_KEPT_MESSAGE,
+	REFRESH_TO_GENERATE_MESSAGE,
+	toolbarStatusWithoutBody,
 	toToolbarStatusModel,
 	type ToolbarStatusModel,
 } from "./toolbarStatusModel";
+import { ShuffleBar } from "./ShuffleBar";
 import {
 	resolveLogicalSelection,
 	SELECTION_INVALIDATED_MESSAGE,
@@ -189,14 +200,59 @@ export type CopyDefinitionOutcome =
 export type CollectDefinitionOutcome = CollectSelectedFragmentOutcome;
 
 /**
+ * WORKBENCH-UI5 (decision 17): a note the reader chose as the target, captured the way the Open command captures
+ * the active note — the editor's text when the note is open in an editor, the saved file otherwise — so the View
+ * opens it with the same `openCapture`.
+ */
+/** A Vocabulary applied with no note, put aside while an Open reads a note (see `SemantropyView.stashedStandalone`). */
+type StashedStandalone = {
+	readonly vocabulary: ManualMorphVocabulary;
+	readonly selection: VocabularySelection;
+	readonly draft: VocabularySelection;
+	readonly stale: Map<string, VocabularySourceIssue["reason"]>;
+};
+
+export type TargetChoice = {
+	capture: SourceCapture;
+	readCached: (sourcePath: string) => Promise<string>;
+	capturedSourceChanged: () => boolean;
+};
+
+/**
  * The adapters the view needs from the plugin. They are stable for the view's
  * lifetime and resolve against Obsidian at call time, so the view never
  * holds a `TFile`, an `Editor`, a `Vault`, or a `CollectionStorage`.
  */
 export type SemantropyViewHost = {
 	automaticPosCoordinator?: AutomaticPosCoordinator;
-	/** 0.1.0 S5: false leaves out the Recompose dialog entry (the web page has its own Recompose panel). */
+	/**
+	 * 0.1.0 S5: false says this host has its own Recompose (the web page's panel), so the View offers neither the
+	 * Recompose control nor the tab, even with `workbenchTabs`. The name is from the dialog WORKBENCH-UI4 removed;
+	 * it stays so the web host, which passes it, does not change.
+	 */
 	recomposeDialog?: boolean;
+	/**
+	 * WORKBENCH-UI1 (`Docs/release_0_2_0_plan.md` §3): true opens a note with its
+	 * analysis and Vocabulary owner ready but without a Shuffle; the body shows
+	 * Generate until the first Shuffle. Absent or false shuffles at open, as
+	 * before. A host decision, never a stored setting.
+	 */
+	deferInitialShuffle?: boolean;
+	/**
+	 * WORKBENCH-UI2 (`Docs/release_0_2_0_plan.md` §3.3): true splits the body area
+	 * into [Shuffle] [Recompose] tabs over the one scrolling box, also while no note
+	 * is open (WORKBENCH-UI4), and gives the Toolbar its Recompose control: the
+	 * tab is the only entry to Recompose. Absent or false keeps the single body and
+	 * has no Recompose. A host that has its own Recompose (`recomposeDialog: false`,
+	 * the web page) gets no tabs either. A host decision, never a stored setting.
+	 */
+	workbenchTabs?: boolean;
+	/**
+	 * WORKBENCH-UI5: asks the reader for a Markdown note (the host's own chooser; the View imports nothing of
+	 * Obsidian for it) and returns it captured for an Open, or null when none was chosen. The signal is aborted when
+	 * the View closes or opens again: the host closes its chooser then. Absent: the Shuffle area offers no way to choose a target.
+	 */
+	chooseTarget?: (signal: AbortSignal) => Promise<TargetChoice | null>;
 	/** 0.1.0 S4: extra enclosed-term delimiter pairs from settings. The standard `{{` `}}` is always on. */
 	getEnclosedTermDelimiters?: () => readonly EnclosedTermDelimiter[];
 	getAutomaticPos?: () => AutomaticPosOptions;
@@ -259,6 +315,11 @@ let VIEW_SEQUENCE = 0;
  */
 const MARKER_RECONCILE_ATTEMPTS = 3;
 
+/** How many recent Fake Alert openings the next draw tries not to repeat (the core accepts up to 16). */
+const FAKE_ALERT_RECENT_KEPT = 8;
+/** How many recently shown words the next Fake Alert draws more rarely (the core accepts up to 48). */
+const FAKE_ALERT_RECENT_WORDS_KEPT = 24;
+
 export class SemantropyView extends ItemView {
 	private automaticController: AutomaticPosSettingsController | null = null;
 	private automaticToolbar: AutomaticPosToolbar | null = null;
@@ -273,12 +334,30 @@ export class SemantropyView extends ItemView {
 	private fakeProverbSession: FakeProverbSession | null = null;
 	private fakeProverbModal: FakeProverbModal | null = null;
 	private fakeProverbDisabled = false;
-	private recomposeModal: RecomposeModal | null = null;
+	/**
+	 * WORKBENCH-UI2 stage 3: Recompose lives in the View's Recompose pane over one
+	 * session for the View's lifetime, so its output stays until the View closes.
+	 * The pane is the screen of the current shell only.
+	 */
+	private recomposeSession: RecomposeSession | null = null;
+	private recomposeScreen: RecomposePane | null = null;
+	private fakeAlertModal: FakeAlertModal | null = null;
+	/** WORKBENCH-UI5: the Fake Dictionary dialog (how to look a word up, the key, what the Vocabulary offers); at most one per View. */
+	private dictionaryHelpModal: DictionaryHelpModal | null = null;
+	/** The opening recipes of the last few Fake Alerts; the draw prefers others. Never persisted. */
+	private fakeAlertRecent: string[] = [];
+	/** The words of the last pages Fake Alert put on screen, newest last; the next draw makes them rarer. Never persisted. */
+	private fakeAlertRecentWords: string[] = [];
 	private vocabularyDraft = initialVocabularySelection();
 	private vocabularyGeneration = 0;
 	private vocabularyTask: { generation: number; paths: readonly string[]; token: number; dictionaryToken: number } | null = null;
 	private staleSources = new Map<string, VocabularySourceIssue["reason"]>();
 	private targetVocabularyChanged = false;
+	/**
+	 * WORKBENCH-UI5 (review 3, P3 1): a Vocabulary applied from Selected Notes with no note, put aside while an Open reads a note, so that
+	 * the note's body is made from the note's own (new) selection. A read or an analysis that fails puts it back; a note that opens drops it.
+	 */
+	private stashedStandalone: StashedStandalone | null = null;
 	private sourceProgress: { done: number; total: number } | null = null;
 	private vocabularyError: string | null = null;
 	private vocabularyControls: VocabularyControls | null = null;
@@ -311,6 +390,24 @@ export class SemantropyView extends ItemView {
 	private toolbar: SemantropyToolbar | null = null;
 	private loadButton: HTMLButtonElement | null = null;
 	private unbindLoad: (() => void) | null = null;
+	/** WORKBENCH-UI1: Generate in place of a body opened without a Shuffle; built only when the host defers it. */
+	private generateEl: HTMLElement | null = null;
+	private generateButton: HTMLButtonElement | null = null;
+	private unbindGenerate: (() => void) | null = null;
+	/**
+	 * WORKBENCH-UI2: the tab row and the two panes inside the scrolling box, built
+	 * only on a host with tabs. Which tab is shown and each tab's scroll position
+	 * belong to the shell: never persisted, and a new shell starts on Shuffle.
+	 */
+	private tabRow: WorkbenchTabs | null = null;
+	/** WORKBENCH-UI5: the Shuffle tab's own area under the tab row (target, body state, actions); built with the tabs. */
+	private shuffleBar: ShuffleBar | null = null;
+	/** The host's chooser is open (this aborts it); a second request waits for it. */
+	private chooser: AbortController | null = null;
+	private shufflePane: HTMLElement | null = null;
+	private recomposePane: HTMLElement | null = null;
+	private activeTab: WorkbenchTab = "shuffle";
+	private tabScroll: Record<WorkbenchTab, { top: number; left: number }> = { shuffle: { top: 0, left: 0 }, recompose: { top: 0, left: 0 } };
 	private readonly viewId = `semantropy-view-${(VIEW_SEQUENCE += 1)}`;
 	/**
 	 * The last explicit body selection, recorded logically so moving focus to
@@ -323,6 +420,12 @@ export class SemantropyView extends ItemView {
 		snapshot: LogicalSelectionSnapshot;
 		slot: DisplaySlot | null;
 	} | null = null;
+	/**
+	 * WORKBENCH-UI2 review 1 (P2): advances whenever the View drops the selection on
+	 * purpose (leaving Shuffle). A change that captured the selection earlier puts it
+	 * back on commit or rollback only while this has not moved.
+	 */
+	private selectionEpoch = 0;
 	private manualMenu: HTMLElement | null = null;
 	/** LOCALE1: the open Manual menu's item names. */
 	private manualMenuLabels: UiLabels | null = null;
@@ -363,6 +466,8 @@ export class SemantropyView extends ItemView {
 	private readonly sourceWatch = new SourceChangeWatch();
 	private dictionaryWorld = new FakeDictionaryWorld();
  private readonly definitionCache = new DefinitionCache();
+ /** FAKE-DICT-RECOMPOSE1: the pool of the Vocabulary a Recompose word is looked up in; kept under its Snapshot, weakly. */
+ private readonly recomposePools = new SnapshotPoolCache();
  private dictionaryPopover: DictionaryPopoverController | null = null;
  private dictionaryDiagnosticEl: HTMLElement | null = null;
  private dictionaryCountsEl: HTMLElement | null = null;
@@ -381,9 +486,9 @@ export class SemantropyView extends ItemView {
 		super(leaf);
 		// Every busy transition, from any operation (including an async Popover
 		// Copy / Collect), keeps the pointer affordance in step with what a click
-		// or a hover would actually do.
-		this.lifecycle.busy.onChange(() => this.syncTokenAffordance());
-		this.dictionaryBusy.onChange(() => this.syncTokenAffordance());
+		// or a hover would actually do. FAKE-DICT-RECOMPOSE1: the Recompose text's mark reads both gates too.
+		this.lifecycle.busy.onChange(() => { this.syncTokenAffordance(); this.syncRecomposeAffordance(); });
+		this.dictionaryBusy.onChange(() => { this.syncTokenAffordance(); this.syncRecomposeAffordance(); });
 	}
 
 	getViewType(): string {
@@ -410,6 +515,8 @@ export class SemantropyView extends ItemView {
 	 */
 	onResize(): void {
 		this.toolbar?.refreshLayout();
+		this.vocabularyControls?.refit();
+		this.shuffleBar?.refit();
 		// The Toolbar may have changed height; the work card follows the body's top edge.
 		this.syncBusyOverlay();
 	}
@@ -422,6 +529,9 @@ export class SemantropyView extends ItemView {
 		this.closeFakeProverb();
 		this.fakeProverbDisabled = false;
 		this.closeRecompose();
+		this.closeFakeAlert(); this.fakeAlertRecent = []; this.fakeAlertRecentWords = [];
+		this.closeDictionaryHelp();
+		this.closeChooser();
 		this.closeVocabularyPicker();
   this.definitionCache.clear();
 		this.cancelVocabularyPreparation();
@@ -446,6 +556,9 @@ export class SemantropyView extends ItemView {
 		this.closeCollision();
 		this.closeFakeProverb();
 		this.closeRecompose();
+		this.closeFakeAlert(); this.fakeAlertRecent = []; this.fakeAlertRecentWords = [];
+		this.closeDictionaryHelp();
+		this.closeChooser();
 		this.closeVocabularyPicker();
   this.dictionaryPopover?.dispose(); this.dictionaryPopover = null;
   this.definitionCache.clear(); this.diagnosticSnapshot = null; this.diagnosticCounts = null;
@@ -544,21 +657,77 @@ export class SemantropyView extends ItemView {
 		this.fakeProverbModal = null; this.fakeProverbSession = null;
 	}
 	disableFakeProverb(): void { this.fakeProverbDisabled = true; this.closeFakeProverb(); }
+	/** Ends the View's Recompose session: its output does not outlive the View. */
+	closeRecompose(): void {
+		this.recomposeScreen?.dispose(); this.recomposeScreen = null;
+		this.recomposeSession?.dispose(); this.recomposeSession = null;
+	}
+	private recomposeHost(): RecomposeHost {
+		return { active: () => this.collisionVocabulary(), nonce: () => issueUint32Seed(),
+			paint: () => this.scheduler().paint(), copy: text => this.host.writeClipboard(text), collect: input => this.host.collectFragment(input),
+			// The text on screen changed (a step ran, or Clear): a Popover on a word of the old one goes, and the words' mark follows.
+			changed: () => { if (this.lifecycle.closed) return; this.dictionaryPopover?.validate(); this.syncRecomposeAffordance(); } };
+	}
 	/**
-	 * 0.1.0 S5: Recompose over the same active owner as Collision and Fake
-	 * proverb. The dialog keeps its output only while it is open.
+	 * FAKE-ALERT-VIEW1 (`Docs/fake_alert_policy1.md` §8, §9): one Fake Alert
+	 * from the same active owner as Collision, at the Text Semantropy level.
+	 * The whole Alert — the opening page and every page a button leads to — is
+	 * made before the dialog opens, so pressing a button never draws. A real
+	 * problem is a Notice and never a Fake Alert.
 	 */
-	openRecompose(): void {
-		if (this.lifecycle.closed || this.recomposeModal) return;
+	openFakeAlert(): void {
+		if (this.lifecycle.closed || this.fakeAlertModal) return;
+		this.dictionaryPopover?.close(); this.closeManualMenu();
+		const owner = this.collisionVocabulary();
+		if (!owner) { this.notify(EN_MESSAGES.fakeAlert.noVocabulary); return; }
+		let generation: ReturnType<typeof generateFakeAlert>;
+		try {
+			generation = generateFakeAlert({ owner, level: this.host.getBodySemantropy(), nonce: issueUint32Seed(), recent: this.fakeAlertRecent,
+				recentWords: this.fakeAlertRecentWords });
+		} catch {
+			generation = { ok: false, reason: "invalid-request" };
+		}
+		if (!generation.ok) {
+			this.notify(generation.reason === "insufficient-vocabulary" ? EN_MESSAGES.fakeAlert.insufficient : EN_MESSAGES.fakeAlert.failed);
+			return;
+		}
+		const alert = generation.alert;
+		this.fakeAlertRecent = [...this.fakeAlertRecent, alert.prompt.recipeId].slice(-FAKE_ALERT_RECENT_KEPT);
+		const origin = this.modalOrigin();
+		const modal = new FakeAlertModal(this.app, alert, () => {
+			if (this.fakeAlertModal === modal) this.fakeAlertModal = null;
+		}, origin, (shown) => this.rememberFakeAlertWords(shown));
+		this.fakeAlertModal = modal; modal.open();
+	}
+	closeFakeAlert(): void { this.fakeAlertModal?.close(); this.fakeAlertModal = null; }
+	/**
+	 * WORKBENCH-UI5 (decision 20): the Fake Dictionary dialog, from the Toolbar. It shows how to look a word up,
+	 * the hover modifier (the stored setting) and, folded, what the active Vocabulary offers; while it is open the
+	 * View writes its diagnostics into the dialog, not into a row of the shell (a host with tabs builds none).
+	 */
+	openDictionaryHelp(): void {
+		// Only a host with tabs has the button and the dialog (the web page's availability row stays its own).
+		if (!this.tabbed() || this.lifecycle.closed || this.dictionaryHelpModal) return;
 		this.dictionaryPopover?.close(); this.closeManualMenu();
 		const origin = this.modalOrigin();
-		const modal = new RecomposeModal(this.app, { active: () => this.collisionVocabulary(), nonce: () => issueUint32Seed(),
-			paint: () => this.scheduler().paint(), copy: text => this.host.writeClipboard(text), collect: input => this.host.collectFragment(input) }, () => {
-			if (this.recomposeModal === modal) this.recomposeModal = null;
+		const modal: DictionaryHelpModal = new DictionaryHelpModal(this.app, {
+			modifier: () => this.displaySettings().dictionaryModifier,
+			setModifier: value => { void this.changeDisplaySettings({ dictionaryModifier: value }); },
+			bind: (status, counts) => { this.dictionaryDiagnosticEl = status; this.dictionaryCountsEl = counts; this.syncDictionaryDiagnostics(); },
+			unbind: () => { this.dictionaryDiagnosticEl = null; this.dictionaryCountsEl = null; },
+			closed: () => { if (this.dictionaryHelpModal === modal) this.dictionaryHelpModal = null; },
+			// The shell may have been built again under the open dialog: focus goes back to the button that stands now.
+			focusTarget: () => this.toolbar?.returnTarget(this.contentEl.querySelector<HTMLElement>(".semantropy-fake-dictionary-open")) ?? null,
 		}, origin);
-		this.recomposeModal = modal; modal.open();
+		this.dictionaryHelpModal = modal; modal.open();
 	}
-	closeRecompose(): void { this.recomposeModal?.close(); this.recomposeModal = null; }
+	closeDictionaryHelp(): void { const modal = this.dictionaryHelpModal; this.dictionaryHelpModal = null; modal?.close(); }
+	/** FAKE-ALERT-VARIETY1: a page's words move to the newest end of the recent list, which keeps its last few. */
+	private rememberFakeAlertWords(page: FakeAlertPage): void {
+		if (this.lifecycle.closed) return;
+		const shown = new Set(page.words.map((word) => word.surface));
+		this.fakeAlertRecentWords = [...this.fakeAlertRecentWords.filter((word) => !shown.has(word)), ...shown].slice(-FAKE_ALERT_RECENT_WORDS_KEPT);
+	}
 	disableAutomatic(): void { this.targetBody.invalidateAutomatic("plugin-disable"); void this.onClose(); }
 
 	private mountAutomatic(parent: HTMLElement): void {
@@ -589,11 +758,13 @@ export class SemantropyView extends ItemView {
 		const state = this.session.getState(), body = this.targetBody;
 		if (this.lifecycle.closed || state.status === "loading" || this.staleSources.size || this.targetVocabularyChanged ||
 			(state.status === "ready" && (state.freshness !== "fresh" || !body.isAutomaticCurrent())) ||
-			this.dictionaryBusy.isBusy() || this.pendingDefineId !== null || this.definitionModal?.isOpen()) return null;
+			this.dictionaryBusy.isBusy() || this.pendingDefineId !== null || this.definitionModal?.isShowing()) return null;
 		const token = this.lifecycle.busy.acquire(); if (token === null) return null;
 		const dictionaryToken = this.dictionaryBusy.acquire()!;
 		const task = this.beginBodyTask(change === "level" ? BODY_LEVEL_UPDATING_MESSAGE : "Applying automatic parts of speech…", false);
-		const beforeSelection = this.selection;
+		const beforeSelection = this.selection, selectionEpoch = this.selectionEpoch;
+		// The selection is put back only if nothing dropped it on purpose while this change waited.
+		const restorable = () => this.selectionEpoch === selectionEpoch;
 		this.automaticToolbar?.setBlocked(true);
 		const current = () => !this.lifecycle.closed && this.targetBody === body && this.session.getState() === state &&
 			!this.staleSources.size && !this.targetVocabularyChanged && this.isBodyTaskCurrent(task);
@@ -610,13 +781,13 @@ export class SemantropyView extends ItemView {
 				return { current: () => owned() && staged.current() && session.current(), publish: staged.publish,
 					commit: () => {
 						staged.commit(); session.commit();
-						if (beforeSelection?.owner === body) {
+						if (beforeSelection?.owner === body && restorable()) {
 							const mapped = staged.mapSelection(beforeSelection.snapshot.start, beforeSelection.snapshot.end);
 							this.selection = mapped ? { ...beforeSelection, slot: beforeSelection.slot ? body.getDisplaySlot(beforeSelection.slot.tokenId) : null,
 								snapshot: { ...beforeSelection.snapshot, ...mapped, displayRevision: body.getDisplayRevision() } } : null;
 						}
 					},
-					rollback: () => { session.rollback(); staged.rollback(); if (!this.lifecycle.closed && this.targetBody === body) this.selection = beforeSelection; },
+					rollback: () => { session.rollback(); staged.rollback(); if (!this.lifecycle.closed && this.targetBody === body && restorable()) this.selection = beforeSelection; },
 					dispose: staged.dispose,
 				};
 			},
@@ -632,16 +803,49 @@ export class SemantropyView extends ItemView {
 		};
 	}
 
-	private resetVocabulary(): void {
+	/** The Vocabulary applied with no note, to be put aside by an Open; null when there is none. */
+	private stashStandalone(): StashedStandalone | null {
+		const vocabulary = this.standaloneVocabulary;
+		return vocabulary === null ? null : { vocabulary, selection: this.vocabularySelection, draft: this.vocabularyDraft, stale: new Map(this.staleSources) };
+	}
+	/** Puts back what an Open put aside (an Open that has been taken over, or a View that has closed, never gets here: it is no longer current). */
+	private restoreStandalone(stash: StashedStandalone | null): void {
+		if (stash === null) return;
+		this.stashedStandalone = null;
+		this.standaloneVocabulary = stash.vocabulary;
+		this.vocabularySelection = stash.selection; this.vocabularyDraft = stash.draft;
+		// A Source that changed while the note was being read is stale, whichever way the Open ended.
+		for (const [path, reason] of stash.stale) if (this.staleSources.get(path) !== "missing") this.staleSources.set(path, reason);
+	}
+
+	/** `selection` is the one a reopened note's body was built from, so what the View shows is what was drawn. */
+	private resetVocabulary(selection: VocabularySelection = this.initialSelection()): void {
+		this.stashedStandalone = null;
 		this.standaloneVocabulary = null;
-		this.vocabularyDraft = this.vocabularySelection = this.initialSelection();
+		this.vocabularyDraft = this.vocabularySelection = selection;
 		this.staleSources.clear(); this.targetVocabularyChanged = false; this.vocabularyError = null;
 	}
 	getVocabularyState() {
 		return { selection: this.vocabularySelection, draft: this.vocabularyDraft, snapshot: this.targetBody.getVocabularySnapshot() ?? this.standaloneVocabulary?.snapshot ?? null,
 			stale: this.staleSources.size > 0, staleSources: Array.from(this.staleSources, ([path, reason]) => ({ path, reason })), preparing: this.vocabularyTask !== null,
 			progress: this.sourceProgress, error: this.vocabularyError, ready: !this.lifecycle.closed && this.session.getState().status !== "loading" &&
-				(this.session.getState().status === "ready" || this.vocabularyDraft.mode === "selected") };
+				(this.session.getState().status === "ready" || this.vocabularyDraft.mode === "selected"),
+			applied: !this.lifecycle.closed && (this.session.getState().status === "ready" || this.standaloneVocabulary !== null),
+			// WORKBENCH-UI5 (owner, 2026-10-08): the applied Vocabulary's notes, which the summary names.
+			sources: this.appliedSourcePaths(),
+			// The Vault's listing, for the marks of its list; read only when that list is opened.
+			listedPaths: (): readonly string[] | null => this.host.listVocabularyNotes ? this.host.listVocabularyNotes() : null };
+	}
+	/**
+	 * The Vault paths of the applied Vocabulary's Sources, in path order: the committed Selected Notes, or the Current Note when
+	 * a note is open. It is the committed selection, not the Snapshot, so an Open that is still preparing its own body cannot
+	 * make a Vocabulary applied with no note read as the note's. The committed selection keeps its paths as the picker gave them;
+	 * `vocabularyPaths()` is what `prepareVocabulary()` and so the Snapshot's Sources are made with (normalized, once each, sorted).
+	 */
+	private appliedSourcePaths(): readonly string[] {
+		if (this.vocabularySelection.mode === "selected") return vocabularyPaths(this.vocabularySelection.paths);
+		const state = this.session.getState();
+		return state.status === "ready" ? [state.snapshot.sourcePath] : [];
 	}
 	setVocabularyDraft(selection: VocabularySelection): void {
 		this.cancelVocabularyPreparation();
@@ -662,6 +866,9 @@ export class SemantropyView extends ItemView {
 		this.dictionaryPopover?.close(); this.closeManualMenu(); this.toolbar?.closePopups();
 		const modal: VocabularyModal = new VocabularyModal(this.app, {
 			state: () => this.getVocabularyState(),
+			// WORKBENCH-UI5 (review 1, P3 6): with no note and nothing applied there is no Current Note to start from.
+			initial: () => this.session.getState().status !== "ready" && this.standaloneVocabulary === null
+				? { ...this.vocabularySelection, mode: "selected" as const, paths: [] } : this.vocabularySelection,
 			paths: () => this.host.listVocabularyNotes?.() ?? [],
 			draft: (selection) => this.setVocabularyDraft(selection),
 			apply: () => this.applyVocabulary(),
@@ -686,14 +893,22 @@ export class SemantropyView extends ItemView {
 		if (path === this.getSourcePath()) this.targetVocabularyChanged = true;
 		const active = this.getVocabularyState().snapshot;
 		if (active?.sources.some(source => source.path === path) && this.staleSources.get(path) !== "missing") this.staleSources.set(path, reason);
+		// The Vocabulary an Open put aside is not the active one, but it is the one that comes back if the Open fails.
+		const aside = this.stashedStandalone;
+		if (aside?.vocabulary.snapshot.sources.some(source => source.path === path) && aside.stale.get(path) !== "missing") aside.stale.set(path, reason);
 		if (path === this.getSourcePath() || active?.sources.some(source => source.path === path)) {
 			this.cancelAutomaticPos(); this.automaticController?.markStale(); this.targetBody.invalidateAutomatic("source-changed"); this.automaticToolbar?.sync();
 		}
 		if (this.vocabularyTask && (this.vocabularyTask.paths.includes(path) || path === this.getSourcePath())) this.cancelVocabularyPreparation();
 		this.dictionaryPopover?.validate(); this.syncDictionaryDiagnostics();
-		this.syncVocabularyChrome(); this.syncTokenAffordance();
+		this.syncVocabularyChrome(); this.syncTokenAffordance(); this.syncRecomposeAffordance();
 		this.collisionSession?.sourceChanged(path);
 		this.fakeProverbSession?.sourceChanged(path);
+		// WORKBENCH-UI5 (review 1, P3 2): Generate new in the Recompose pane waits for a fresh Vocabulary, as the dialogs do.
+		this.recomposeScreen?.sync();
+		// WORKBENCH-UI1: a moved Target stops Generate now, not at the next status change.
+		// WORKBENCH-UI5 (review 1, P3 1): on a host with tabs the status line also says at once that a Vocabulary Source moved.
+		if (this.ungenerated() || this.tabbed()) { this.toolbar?.sync(); this.shuffleBar?.sync(); this.syncLoadControl(); }
 	}
 	async applyVocabulary(): Promise<"applied" | "aborted" | "failed" | "busy" | "refresh-required"> {
   this.dictionaryPopover?.close();
@@ -716,7 +931,7 @@ export class SemantropyView extends ItemView {
 		if (state.status === "ready" && paths.includes(state.snapshot.sourcePath) && (state.freshness !== "fresh" || this.targetVocabularyChanged)) {
 			this.vocabularyError = VOCABULARY_REFRESH_REQUIRED; this.syncVocabularyChrome(); return "refresh-required";
 		}
-		const token = this.lifecycle.busy.acquire(); if (token === null || this.dictionaryBusy.isBusy() || this.pendingDefineId !== null || this.definitionModal?.isOpen()) { if (token !== null) this.lifecycle.busy.release(token); return "busy"; }
+		const token = this.lifecycle.busy.acquire(); if (token === null || this.dictionaryBusy.isBusy() || this.pendingDefineId !== null || this.definitionModal?.isShowing()) { if (token !== null) this.lifecycle.busy.release(token); return "busy"; }
 		const dictionaryToken = this.dictionaryBusy.acquire()!;
 		const generation = ++this.vocabularyGeneration;
 		this.vocabularyTask = { generation, paths, token, dictionaryToken }; this.vocabularyError = null;
@@ -789,6 +1004,121 @@ export class SemantropyView extends ItemView {
 		);
 	}
 
+	/** WORKBENCH-UI1: whether this host opens a note without a Shuffle. */
+	private defersShuffle(): boolean {
+		return this.host.deferInitialShuffle === true;
+	}
+
+	/** WORKBENCH-UI2: whether this host splits the body area into tabs; never without the Recompose entry. */
+	private tabbed(): boolean {
+		return this.host.workbenchTabs === true && this.host.recomposeDialog !== false;
+	}
+
+	/**
+	 * WORKBENCH-UI2: the Recompose pane is on screen, so the Shuffle body is
+	 * hidden. While it is, nothing reads or acts on a selection in that body.
+	 */
+	private recomposeShown(): boolean {
+		return this.activeTab === "recompose" && !!this.recomposePane;
+	}
+
+	/** WORKBENCH-UI2: the tab row before the scrolling box, and the Recompose pane beside the Shuffle one. */
+	private buildTabs(root: HTMLElement, scroll: HTMLElement, shuffle: HTMLElement): void {
+		const recompose = scroll.createDiv({ cls: "semantropy-pane semantropy-recompose-pane" });
+		recompose.hidden = true;
+		this.shufflePane = shuffle; this.recomposePane = recompose;
+		this.recomposeSession ??= new RecomposeSession(this.recomposeHost());
+		this.recomposeScreen = new RecomposePane(recompose, this.recomposeSession);
+		this.tabRow = new WorkbenchTabs(root, scroll, { shuffle, recompose }, this.viewId, this.shellLabels, (tab, focus) => this.showTab(tab, focus));
+		this.tabRow.sync(this.activeTab);
+		// WORKBENCH-UI5: under the tab row, outside the scrolling box, so it does not scroll with the body.
+		this.shuffleBar = new ShuffleBar(root, scroll, {
+			model: () => this.viewModel(),
+			status: () => this.statusModel(),
+			target: () => {
+				const state = this.session.getState();
+				return state.status === "ready" ? { name: state.snapshot.sourceName, pending: false } : { name: null, pending: state.status === "loading" };
+			},
+			manual: () => { const slot = this.selectedManualSlot(); return { count: this.targetBody.getManualOverrideCount(), diagnostic: slot?.manualDiagnostic ?? null }; },
+			generate: () => this.ungenerated(),
+			...(this.host.chooseTarget ? { chooseTarget: () => { void this.chooseTarget(); } } : {}),
+			reshuffle: () => { void this.reshuffle(); },
+			refreshTarget: () => { void this.refreshSource(); },
+			copy: () => { void this.copySelectedFragment(); },
+			collect: () => { void this.collectSelectedFragment(); },
+		});
+		this.shuffleBar.setShown(this.activeTab === "shuffle");
+	}
+
+	/**
+	 * WORKBENCH-UI2: shows one pane and hides the other. The scrolling box stays
+	 * the one scroll for both, so each tab's position is kept when it is left and
+	 * put back when it is shown again. Leaving Shuffle drops its selection, its
+	 * word menu and its definition: a hidden body offers nothing to act on.
+	 */
+	private showTab(tab: WorkbenchTab, focus = false): void {
+		const scroll = this.scrollEl, row = this.tabRow, shuffle = this.shufflePane, recompose = this.recomposePane;
+		if (this.lifecycle.closed || !scroll || !row || !shuffle || !recompose) return;
+		if (tab !== this.activeTab) {
+			const leaving = this.activeTab === "shuffle" ? shuffle : recompose;
+			const doc = this.contentEl.ownerDocument;
+			this.tabScroll[this.activeTab] = { top: scroll.scrollTop, left: scroll.scrollLeft };
+			if (this.activeTab === "shuffle") this.leaveShuffle(shuffle);
+			// A Popover on a word of the Recompose text goes with the tab, as the Shuffle side's does.
+			else this.dictionaryPopover?.close();
+			// Focus inside the pane going away (or the area that goes with the Shuffle pane) moves to the tab that replaced it.
+			if (leaving.contains(doc.activeElement) || (this.activeTab === "shuffle" && this.shuffleBar?.el.contains(doc.activeElement))) focus = true;
+			this.activeTab = tab;
+			shuffle.hidden = tab !== "shuffle";
+			recompose.hidden = tab !== "recompose";
+			// The area is shown (or hidden) BEFORE the scroll position is put back: the box is shorter by the area's height
+			// with it, and a position set while the area was still hidden is cut to the taller box's range (review 2, P3 1).
+			this.shuffleBar?.setShown(tab === "shuffle");
+			const saved = this.tabScroll[tab];
+			scroll.scrollTop = saved.top; scroll.scrollLeft = saved.left;
+			row.sync(tab);
+			this.updateChrome();
+		}
+		if (focus) row.focus(tab);
+	}
+
+	private leaveShuffle(pane: HTMLElement): void {
+		this.closeManualMenu(); this.dictionaryPopover?.close();
+		this.selection = null; this.selectionEpoch += 1; this.selectionGesture = false;
+		const selection = this.contentEl.ownerDocument.getSelection();
+		if (!selection) return;
+		for (let index = 0; index < selection.rangeCount; index++) {
+			if (selection.getRangeAt(index).intersectsNode(pane)) { selection.removeAllRanges(); return; }
+		}
+	}
+
+	/**
+	 * WORKBENCH-UI1: ready, opened without a Shuffle and not generated since —
+	 * the body has Chunks to show and shows none. It is read from the body owner,
+	 * never stored: the session states stay the four they were.
+	 */
+	private ungenerated(): boolean {
+		return this.defersShuffle() && this.session.getState().status === "ready" && this.targetBody.awaitsFirstChunk();
+	}
+
+	/**
+	 * WORKBENCH-UI3: the notice for a Reshuffle text command that returned
+	 * `unavailable`. A body not generated whose Generate waits for Refresh target
+	 * says so; every other case keeps the existing sentence.
+	 */
+	reshuffleUnavailableMessage(): string {
+		return this.ungenerated() && this.generateBlocked() ? REFRESH_TO_GENERATE_MESSAGE : RESHUFFLE_UNAVAILABLE_MESSAGE;
+	}
+
+	/**
+	 * WORKBENCH-UI1: Generate would show the snapshot taken at open. Once the
+	 * Target has moved on from it, Generate waits for Refresh target.
+	 */
+	private generateBlocked(): boolean {
+		const state = this.session.getState();
+		return state.status !== "ready" || state.freshness !== "fresh" || this.targetVocabularyChanged;
+	}
+
 	/**
 	 * Draws a new body Seed. The current body stays on screen while the next
 	 * one is prepared in slices; it is swapped in only when complete.
@@ -798,6 +1128,13 @@ export class SemantropyView extends ItemView {
 		if (closed) {
 			return closed;
 		}
+		// WORKBENCH-UI5 (review 1, P3 5): with no note there is no body to act on. That is "unavailable" — the command says so in a
+		// Notice; "aborted", which the abandoned-work check below would give, is silent — and the tab stays where it is.
+		if (this.tabbed() && this.session.getState().status !== "ready") return "unavailable";
+		// WORKBENCH-UI2: Reshuffle text acts on the Shuffle body, so that is the tab it shows.
+		this.showTab("shuffle");
+		// WORKBENCH-UI1: the first Shuffle of a body opened without one is Generate.
+		if (this.ungenerated()) return await this.generateBody();
 
 		const scheduler = this.scheduler();
 		let task: number | null = null;
@@ -860,6 +1197,8 @@ export class SemantropyView extends ItemView {
 		if (this.lifecycle.closed) {
 			return "aborted";
 		}
+		// WORKBENCH-UI2: Refresh target rebuilds the Shuffle body, so that is the tab it shows (WORKBENCH-UI5: when there is one).
+		if (this.session.getState().status === "ready") this.showTab("shuffle");
 		if (this.host.waitForPendingSettings && this.pendingLevelSave) {
 			const snapshot = this.session.getReadySnapshot(), owner = this.targetBody;
 			await this.pendingLevelChange;
@@ -867,6 +1206,9 @@ export class SemantropyView extends ItemView {
 		}
 
 		this.cancelBodyTask();
+		// WORKBENCH-UI1: Refresh keeps what the body was. A generated body comes back
+		// with its first Chunk, and one not generated yet stays that way.
+		const ungenerated = this.ungenerated();
 		let watchToken = 0;
 		let task: number | null = null;
 		const oldBody = this.targetBody, oldRoot = oldBody.getContainer(), bodyEl = this.bodyEl;
@@ -892,7 +1234,7 @@ export class SemantropyView extends ItemView {
 				const current = () => !this.lifecycle.closed && this.session.isCurrent(requestId) &&
 					!this.sourceWatch.changedSince(watchToken) && this.targetBody === oldBody && this.bodyEl === bodyEl &&
 					!!bodyEl?.isConnected && bodyEl.parentNode === parent && oldRoot?.parentNode === bodyEl && oldBody.isDisplayIntact();
-				const result = await this.prepareSnapshotBody(requestId, snapshot, bodySeed, bodySemantropy, staged, current);
+				const result = await this.prepareSnapshotBody(requestId, snapshot, bodySeed, bodySemantropy, staged, current, ungenerated);
 				if (result.status !== "applied") { staged.release(); return null; }
 				return { analysis: result.analysis, discard: () => staged.release(), commit: accept => {
 					if (!current()) return false;
@@ -924,12 +1266,32 @@ export class SemantropyView extends ItemView {
 	/** Adds exactly the next canonical descriptor, keeping all committed nodes in place. */
 	async loadNextSection(): Promise<"applied" | "busy" | "unavailable" | "aborted" | "failed"> {
 		if (this.lifecycle.closed) return "aborted";
+		// WORKBENCH-UI1: with no Chunk shown yet the next section is the first one, under Generate's rule.
+		if (this.ungenerated()) return await this.generateBody();
+		return await this.loadSection("Loading next section…", false, "Could not load the next section. Try again.");
+	}
+
+	/**
+	 * WORKBENCH-UI1: the first Shuffle of a body opened without one — from the
+	 * empty body's Generate, Reshuffle text or its command. It is Load next for
+	 * the first descriptor: the open's Vocabulary owner and Seed, at the level the
+	 * body has now, with nothing re-read or re-analyzed and no other draw. A
+	 * Target that moved since its snapshot waits for Refresh target.
+	 */
+	async generateBody(): Promise<"applied" | "busy" | "unavailable" | "aborted" | "failed"> {
+		if (this.lifecycle.closed) return "aborted";
+		if (!this.ungenerated() || this.generateBlocked()) return "unavailable";
+		return await this.loadSection(EN_MESSAGES.view.generatingText, true, EN_MESSAGES.view.generateFailed);
+	}
+
+	private async loadSection(message: string, prominent: boolean, failure: string): Promise<"applied" | "busy" | "unavailable" | "aborted" | "failed"> {
+		if (this.lifecycle.closed) return "aborted";
 		const state = this.session.getState();
 		if (state.status !== "ready" || !this.targetBody.hasNext()) return "unavailable";
 		const token = this.lifecycle.busy.acquire();
 		if (token === null) return "busy";
 		const body = this.targetBody, scheduler = this.scheduler();
-		const task = this.beginBodyTask("Loading next section…", true, false);
+		const task = this.beginBodyTask(message, true, prominent);
 		const current = () => this.isBodyTaskCurrent(task) && this.targetBody === body && this.session.getReadySnapshot() === state.snapshot;
 		try {
 			await scheduler.paint();
@@ -942,7 +1304,7 @@ export class SemantropyView extends ItemView {
 				this.lifecycle.reshuffleNotice = null;
 				return "applied";
 			}
-			this.lifecycle.reshuffleNotice = "Could not load the next section. Try again.";
+			this.lifecycle.reshuffleNotice = failure;
 			return "failed";
 		} finally {
 			this.endBodyTask(task); this.lifecycle.busy.release(token);
@@ -961,7 +1323,8 @@ export class SemantropyView extends ItemView {
 		if (this.lifecycle.closed) {
 			return "aborted";
 		}
-		const selected = this.resolveActionSelection(deps.selection);
+		// WORKBENCH-UI2: the hidden Shuffle body is never what a Copy reads.
+		const selected = this.recomposeShown() ? { status: "empty" as const } : this.resolveActionSelection(deps.selection);
 		if (selected.status !== "selected") {
 			this.notify(selected.message ?? COPY_EMPTY_SELECTION_MESSAGE);
 			return "empty";
@@ -999,7 +1362,7 @@ export class SemantropyView extends ItemView {
 		if (this.lifecycle.closed) {
 			return "aborted";
 		}
-		const selected = this.resolveActionSelection(deps.selection);
+		const selected = this.recomposeShown() ? { status: "empty" as const } : this.resolveActionSelection(deps.selection);
 		if (selected.status !== "selected") {
 			this.notify(selected.message ?? COLLECT_EMPTY_SELECTION_MESSAGE);
 			return "empty";
@@ -1053,7 +1416,7 @@ export class SemantropyView extends ItemView {
 
 		const requestId = this.dictionaryWorld.beginRequest();
 		const selected = this.readCommittedBodySelection(deps.selection);
-		if (selected.status !== "selected") {
+		if (selected.status !== "selected" || this.recomposeShown()) {
 			this.settleCancelledDefine();
 			this.host.showNotice(DEFINE_EMPTY_SELECTION_MESSAGE);
 			return "empty";
@@ -1318,6 +1681,7 @@ export class SemantropyView extends ItemView {
   if (bodyToken === null) return "busy";
   const owner = this.targetBody;
   const current = () => !this.lifecycle.closed && this.targetBody === owner;
+  const noBody = this.dictionaryWorld.getCurrent()?.snapshot === null && this.session.getState().status !== "ready";
   this.updateChrome();
   let outcome: DictionaryLevelChangeOutcome;
   try {
@@ -1339,7 +1703,9 @@ export class SemantropyView extends ItemView {
 				deps.persist ??
 				((value) => this.host.setDictionarySemantropy(value)),
 			isAbandoned: () => !current(),
-   prepareDisplay: async () => {
+   // FAKE-DICT-RECOMPOSE1: the definition of a word of a Recompose sentence, with no note open, has no body whose markers
+   // follow the level; with a note open the body is made again as it always was.
+   prepareDisplay: noBody ? undefined : async () => {
     const prepared = await owner.prepareMarkers(next, owner.getMarkerVisibility(), { isCurrent: current, scheduler: this.scheduler() });
     return prepared.status === "prepared" ? prepared : null;
    },
@@ -1533,6 +1899,39 @@ export class SemantropyView extends ItemView {
 		}
 	}
 
+	/**
+	 * WORKBENCH-UI5 (decision 17): the reader chooses a Vault note as the target. The host shows its own
+	 * chooser; the note comes back captured as the Open command captures one, and opens by the same rules
+	 * as that command (it starts not generated, the Vocabulary resets, and the note is watched for change).
+	 * Nothing is read until a note is chosen.
+	 */
+	async chooseTarget(): Promise<"opened" | "cancelled" | "unavailable" | "busy" | "aborted"> {
+		const choose = this.host.chooseTarget;
+		if (this.lifecycle.closed) return "aborted";
+		if (!choose) return "unavailable";
+		if (this.chooser) return "busy";
+		const request = new AbortController();
+		this.chooser = request;
+		this.toolbar?.closePopups(); this.dictionaryPopover?.close(); this.closeManualMenu();
+		let choice: TargetChoice | null;
+		try { choice = await choose(request.signal); } catch { choice = null; } finally { if (this.chooser === request) this.chooser = null; }
+		// A chooser the View closed (it closed, or opened again) reports nothing, whatever the host answers late.
+		if (this.lifecycle.closed || request.signal.aborted) return "aborted";
+		if (!choice) return "cancelled";
+		await this.openCapture(choice.capture, { readCached: choice.readCached, capturedSourceChanged: choice.capturedSourceChanged });
+		// The Open of the first note builds the shell again, and the button the reader pressed went with it: focus goes to its successor.
+		const doc = this.contentEl.ownerDocument;
+		if (!this.lifecycle.closed && (!doc.activeElement || doc.activeElement === doc.body)) this.shuffleBar?.chooseButton()?.focus({ preventScroll: true });
+		return "opened";
+	}
+
+	/** The host's chooser, if open, is told to close (the View closes or opens again): nothing it answers later is used. */
+	private closeChooser(): void {
+		const request = this.chooser;
+		this.chooser = null;
+		request?.abort();
+	}
+
 	async openCapture(
 		capture: SourceCapture,
 		deps: Pick<OpenSourceDependencies, "readCached"> &
@@ -1545,11 +1944,27 @@ export class SemantropyView extends ItemView {
 				capturedSourceChanged?: () => boolean;
 			},
 	): Promise<void> {
+		// WORKBENCH-UI5 (review 1, P3 7): a View that has been closed builds no shell, session or pane for an Open that arrives late.
+		if (this.lifecycle.closed) return;
+		// WORKBENCH-UI5: an Open with no note to take (run from the Semantropy pane itself, or from a view that is not
+		// a Markdown note) only brings this View forward: it keeps the target, the body, the Vocabulary and the
+		// Recompose text it has. With no note and no Vocabulary yet there is nothing to keep, and it is as it was.
+		// Only on a host with tabs (review 2, P3 2): the web page never sends one, and its View keeps the rule it had.
+		if (this.tabbed() && capture.kind === "none" && (this.session.getState().status !== "empty" || this.standaloneVocabulary !== null)) {
+			// Nothing else would tell the reader why the command did nothing (review 2, P3 11).
+			this.notify(OPEN_KEPT_MESSAGE);
+			return;
+		}
   if (this.session.getState().status === "ready" && this.targetBody.isDisplayIntact() && capture.kind === "markdown") {
    return this.replaceOpen(capture, deps);
   }
+		// A Vocabulary applied from Selected Notes with no note belongs to no note, so an Open that fails leaves it as it was
+		// (review 2, P3 3). The note's body is made from the note's own, new selection (review 3, P3 1: from the old one it took the weights and
+		// the draw mode of Selected Notes), so the old one is put aside here and put back by a read or an analysis that fails.
+		const stash = this.stashedStandalone ?? (this.tabbed() && capture.kind === "markdown" ? this.stashStandalone() : null);
 		this.cancelVocabularyPreparation();
 		this.resetVocabulary();
+		this.stashedStandalone = stash;
 		const requestId = this.session.beginLoading();
 		// Open supersedes anything in flight, including a Refresh that may never
 		// settle; it must not inherit that operation's claim on the actions.
@@ -1583,6 +1998,7 @@ export class SemantropyView extends ItemView {
 		}
 		if (!captured) {
 			this.sourceWatch.endRequest(requestId);
+			this.restoreStandalone(stash);
 			this.renderShell();
 			return;
 		}
@@ -1609,10 +2025,12 @@ export class SemantropyView extends ItemView {
 					: ANALYZE_ERROR_MESSAGE,
 			);
 			this.targetBody.release();
+			this.restoreStandalone(stash);
 			this.renderShell();
 			return;
 		}
 
+		this.stashedStandalone = null;
 		this.session.completeReady(
 			requestId,
 			captured.snapshot,
@@ -1638,6 +2056,8 @@ export class SemantropyView extends ItemView {
   this.cancelVocabularyPreparation(); this.lifecycle.busy.revoke(); this.bodyTask = null;
   const previous = this.session.getReadySnapshot(), old = this.targetBody, container = this.bodyEl;
   if (!previous || !container) return;
+  // WORKBENCH-UI2: an Open is about the Target, so it shows Shuffle, like a fresh shell does.
+  this.showTab("shuffle");
   const request = this.session.beginRefresh();
   const watch = this.sourceWatch.beginRequest(request, capture.kind === "markdown" ? capture.note.sourcePath : null);
   const parent = container.parentNode;
@@ -1653,16 +2073,22 @@ export class SemantropyView extends ItemView {
    if (!current()) return;
    if (!captured) { this.lifecycle.reshuffleNotice = TARGET_RENDER_ERROR_MESSAGE; return; }
    const scheduler = this.scheduler(); await scheduler.paint(); if (!current()) return;
+   // REOPEN-VOCABULARY-OPTIONS1: the note's Vocabulary is built from the note's own selection (Current Note, the stored draw mode, no
+   // weights) and with the enclosed-term delimiters, as a first Open builds it. The same selection is what the View shows afterwards.
+   const selection = this.initialSelection();
+   // WORKBENCH-UI1: an Open, even of another note, comes back not generated on a host that defers the Shuffle.
    const result = await staged.open({ snapshot: captured.snapshot, bodySeed: captured.bodySeed, bodySemantropy: this.host.getBodySemantropy(), automaticPos: this.host.getAutomaticPos?.(),
+    drawMode: selection.drawMode, sourceWeights: selectionSourceWeights(selection), enclosedTerms: this.enclosedTerms(),
     dictionarySemantropy: this.dictionaryLevel(), markerVisibility: this.markerVisibility(), targetSize: this.host.targetChunkSize,
-    targetRevision: request, getTokenizer: () => this.host.getTokenizer(), scheduler, isCurrent: current, ownerDocument: container.ownerDocument });
+    targetRevision: request, getTokenizer: () => this.host.getTokenizer(), scheduler, isCurrent: current, ownerDocument: container.ownerDocument,
+    ...(this.defersShuffle() ? { deferFirstChunk: true } : {}) });
    if (!current()) return;
    if (result.status !== "applied") { if (result.status !== "stale") this.lifecycle.reshuffleNotice = TARGET_RENDER_ERROR_MESSAGE; return; }
    const dom = targetDomTransaction(container, [staged.getContainer()!]);
    try { published = this.session.completeReady(request, captured.snapshot, captured.bodySeed, result.analysis, dom.publish); }
    finally { if (!published) dom.rollback(); }
    if (!published) return;
-   this.targetBody = staged; this.resetVocabulary(); old.release(); this.dismissDefinition();
+   this.targetBody = staged; this.resetVocabulary(selection); old.release(); this.dismissDefinition();
    if (this.sourceWatch.changedSince(watch) || deps.capturedSourceChanged?.()) this.session.setSourceFreshness(captured.snapshot, "stale");
    this.lifecycle.reshuffleNotice = null;
   } catch { if (current()) this.lifecycle.reshuffleNotice = TARGET_RENDER_ERROR_MESSAGE; }
@@ -1686,6 +2112,8 @@ export class SemantropyView extends ItemView {
 		bodySemantropy: BodySemantropy,
 		controller = this.targetBody,
 		extraCurrent: () => boolean = () => true,
+		/** WORKBENCH-UI1: an Open defers on a host that asks for it; a Refresh keeps what the body was. */
+		deferFirstChunk = this.defersShuffle(),
 	): Promise<TargetOpenResult> {
 		const scheduler = this.scheduler();
 		const container = this.contentEl, parent = container.parentNode, connected = container.isConnected;
@@ -1713,6 +2141,7 @@ export class SemantropyView extends ItemView {
 			isCurrent,
 			scheduler,
 			ownerDocument: this.contentEl.ownerDocument,
+			...(deferFirstChunk ? { deferFirstChunk: true } : {}),
 		});
 	}
 
@@ -1799,12 +2228,16 @@ export class SemantropyView extends ItemView {
 	private unbindActions(): void {
 		this.unbindLoad?.();
 		this.unbindLoad = null;
+		this.unbindGenerate?.();
+		this.unbindGenerate = null;
 	}
 
 	private viewModel() {
+		const ungenerated = this.ungenerated();
 		return toSemantropyViewModel(this.session.getState(), {
 			busy: this.lifecycle.busy.isBusy(),
 			transforming: this.bodyTask?.cancellable === true,
+			...(ungenerated ? { ungenerated, generateBlocked: this.generateBlocked() } : {}),
 		});
 	}
 
@@ -1814,9 +2247,10 @@ export class SemantropyView extends ItemView {
 	}
 
 	private statusModel(): ToolbarStatusModel {
-		const vocabulary = this.getVocabularyState();
+		const vocabulary = this.getVocabularyState(), ungenerated = this.ungenerated();
 		return toToolbarStatusModel({
 			sessionStatus: this.session.getState().status,
+			...(ungenerated ? { ungenerated, generateBlocked: this.generateBlocked() } : {}),
 			model: this.viewModel(),
 			taskMessage: this.bodyTask?.message ?? null,
 			noticeMessage: this.lifecycle.reshuffleNotice ?? null,
@@ -1859,7 +2293,8 @@ export class SemantropyView extends ItemView {
 		const root = this.contentEl.createDiv({ cls: "semantropy-root" });
 		this.toolbar = new SemantropyToolbar(root, {
 			model: () => this.viewModel(),
-			status: () => this.statusModel(),
+			// WORKBENCH-UI5: with tabs the body's state is in the Shuffle area; the Toolbar says what every tab needs.
+			status: () => this.tabbed() ? toolbarStatusWithoutBody(this.statusModel()) : this.statusModel(),
 			display: () => this.displaySettings(),
 			alert: () => this.markerApplyError,
 			// One resolution of the exact one-token selection feeds both the
@@ -1869,21 +2304,33 @@ export class SemantropyView extends ItemView {
 			manual: () => { const slot = this.selectedManualSlot(); return { selected: !!slot?.manualEligible,
 				selectedShuffleable: slot?.manualDiagnostic.status === "available",
 				selectedOverridden: !!slot && this.targetBody.hasManualOverride(slot),
-				count: this.targetBody.getManualOverrideCount(), diagnostic: slot?.manualDiagnostic ?? null }; },
-			vocabularyHost: (entry, summary) => {
-				if (!ready) return;
+				count: this.targetBody.getManualOverrideCount(), diagnostic: slot?.manualDiagnostic ?? null,
+				// WORKBENCH-UI2 review 1: the hidden Shuffle body's changes are not cleared from the Recompose tab.
+				clearable: !this.recomposeShown() }; },
+			// WORKBENCH-UI5 (review 2, P3 5): with tabs the sentence about the selected word stands in the Shuffle area.
+			...(this.tabbed() ? { manualDiagnosticId: () => this.shuffleBar?.diagnosticId ?? null } : {}),
+			vocabularyHost: (entry, summary, adopt) => {
+				// WORKBENCH-UI4: with tabs the Vocabulary can be chosen without a note, for Recompose and the phrase generators.
+				if (!ready && !this.tabbed()) return;
 				this.vocabularyControls = new VocabularyControls(entry, summary, {
 					state: () => this.getVocabularyState(),
 					open: () => this.openVocabularyPicker(),
+					// WORKBENCH-UI5 (owner, 2026-10-08): a host with tabs names the notes in the summary; the web page's line stays as it was.
+					...(this.tabbed() ? { names: { adopt } } : {}),
 				});
 			},
+			// WORKBENCH-UI3: only a host with either flag tells the Toolbar what the body area shows.
+			...(this.defersShuffle() || this.tabbed() ? { workbench: () => ({
+				generate: this.ungenerated(), tabbed: this.tabbed(),
+				recomposeShown: this.recomposeShown() }) } : {}),
 			reshuffle: () => { void this.reshuffle(); },
 			refreshTarget: () => { void this.refreshSource(); },
 			copy: () => { void this.copySelectedFragment(); },
 			collect: () => { void this.collectSelectedFragment(); },
 			collision: () => this.openCollision(),
 			fakeProverb: () => this.openFakeProverb(),
-			...(this.host.recomposeDialog === false ? {} : { recompose: () => this.openRecompose() }),
+			...(this.tabbed() ? { fakeDictionary: () => this.openDictionaryHelp() } : {}),
+			fakeAlert: () => this.openFakeAlert(),
 			cancelVocabulary: () => { this.cancelVocabulary(); },
 			setBodySemantropy: (value) => { this.onLevelSelected(value); },
 			setDisplay: (patch) => { void this.changeDisplaySettings(patch); },
@@ -1891,10 +2338,12 @@ export class SemantropyView extends ItemView {
 			shuffleSelected: () => { this.runManual("shuffle", this.selectedManualSlot()); },
 			restoreSelected: () => { this.runManual("restore", this.selectedManualSlot()); },
 			useAutomaticSelected: () => { this.runManual("automatic", this.selectedManualSlot()); },
-			clearManual: () => { if (this.targetBody.clearManual() === "applied") { this.afterManualChange(); } },
+			clearManual: () => { if (!this.recomposeShown() && this.targetBody.clearManual() === "applied") { this.afterManualChange(); } },
 		});
 		this.mountAutomatic(this.toolbar.automaticHost);
-		const diagnostics = root.createEl("details", { cls: "semantropy-dictionary-diagnostics" });
+		// WORKBENCH-UI5: a host with tabs shows this in the Fake Dictionary dialog instead (the Toolbar's button).
+		if (!this.tabbed()) {
+  const diagnostics = root.createEl("details", { cls: "semantropy-dictionary-diagnostics" });
   this.shellLabels.text(diagnostics.createEl("summary"), () => ui().dictionary.availability);
   this.dictionaryDiagnosticEl = diagnostics.createDiv({ attr: { role: "status" } });
   this.dictionaryCountsEl = diagnostics.createDiv();
@@ -1907,6 +2356,7 @@ export class SemantropyView extends ItemView {
   modifier.addEventListener("change", () => {
    if (modifier.value === "alt" || modifier.value === "shift") void this.changeDisplaySettings({ dictionaryModifier: modifier.value });
   });
+		}
   this.scrollEl = root.createDiv({ cls: "semantropy-scroll" });
   // Visual only: the status line above already announces the same state.
   this.busyEl = root.createDiv({ cls: "semantropy-busy", attr: { "aria-hidden": "true" } });
@@ -1915,9 +2365,27 @@ export class SemantropyView extends ItemView {
   busyCard.createDiv({ cls: "semantropy-busy-spinner" });
   this.busyTextEl = busyCard.createDiv({ cls: "semantropy-busy-text" });
   this.busyDetailEl = busyCard.createDiv({ cls: "semantropy-busy-detail" });
+		this.activeTab = "shuffle";
+		this.tabScroll = { shuffle: { top: 0, left: 0 }, recompose: { top: 0, left: 0 } };
+		// WORKBENCH-UI2: on a host with tabs the Shuffle side moves into its pane; every
+		// other host builds it straight into the scrolling box, as before.
+		const pane = this.tabbed() ? this.scrollEl.createDiv({ cls: "semantropy-pane semantropy-shuffle-pane" }) : this.scrollEl;
 		if (ready) {
-			this.bodyEl = this.scrollEl.createDiv({ cls: SEMANTROPY_BODY_CLASS });
-			this.loadButton = this.scrollEl.createEl("button", {
+			// WORKBENCH-UI1: Generate stands where the body was not shuffled at open. Built only
+			// on a host that defers the Shuffle, so every other host's shell is unchanged.
+			if (this.defersShuffle()) {
+				this.generateEl = pane.createDiv({ cls: "semantropy-generate" });
+				this.generateButton = this.generateEl.createEl("button", {
+					cls: "semantropy-action mod-cta semantropy-generate-button",
+					attr: { type: "button" },
+				});
+				this.shellLabels.text(this.generateButton, () => ui().common.generate);
+				this.unbindGenerate = bindExclusiveClick(this.unbindGenerate, this.generateButton, () => {
+					void this.generateFromButton();
+				});
+			}
+			this.bodyEl = pane.createDiv({ cls: SEMANTROPY_BODY_CLASS });
+			this.loadButton = pane.createEl("button", {
 				cls: "semantropy-action semantropy-load-next",
 				attr: { type: "button" },
 			});
@@ -1926,18 +2394,34 @@ export class SemantropyView extends ItemView {
 				void this.loadNextSection();
 			});
 			this.syncLoadControl();
+			if (pane !== this.scrollEl) this.buildTabs(root, this.scrollEl, pane);
 			this.bindBodySelection();
 			this.bindManualActions();
    this.bindDictionaryPopover(root);
+		} else if (this.tabbed()) {
+			// WORKBENCH-UI4: the tabs stand without a note too. With no note the Shuffle tab says so, in the
+			// sentence the status line uses; while a note is being read, or when it could not be, it stays empty
+			// (the status line says why) and Recompose is the tab that can be used.
+			if (this.session.getState().status === "empty") {
+				this.shellLabels.text(pane.createDiv({ cls: "semantropy-shuffle-empty" }), () => localize(this.viewModel().message ?? ""));
+			}
+			this.buildTabs(root, this.scrollEl, pane);
+			// FAKE-DICT-RECOMPOSE1: the Recompose text can be looked up with no note too, so the Popover is bound to it alone.
+			this.bindDictionaryPopover(root);
 		}
 		this.applyBodyDisplayStyles();
 		this.syncTokenAffordance();
+		this.syncRecomposeAffordance();
 		// An Open draws the shell and then waits for analysis without another chrome pass.
 		this.syncBusyOverlay();
+		// The Fake Dictionary dialog, if open, is bound to the sentence the diagnostics write: it follows the shell's new state
+		// at once (a note being read is not "no Vocabulary chosen"). The availability row of a host without tabs is not touched here.
+		if (this.dictionaryHelpModal) this.syncDictionaryDiagnostics();
 	}
 
 	/**
-	 * Applies the display settings to the body alone.
+	 * Applies the display settings to the body alone (WORKBENCH-UI3: and the
+	 * body's font and size to the Recompose pane's text).
 	 *
 	 * Font, size and colours are set on the body element, and ruby visibility
 	 * is a class on it, so none of them reaches the Toolbar, the status line or
@@ -1959,14 +2443,19 @@ export class SemantropyView extends ItemView {
 			scroll.style.setProperty("background-color", display.bodyBackground ?? "");
 			scroll.style.setProperty("color", display.bodyForeground ?? "");
 		}
+		const stack = BODY_FONT_STACKS[display.bodyFontFamily];
+		const size = display.bodyFontSizePx === null ? "" : `${display.bodyFontSizePx}px`;
+		// WORKBENCH-UI3: the Recompose pane's text takes the body's font and size;
+		// ruby and markers stay the Shuffle body's own.
+		const recomposed = this.recomposeScreen?.outputElement();
+		if (recomposed) {
+			recomposed.style.setProperty("font-family", stack ?? "");
+			recomposed.style.setProperty("font-size", size);
+		}
 		const body = this.bodyEl;
 		if (!body) return;
-		const stack = BODY_FONT_STACKS[display.bodyFontFamily];
 		body.style.setProperty("font-family", stack ?? "");
-		body.style.setProperty(
-			"font-size",
-			display.bodyFontSizePx === null ? "" : `${display.bodyFontSizePx}px`,
-		);
+		body.style.setProperty("font-size", size);
 		body.classList.toggle("is-ruby-hidden", !display.showRuby);
 	}
 
@@ -2056,6 +2545,7 @@ export class SemantropyView extends ItemView {
   this.dictionaryPopover?.close();
   const modifier = this.contentEl.querySelector<HTMLSelectElement>(".semantropy-dictionary-diagnostics select");
   if (modifier) modifier.value = this.displaySettings().dictionaryModifier;
+		this.dictionaryHelpModal?.sync();
 		this.applyBodyDisplayStyles();
 		this.updateChrome();
 		await this.reconcileMarkerVisibility();
@@ -2156,18 +2646,23 @@ export class SemantropyView extends ItemView {
 	}
 
 	private updateChrome(): void {
-		if (!this.lifecycle.closed && this.automaticController?.read().status === "stale" && this.targetBody.isAutomaticCurrent() && this.toolbar)
+		// WORKBENCH-UI5 (review 1, P3 1): with no note there is no body to be current; the Vocabulary being fresh again is what it waits for.
+		// Only on a host with tabs: the web page's View keeps the rule it had (review 2, P3 2).
+		const automaticCurrent = this.tabbed() && this.session.getState().status !== "ready" ? this.staleSources.size === 0 : this.targetBody.isAutomaticCurrent();
+		if (!this.lifecycle.closed && this.automaticController?.read().status === "stale" && automaticCurrent && this.toolbar)
 			this.mountAutomatic(this.toolbar.automaticHost);
 		this.automaticToolbar?.setBlocked(this.lifecycle.busy.isBusy());
 		this.collisionModal?.sync();
 		this.fakeProverbModal?.sync();
-		this.recomposeModal?.sync();
+		this.recomposeScreen?.sync();
   this.dictionaryPopover?.validate(); this.syncDictionaryDiagnostics();
 		if (this.manualMenu && this.manualMenuRevision !== this.targetBody.getDisplayRevision()) this.closeManualMenu();
 		this.syncVocabularyChrome();
 		this.toolbar?.sync();
+		this.shuffleBar?.sync();
 		this.syncLoadControl();
 		this.syncTokenAffordance();
+		this.syncRecomposeAffordance();
 		this.syncBusyOverlay();
 		this.retryMarkerVisibility();
 	}
@@ -2244,15 +2739,39 @@ export class SemantropyView extends ItemView {
 	}
 
 	private syncLoadControl(): void {
+		this.syncGenerateControl();
 		if (!this.loadButton) return;
-		this.loadButton.hidden = !this.targetBody.hasNext();
-		this.loadButton.disabled = this.lifecycle.closed || this.lifecycle.busy.isBusy() || !this.targetBody.hasNext();
+		// WORKBENCH-UI1: before the first Chunk, Generate is the way on, not Load next.
+		const ungenerated = this.ungenerated();
+		this.loadButton.hidden = !this.targetBody.hasNext() || ungenerated;
+		this.loadButton.disabled = this.lifecycle.closed || this.lifecycle.busy.isBusy() || !this.targetBody.hasNext() || ungenerated;
+	}
+
+	/** WORKBENCH-UI1: Generate shows only while nothing is generated, and waits while busy or until Refresh. */
+	private syncGenerateControl(): void {
+		if (!this.generateEl || !this.generateButton) return;
+		const ungenerated = this.ungenerated();
+		this.generateEl.hidden = !ungenerated;
+		this.generateButton.disabled = !ungenerated || this.lifecycle.closed || this.lifecycle.busy.isBusy() || this.generateBlocked();
+	}
+
+	/**
+	 * The empty body's Generate. Its button leaves with the first Chunk, so
+	 * keyboard focus that was on it moves to Reshuffle text, not to the page.
+	 */
+	private async generateFromButton(): Promise<void> {
+		const button = this.generateButton, doc = this.contentEl.ownerDocument;
+		if (await this.generateBody() !== "applied" || this.lifecycle.closed || !button) return;
+		const active = doc.activeElement;
+		if (active !== null && active !== button && active !== doc.body) return;
+		this.toolbar?.returnTarget(this.contentEl.querySelector<HTMLElement>(".semantropy-reshuffle"))?.focus();
 	}
 
 	private syncActionControls(): void {
 		this.syncLoadControl();
 		this.syncTokenAffordance();
 		this.toolbar?.sync();
+		this.shuffleBar?.sync();
 		this.automaticToolbar?.setBlocked(this.lifecycle.busy.isBusy());
 		this.retryMarkerVisibility();
 	}
@@ -2269,7 +2788,8 @@ export class SemantropyView extends ItemView {
 	 * form input keep working.
 	 */
 	private captureBodySelection(): void {
-		if (this.lifecycle.closed) return;
+		// WORKBENCH-UI2: a selection change while the Shuffle body is hidden records nothing.
+		if (this.lifecycle.closed || this.recomposeShown()) return;
 		const owner = this.targetBody;
 		const selection = this.contentEl.ownerDocument.getSelection();
 		const logical = owner.readLogicalSelection(selection);
@@ -2310,7 +2830,7 @@ export class SemantropyView extends ItemView {
 		// re-derived. A sync that changes nothing writes nothing. During a pointer
 		// drag in the body it waits for the release (see `selectionGesture`).
 		if (this.selectionGesture) return;
-		this.toolbar?.sync(); this.syncDictionaryDiagnostics();
+		this.toolbar?.sync(); this.shuffleBar?.sync(); this.syncDictionaryDiagnostics();
 	}
 
 	/**
@@ -2327,6 +2847,7 @@ export class SemantropyView extends ItemView {
 	 * entry points accept.
 	 */
 	private selectedManualSlot(): DisplaySlot | null {
+		if (this.recomposeShown()) return null;
 		const selection = this.contentEl.ownerDocument.getSelection();
 		const live = this.targetBody.readSelectedSlot(selection);
 		if (live) return live;
@@ -2474,7 +2995,7 @@ export class SemantropyView extends ItemView {
 	}
 
 	private runManual(action: "shuffle" | "restore" | "automatic", slot: DisplaySlot | null): void {
-		if (!slot || this.lifecycle.busy.isBusy()) { this.closeManualMenu(); return; }
+		if (!slot || this.lifecycle.busy.isBusy() || this.recomposeShown()) { this.closeManualMenu(); return; }
 		const result = action === "shuffle" ? this.targetBody.shuffleManual(slot) : action === "restore" ? this.targetBody.restoreManual(slot) : this.targetBody.useAutomatic(slot);
 		this.closeManualMenu();
 		if (result === "applied") this.afterManualChange();
@@ -2634,7 +3155,7 @@ export class SemantropyView extends ItemView {
 	}
 
 	private ensureDefinitionModal(): FakeDefinitionModal {
-		if (this.definitionModal && this.definitionModal.isOpen()) {
+		if (this.definitionModal && this.definitionModal.isShowing()) {
 			return this.definitionModal;
 		}
 		const modal = new FakeDefinitionModal(this.app, {
@@ -2693,7 +3214,7 @@ export class SemantropyView extends ItemView {
  }
  private definitionIsOpen(): boolean {
   this.dictionaryPopover?.validate();
-  return !!this.definitionModal?.isOpen() || !!this.dictionaryPopover?.isOpen();
+  return !!this.definitionModal?.isShowing() || !!this.dictionaryPopover?.isOpen();
  }
  private rememberDefinition(): void {
   const current = this.dictionaryWorld.getCurrent();
@@ -2704,23 +3225,53 @@ export class SemantropyView extends ItemView {
  }
  private hoverTarget(element: Element): DictionaryHoverTarget | null {
   if (element.closest("rt,rp,a,code,pre,input,textarea,select,button,[contenteditable=true]")) return null;
+  // FAKE-DICT-RECOMPOSE1: a word of a Recompose sentence is looked up the same way, for a Vocabulary instead of a Target.
+  if (this.recomposeScreen?.outputElement().contains(element)) return this.recomposeHoverTarget(element);
   const anchor = element.closest<HTMLElement>(".semantropy-token");
   if (!anchor || !this.bodyEl?.contains(anchor)) return null;
   const owner = this.targetBody, slot = owner.getSlotForElement(anchor), snapshot = owner.getVocabularySnapshot();
   if (!slot?.dictionaryAvailable || slot.dictionary.outcome !== "accepted" || !snapshot) return null;
   const world = this.dictionaryWorld, revision = owner.getDisplayRevision(), generation = owner.getBodyGeneration();
   const level = this.dictionaryLevel();
-  return { slot, anchor, isCurrent: () => {
-   return this.dictionaryLive() && this.targetBody === owner && this.dictionaryWorld === world &&
+  return { slot, surface: slot.displaySurface, identified: slot.dictionary, noTarget: false, anchor, isCurrent: () => {
+   return this.dictionaryLive() && !this.recomposeShown() && this.targetBody === owner && this.dictionaryWorld === world &&
     owner.getBodyGeneration() === generation && owner.getDisplayRevision() === revision && owner.getVocabularySnapshot() === snapshot &&
     owner.getSlotForElement(anchor) === slot && this.dictionaryLevel() === level;
   } };
  }
+ /**
+  * FAKE-DICT-RECOMPOSE1: a word of the Recompose text. It is current while the tab is shown, the text's Vocabulary is the active
+  * one and ready (the session's `lookup`), the View is not preparing a Vocabulary, and the word is still where it was. The
+  * dictionary level is not part of it: changing the level from this Popover must not close it.
+  */
+ private recomposeHoverTarget(element: Element): DictionaryHoverTarget | null {
+  const pane = this.recomposeScreen, found = pane?.wordAt(element);
+  if (!pane || !found || !this.recomposeLookupLive()) return null;
+  const { word, anchor } = found, world = this.dictionaryWorld;
+  return { slot: word, surface: word.headword.surface, identified: { outcome: "accepted", headword: word.headword }, noTarget: true, anchor,
+   isCurrent: () => this.recomposeLookupLive() && this.dictionaryWorld === world && anchor.isConnected && this.recomposeScreen?.wordAt(anchor)?.word === word };
+ }
+ /** The View-wide half of a lookup in a Recompose sentence: the tab is shown, its text can be looked up, and no Vocabulary is being prepared. */
+ private recomposeLookupLive(): boolean {
+  return !this.lifecycle.closed && this.recomposeShown() && !this.vocabularyTask && (this.recomposeSession?.read().lookup ?? false);
+ }
+ /** Whether a lookup would act now, so the words carry their marker; the pointer is the sentence's own (a click chooses the branch point). */
+ private syncRecomposeAffordance(): void {
+  const output = this.recomposeScreen?.outputElement();
+  if (!output) return;
+  const marked = this.recomposeLookupLive() && !this.lifecycle.busy.isBusy() && !this.dictionaryBusy.isBusy() && this.displaySettings().showDictionaryMarkers;
+  output.classList.toggle("is-dictionary-marked", marked);
+ }
  private bindDictionaryPopover(root: HTMLElement): void {
-  if (!this.bodyEl || !this.scrollEl) return;
-  this.dictionaryPopover = new DictionaryPopoverController(root, this.bodyEl, this.scrollEl, {
+  const recomposed = this.recomposeScreen?.outputElement();
+  const bodies = [this.bodyEl, recomposed].filter((element): element is HTMLElement => !!element);
+  if (bodies.length === 0 || !this.scrollEl) return;
+  this.dictionaryPopover = new DictionaryPopoverController(root, bodies, recomposed ? [this.scrollEl, recomposed] : this.scrollEl, {
+   wordSelector: ".semantropy-token,.semantropy-recompose-word",
+   // A word of a Recompose sentence has no Target note to collect for.
+   collectOffered: () => this.dictionaryPopover?.getTarget()?.noTarget !== true,
    modifier: () => this.displaySettings().dictionaryModifier,
-   canStart: () => !this.lifecycle.closed && !this.lifecycle.busy.isBusy() && !this.dictionaryBusy.isBusy() && !this.vocabularyTask && !this.definitionModal?.isOpen() && !this.collisionModal && !this.fakeProverbModal && !this.recomposeModal,
+   canStart: () => !this.lifecycle.closed && !this.lifecycle.busy.isBusy() && !this.dictionaryBusy.isBusy() && !this.vocabularyTask && !this.definitionModal?.isShowing() && !this.collisionModal && !this.fakeProverbModal && !this.fakeAlertModal,
    resolve: element => this.hoverTarget(element),
    begin: target => { this.closeManualMenu(); void this.defineHoverTarget(target); },
    closed: () => { this.pendingDefineId = null; this.definitionError = null; this.dictionaryWorld.invalidateDisplay(); },
@@ -2729,7 +3280,41 @@ export class SemantropyView extends ItemView {
    onReshuffle: () => { this.reshuffleDefinition(); }, onSemantropyChange: value => { void this.setDictionarySemantropy(value); },
   });
  }
+ /**
+  * FAKE-DICT-RECOMPOSE1: the definition of a word of a Recompose sentence. The same steps as the Shuffle body's hover, for
+  * the active Vocabulary alone: its pool comes from its Snapshot (made once), nothing is tokenized, no Target is read, and the
+  * definition is committed with no Target. The cache is shared with the Shuffle side by the same key, but this side only reads
+  * its result: it neither reads nor writes an entry's Target.
+  */
+ private async defineRecomposeWord(target: DictionaryHoverTarget): Promise<void> {
+  const world = this.dictionaryWorld, owner = this.collisionVocabulary();
+  if (!owner || !target.isCurrent()) return;
+  // With a note open whose body was made from this very Snapshot, the body already holds this pool (the same function of the same
+  // Snapshot): it is used as it is. Otherwise (no note, or a note whose Vocabulary is another) it is made once and kept under its Snapshot.
+  const snapshot = owner.snapshot;
+  const pool = (this.targetBody.getVocabularySnapshot() === snapshot ? this.targetBody.getDictionaryPool() : undefined) ?? this.recomposePools.poolOf(snapshot);
+  const requestId = world.beginRequest();
+  this.pendingDefineId = requestId; this.definitionError = null; this.dictionaryLevelError = null;
+  const level = this.dictionaryLevel();
+  try {
+   const nonce = world.ensureSeed(issueUint32Seed);
+   const current = () => target.isCurrent() && this.dictionaryPopover?.getTarget() === target && world.isCurrent(requestId) && world.getSeed() === nonce;
+   const result = await runDefineSelectedWord({
+    selection: target.surface, identified: target.identified, snapshot: null, tokenSequences: [], preparedPool: pool,
+    dictionarySeed: nonce, dictionarySemantropy: level, getTokenizer: () => this.host.getTokenizer(),
+    isCurrent: current, getSnapshotIdentity: () => null,
+    generate: request => this.definitionCache.getForWorld(definitionCacheKey(request.headword, nonce, level, snapshot))?.result ?? generateFakeDefinition(request),
+   });
+   if (!current()) { this.dictionaryPopover?.validate(); return; }
+   if (result.status === "ready") {
+    world.commit(requestId, { headword: result.headword, pool, snapshot: null, vocabulary: collectVocabularyFromSnapshot(snapshot),
+     dictionarySeed: result.result.outcome === "generated" ? result.result.dictionarySeed : nonce, dictionarySemantropy: level, result: result.result });
+   } else if (result.status !== "stale") this.definitionError = DEFINE_GENERATION_ERROR_MESSAGE;
+  } catch { if (target.isCurrent() && world.isCurrent(requestId)) this.definitionError = DEFINE_GENERATION_ERROR_MESSAGE; }
+  if (world.isCurrent(requestId)) this.syncDefinitionModal();
+ }
  private async defineHoverTarget(target: DictionaryHoverTarget): Promise<void> {
+  if (target.noTarget) return this.defineRecomposeWord(target);
   const world = this.dictionaryWorld, owner = this.targetBody;
   const state = this.session.getState(), snapshot = owner.getVocabularySnapshot(), pool = owner.getDictionaryPool();
   if (state.status !== "ready" || !snapshot || !pool || !target.isCurrent()) return;
@@ -2741,7 +3326,7 @@ export class SemantropyView extends ItemView {
    const current = () => target.isCurrent() && this.dictionaryPopover?.getTarget() === target &&
     world.isCurrent(requestId) && world.getSeed() === nonce;
    const result = await runDefineSelectedWord({
-    selection: target.slot.displaySurface, identified: target.slot.dictionary,
+    selection: target.surface, identified: target.identified,
     snapshot: dictionarySnapshotIdentityOf(state.snapshot), tokenSequences: state.tokenSequences, preparedPool: pool,
     dictionarySeed: nonce, dictionarySemantropy: level, getTokenizer: () => this.host.getTokenizer(),
     isCurrent: current, getSnapshotIdentity: () => {
@@ -2764,7 +3349,9 @@ export class SemantropyView extends ItemView {
   if (world.isCurrent(requestId)) this.syncDefinitionModal();
  }
  private syncDictionaryDiagnostics(): void {
-  const snapshot = this.targetBody.getVocabularySnapshot();
+  // WORKBENCH-UI5: the Vocabulary in use, which with no note is the one applied from Selected Notes (it was the Target's only,
+  // so a View without a note said "being prepared" for good). A host without tabs has no Vocabulary without a note.
+  const snapshot = this.targetBody.getVocabularySnapshot() ?? this.standaloneVocabulary?.snapshot ?? null;
   if (snapshot !== this.diagnosticSnapshot) {
    this.diagnosticSnapshot = snapshot; this.diagnosticCounts = snapshot ? dictionaryDiagnostics(snapshot) : null;
   }
@@ -2772,7 +3359,8 @@ export class SemantropyView extends ItemView {
   if (this.dictionaryDiagnosticEl) {
    const state = this.session.getState();
    const text = dictionaryDiagnosticMessage({ level: this.dictionaryLevel(), preparing: !!this.vocabularyTask,
-    stale: !!this.staleSources.size || this.targetVocabularyChanged || (state.status === "ready" && state.freshness !== "fresh"), slot: this.selectedManualSlot(), counts });
+    stale: !!this.staleSources.size || this.targetVocabularyChanged || (state.status === "ready" && state.freshness !== "fresh"), slot: this.selectedManualSlot(), counts,
+    none: this.tabbed() && !snapshot && state.status !== "loading" });
    const shown = localize(text);
    if (this.dictionaryDiagnosticEl.textContent !== shown) this.dictionaryDiagnosticEl.textContent = shown;
   }
@@ -2803,18 +3391,28 @@ export class SemantropyView extends ItemView {
 		this.automaticToolbar?.relabel();
 		this.vocabularyControls?.relabel();
 		this.toolbar?.relabel();
+		this.shuffleBar?.relabel();
 		this.vocabularyModal?.relabel();
 		this.definitionModal?.relabel();
 		this.dictionaryPopover?.relabel();
 		this.collisionModal?.relabel();
 		this.fakeProverbModal?.relabel();
-		this.recomposeModal?.relabel();
+		this.recomposeScreen?.relabel();
+		this.fakeAlertModal?.relabel();
+		this.dictionaryHelpModal?.relabel();
 		this.syncDictionaryDiagnostics();
 	}
 
 	private clearChromeRefs(): void {
-  this.dictionaryDiagnosticEl = null; this.dictionaryCountsEl = null;
+  if (!this.dictionaryHelpModal) { this.dictionaryDiagnosticEl = null; this.dictionaryCountsEl = null; }
 		this.loadButton = null;
+		this.generateEl = null;
+		this.generateButton = null;
+		this.tabRow?.dispose(); this.tabRow = null;
+		this.shuffleBar?.dispose(); this.shuffleBar = null;
+		this.recomposeScreen?.dispose(); this.recomposeScreen = null;
+		this.shufflePane = null;
+		this.recomposePane = null;
 		this.bodyEl = null;
 		this.scrollEl = null;
 		this.busyEl = null;

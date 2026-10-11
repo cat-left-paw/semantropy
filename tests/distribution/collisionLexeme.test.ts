@@ -109,6 +109,17 @@ const PINNED: Readonly<Record<string, readonly string[]>> = {
 	御座る: ["五段・ラ行特殊"],
 	// 一段 lexemes with a second, single-lemma class.
 	くれる: ["一段", "一段・クレル"],
+	// SHORT-OKURIGANA-EXCLUDE1 (`Docs/max_realization_amendment2.md`): the eight 一段 lexemes the exclusion set also names.
+	// へるる / のぼりつめるる / 上り詰めるる are dictionary expansion artifacts the Shuffle's realizer already excluded; the
+	// five after them are spellings with the stem's last kana left out (恐る beside 恐れる). 割る is also a 五段 verb (ワル).
+	へるる: ["一段"],
+	のぼりつめるる: ["一段"],
+	上り詰めるる: ["一段"],
+	恐る: ["一段"],
+	流る: ["一段"],
+	割る: ["一段", "五段・ラ行"],
+	仕掛る: ["一段"],
+	組み立る: ["一段"],
 	// Kanji spellings that also carry an unrelated 五段・ラ行 lexeme.
 	する: ["サ変・スル", "五段・ラ行"],
 	来る: ["カ変・来ル", "五段・ラ行"],

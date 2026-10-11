@@ -18,6 +18,12 @@
  * not recognise rather than skipping it, so an entry cannot be lost to a typo,
  * and it reports every problem it finds in document order so one failing build
  * names them all.
+ *
+ * FAKE-PROVERB-RECIPES3 (`Docs/fake_proverb_recipes3_amendment1.md`): a recipe
+ * is written as one `line:` of fixed text and holes (`{n1}は{n2}を{v1}`). The
+ * parser turns it into the same Recipe Schema 2 parts as before; fixed text has
+ * no entry of its own, and its id comes from the text. Problems are also
+ * explained in Japanese for the owner, who edits the document.
  */
 import esbuild from "esbuild";
 import { createHash } from "node:crypto";
@@ -48,25 +54,64 @@ export const GENERATE_COMMAND = "npm run generate:fake-proverb-recipes";
 // Shared compiler for the synchronous parser API. Build/watch re-load their root's
 // compiler for each generation, so later edits never use a stale validator.
 const sourceCompiler = await loadRecipeCompiler(fileURLToPath(new URL("../../", import.meta.url)));
+// The schema's limits and closed forms, for the Japanese explanations only: the compiler alone decides what is valid.
+const sourceSchema = await loadRecipeSchema(fileURLToPath(new URL("../../", import.meta.url)));
 export const FAKE_PROVERB_RECIPE_SCHEMA_VERSION = sourceCompiler.FAKE_PROVERB_RECIPE_SCHEMA_VERSION;
 export const FAKE_PROVERB_LITERAL_MAX_CODE_POINTS = sourceCompiler.FAKE_PROVERB_LITERAL_MAX_CODE_POINTS;
 
-const ENTRY_KINDS = ["proverb", "gloss", "literal", "profile"];
+const ENTRY_KINDS = ["proverb", "gloss", "profile"];
+/** Fields a kind may carry once, before its `line:` (a recipe) or its `form:` lines (a profile). */
 const SCALAR_FIELDS = Object.freeze({
 	proverb: ["enabled", "weight"],
 	gloss: ["enabled", "weight"],
-	literal: [],
+	profile: ["kind", "tag"],
+});
+const REQUIRED_FIELDS = Object.freeze({
+	proverb: ["enabled", "weight"],
+	gloss: ["enabled", "weight"],
 	profile: ["kind"],
 });
-const SLOT_PART_KINDS = ["noun", "modifier", "predicate"];
+// The closed slot kinds come from the compiler, so the line syntax never disagrees with the schema.
+const SLOT_KINDS = [...sourceCompiler.FAKE_PROVERB_SLOT_KINDS];
+/** The letter that names a slot kind inside a hole: `{n1}`, `{m1}`, `{v1}`, `{a1}`. */
+const HOLE_KINDS = Object.freeze({ n: "noun", m: "modifier", v: "predicate", a: "adverbial" });
+if (JSON.stringify(Object.values(HOLE_KINDS)) !== JSON.stringify(SLOT_KINDS)) {
+	throw new Error("The Fake Proverb hole letters do not cover the schema's slot kinds.");
+}
+const KIND_JA = Object.freeze({ noun: "名詞", modifier: "修飾", predicate: "述語", adverbial: "連用の修飾" });
 const METADATA_KEYS = ["schema-version", "data-version"];
 const HEADING = /^## ([^ ]+) (.+)$/u;
 const TITLE = /^# (.+)$/u;
 const FIELD = /^([a-z][a-z0-9-]*): (.*)$/su;
 const INTEGER = /^(0|[1-9][0-9]*)$/u;
+/** A hole: an optional `-` or `+`, a kind letter, a number 1 to 9, and an optional `:tag`. */
+const HOLE = /^([-+]?)([nmva])([1-9])(?::(.*))?$/su;
+/** A profile tag: one to four Hiragana, Katakana or Han characters. */
+const TAG = /^[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]{1,4}$/u;
 
-function issue(code, line, detail) {
-	return detail === undefined ? { code, line } : { code, line, detail };
+/**
+ * The id of a fixed literal, derived from its text: `l-` and the first eight hex
+ * digits of the text's SHA-256 (UTF-8). The same text is the same literal
+ * wherever and whenever it is written, so adding a recipe never renames another
+ * recipe's literals. Two texts that meet in one id stop the build.
+ */
+export const FAKE_PROVERB_LITERAL_ID_HEX_DIGITS = 8;
+export function fakeProverbLiteralId(text) {
+	return `l-${createHash("sha256").update(String(text), "utf8").digest("hex").slice(0, FAKE_PROVERB_LITERAL_ID_HEX_DIGITS)}`;
+}
+
+/**
+ * One problem. `code`, `line` and `detail` are what tests and records name;
+ * `entry` (kind and id) and `ja` (a sentence for the person editing the
+ * document) are for the Japanese report.
+ */
+function issue(code, line, detail, ja, entry) {
+	return {
+		code, line,
+		...(detail === undefined ? {} : { detail }),
+		...(entry === undefined ? {} : { entry }),
+		...(ja === undefined ? {} : { ja }),
+	};
 }
 
 export function describeFakeProverbSourceIssue(entry) {
@@ -78,212 +123,434 @@ export function describeFakeProverbSourceIssues(issues) {
 	return issues.map(describeFakeProverbSourceIssue).join("; ");
 }
 
+/**
+ * The same problems for the person who edits the document: the line, the entry,
+ * a Japanese sentence where one is written, and the code in brackets. A problem
+ * the document cannot cause by itself keeps its code alone. One mistake the
+ * compiler reports under two codes (the same line, the same sentence) is said
+ * once, with both codes.
+ */
+export function explainFakeProverbSourceIssues(issues) {
+	const said = new Map();
+	for (const entry of issues) {
+		const where = entry.entry === undefined ? "" : `（${entry.entry}）`;
+		const text = entry.ja ?? (entry.detail === undefined ? "（日本語の説明の無い誤りです）" : `（日本語の説明の無い誤りです: ${entry.detail}）`);
+		const sentence = `${entry.line} 行目${where}: ${text}`;
+		const codes = said.get(sentence) ?? [];
+		if (!codes.includes(entry.code)) codes.push(entry.code);
+		said.set(sentence, codes);
+	}
+	const lines = [`${STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN} に、直すところがあります。`];
+	for (const [sentence, codes] of said) lines.push("", `${sentence} (${codes.join(", ")})`);
+	return lines.join("\n");
+}
+
 function parsePositiveSafeInteger(value) {
 	const numeric = Number(value);
 	return INTEGER.test(value) && Number.isSafeInteger(numeric) && numeric >= 1 && String(numeric) === value
 		? numeric : null;
 }
 
-function splitWords(value) {
-	const words = value.split(" ");
-	return words.some((word) => word === "") ? null : words;
+/** Splits one authored line into fixed text and holes: `{` opens a hole and the next `}` closes it. Null when a `{` is never closed. */
+function splitLine(text) {
+	const pieces = [];
+	let rest = text;
+	while (rest !== "") {
+		const open = rest.indexOf("{");
+		if (open === -1) {
+			pieces.push({ literal: rest });
+			break;
+		}
+		if (open > 0) pieces.push({ literal: rest.slice(0, open) });
+		const close = rest.indexOf("}", open);
+		if (close === -1) return null;
+		pieces.push({ hole: rest.slice(open + 1, close) });
+		rest = rest.slice(close + 1);
+	}
+	return pieces;
 }
 
-/**
- * One `part:` value. Slot parts take a slot ID, a profile ID and an optional
- * trailing `export`; a literal part takes one literal ID; a reference takes a
- * slot kind and a slot ID. Nothing else is accepted.
- */
-function parsePart(value, line, id, issues) {
-	const words = splitWords(value);
-	if (words === null) {
-		issues.push(issue("invalid-part", line, id));
-		return null;
-	}
-	const [kind] = words;
-	if (SLOT_PART_KINDS.includes(kind)) {
-		if ((words.length !== 3 && words.length !== 4) || (words.length === 4 && words[3] !== "export")) {
-			issues.push(issue("invalid-part", line, id));
-			return null;
-		}
-		return { kind, slotId: words[1], profileId: words[2], exported: words.length === 4 };
-	}
-	if (kind === "literal") {
-		if (words.length !== 2) {
-			issues.push(issue("invalid-part", line, id));
-			return null;
-		}
-		return { kind, literalId: words[1] };
-	}
-	if (kind === "reference") {
-		if (words.length !== 3) {
-			issues.push(issue("invalid-part", line, id));
-			return null;
-		}
-		return { kind, slotKind: words[1], slotId: words[2] };
-	}
-	issues.push(issue("unknown-part-kind", line, id));
-	return null;
-}
-
-function parseRequirement(value, line, id, issues) {
-	const words = splitWords(value);
-	if (words === null || words.length !== 2) {
-		issues.push(issue("invalid-requires", line, id));
-		return null;
-	}
-	return { kind: words[0], slotId: words[1] };
-}
-
-function parseForm(value, line, id, issues) {
-	const words = splitWords(value);
-	if (words === null || words.length !== 2) {
-		issues.push(issue("invalid-form-line", line, id));
-		return null;
-	}
-	const weight = parsePositiveSafeInteger(words[1]);
-	if (weight === null) {
-		issues.push(issue("invalid-weight", line, id));
-		return null;
-	}
-	return { form: words[0], weight };
-}
+const WEIGHT_JA = "weight は、1 以上の整数で書きます（0、小数、先頭に 0 の付く数は使えません）。";
+const HOLE_SHAPES_JA = "使える形は {n1} {m1} {v1} {a1} で、番号は 1 から 9 までです。";
 
 /** Strict line syntax followed by the same semantic compiler used by generation. */
 export function parseStandardFakeProverbRecipeMarkdown(markdown) {
-	return parseWithCompiler(markdown, sourceCompiler);
+	return parseWithCompiler(markdown, sourceCompiler, sourceSchema);
 }
 
-function parseWithCompiler(markdown, compiler) {
+/**
+ * Reads the document.
+ *
+ * A recipe is `enabled`, `weight` and one `line:` of fixed text and holes. From
+ * the holes come the parts the compiler knows: a proverb hole is a slot named
+ * by its letter and number and exported unless it starts with `-`; a gloss
+ * hole without `+` is a reference to the proverb slot of that name, and a
+ * requirement in order of first appearance; a gloss hole with `+` is a
+ * gloss-local slot, named `g1`, `g2` … in order of first appearance, and the
+ * same `+` name again is a reference to it. A tag after `:` picks the profile
+ * of that kind that declares it; no tag picks the kind's profile without one.
+ * Each run of fixed text is one literal part, and equal text is one literal.
+ */
+function parseWithCompiler(markdown, compiler, schema) {
 	const issues = [];
 	const lines = String(markdown).replace(/^\uFEFF/u, "").split(/\r\n|\r|\n/u);
 	const metadata = new Map();
-	const entryLines = new Map();
-	const parsed = { proverbs: [], glosses: [], literals: [], profiles: [] };
+	const metadataLines = new Map();
+	const entries = [];
 	let sawTitle = false;
-	let seenFirstEntry = false;
 	let current = null;
 	let state = "metadata";
-	const finish = () => {
-		if (current === null) return;
-		const { kind, id, line, fields, body } = current;
-		if (!ENTRY_KINDS.includes(kind)) {
-			current = null;
-			return;
-		}
-		for (const key of SCALAR_FIELDS[kind]) {
-			if (!fields.has(key)) issues.push(issue("missing-field", line, `${id}: ${key}`));
-		}
-		const weight = fields.has("weight") ? parsePositiveSafeInteger(fields.get("weight")) : 0;
-		if (weight === null) issues.push(issue("invalid-weight", line, id));
-		if (fields.has("enabled") && fields.get("enabled") !== "true" && fields.get("enabled") !== "false") {
-			issues.push(issue("invalid-boolean", line, `${id}: enabled`));
-		}
-		const enabled = fields.get("enabled") === "true";
-		if (kind === "proverb") {
-			parsed.proverbs.push({ id, enabled, weight: weight ?? 0, parts: current.parts });
-		} else if (kind === "gloss") {
-			parsed.glosses.push({ id, enabled, weight: weight ?? 0, requires: current.requires, parts: current.parts });
-		} else if (kind === "literal") {
-			if (body === null) issues.push(issue("missing-body", line, id));
-			parsed.literals.push({ id, literal: body ?? "" });
-		} else {
-			parsed.profiles.push({ id, kind: fields.get("kind") ?? "", forms: current.forms });
-		}
-		current = null;
-	};
+	const named = (entry) => `${entry.kind} ${entry.id}`;
+
 	for (const [index, raw] of lines.entries()) {
 		const line = index + 1;
 		if (raw === "") {
-			if (state === "fields") state = current.kind === "literal" ? "body" : "after-fields";
+			if (state === "fields") state = "after-fields";
 			continue;
 		}
 		if (raw === ">" || raw.startsWith("> ")) continue;
 		if (raw.startsWith("#")) {
 			const heading = HEADING.exec(raw);
 			if (heading) {
-				finish();
-				seenFirstEntry = true;
 				const [, kind, id] = heading;
-				if (!ENTRY_KINDS.includes(kind)) issues.push(issue("unknown-entry-kind", line, kind));
-				current = { kind, id, line, fields: new Map(), body: null, parts: [], requires: [], forms: [], phase: "fields" };
-				entryLines.set(id, line);
+				if (!ENTRY_KINDS.includes(kind)) {
+					issues.push(issue("unknown-entry-kind", line, kind,
+						kind === "literal"
+							? "literal の項目は、いまの書式にはありません。固定の文字は、line: の文の中に直接書きます。"
+							: `項目の種類「${kind}」はありません。使えるのは proverb、gloss、profile です。`));
+				}
+				current = { kind, id, line, fields: new Map(), fieldLines: new Map(), text: null, textLine: null, forms: [] };
+				entries.push(current);
 				state = "fields";
 				continue;
 			}
 			if (TITLE.test(raw)) {
-				if (seenFirstEntry) issues.push(issue("unexpected-title", line));
-				else if (sawTitle) issues.push(issue("duplicate-title", line));
+				if (entries.length > 0) issues.push(issue("unexpected-title", line, undefined, "題の行（# で始まる行）は、ファイルの最初に 1 つだけ書きます。"));
+				else if (sawTitle) issues.push(issue("duplicate-title", line, undefined, "題の行（# で始まる行）が 2 つあります。"));
 				sawTitle = true;
-			} else issues.push(issue("unknown-heading", line));
+			} else {
+				issues.push(issue("unknown-heading", line, undefined, "見出しの書き方が違います。「## proverb id」のように、## と種類と id を、半角の空白 1 つで区切ります。"));
+				// What follows belongs to no entry the parser knows: skip it up to the next entry, so one typo is one problem.
+				if (state !== "metadata") { current = { kind: "", id: "", line, fields: new Map(), fieldLines: new Map(), text: null, textLine: null, forms: [] }; state = "fields"; }
+			}
 			continue;
 		}
 		if (state === "metadata") {
 			const field = FIELD.exec(raw);
-			if (!field) { issues.push(issue("orphan-content", line)); continue; }
+			if (!field) { issues.push(issue("orphan-content", line, undefined, "どの項目にも入らない行です。注記にするなら、行の先頭に「> 」を付けます。")); continue; }
 			const [, key, value] = field;
-			if (!METADATA_KEYS.includes(key)) { issues.push(issue("unknown-metadata", line, key)); continue; }
-			if (metadata.has(key)) { issues.push(issue("duplicate-metadata", line, key)); continue; }
+			if (!METADATA_KEYS.includes(key)) { issues.push(issue("unknown-metadata", line, key, `最初の項目より前に書けるのは、schema-version と data-version だけです。`)); continue; }
+			if (metadata.has(key)) { issues.push(issue("duplicate-metadata", line, key, `${key} が 2 回書いてあります。`)); continue; }
 			const numeric = parsePositiveSafeInteger(value);
-			if (numeric === null) issues.push(issue("invalid-metadata", line, key));
+			if (numeric === null) issues.push(issue("invalid-metadata", line, key, `${key} は、1 以上の整数で書きます。`));
 			metadata.set(key, numeric ?? 0);
-			entryLines.set(key, line);
+			metadataLines.set(key, line);
 			continue;
 		}
 		if (current === null) { issues.push(issue("orphan-content", line)); continue; }
-		if (state === "fields") {
-			const field = FIELD.exec(raw);
-			if (!field || !ENTRY_KINDS.includes(current.kind)) { issues.push(issue("invalid-field", line, current.id)); continue; }
-			const [, key, value] = field;
-			const recipe = current.kind === "proverb" || current.kind === "gloss";
-			if (recipe && key === "part") {
-				current.phase = "parts";
-				const part = parsePart(value, line, current.id, issues);
-				if (part !== null) current.parts.push(part);
-				continue;
-			}
-			if (current.kind === "gloss" && key === "requires") {
-				// Requirements precede every part: a gloss declares what it binds
-				// before it can reference it.
-				if (current.phase === "parts") { issues.push(issue("requires-after-part", line, current.id)); continue; }
-				current.phase = "requires";
-				const requirement = parseRequirement(value, line, current.id, issues);
-				if (requirement !== null) current.requires.push(requirement);
-				continue;
-			}
-			if (current.kind === "profile" && key === "form") {
-				const form = parseForm(value, line, current.id, issues);
-				if (form !== null) current.forms.push(form);
-				continue;
-			}
-			if (!SCALAR_FIELDS[current.kind].includes(key)) {
-				issues.push(issue("unknown-field", line, `${current.id}: ${key}`)); continue;
-			}
-			if (current.phase !== "fields") { issues.push(issue("misplaced-field", line, `${current.id}: ${key}`)); continue; }
-			if (current.fields.has(key)) { issues.push(issue("duplicate-field", line, `${current.id}: ${key}`)); continue; }
-			current.fields.set(key, value);
+		// The lines of an entry whose heading was refused are already accounted for.
+		if (!ENTRY_KINDS.includes(current.kind)) continue;
+		if (state !== "fields") {
+			issues.push(issue("unexpected-content", line, current.id, "項目の途中に空行があります。空行は、項目と項目のあいだにだけ置きます。", named(current)));
 			continue;
 		}
-		if (state === "body") {
-			if (raw !== raw.trim()) issues.push(issue("body-whitespace", line, current.id));
-			current.body = raw;
-			state = "after-body";
-		} else issues.push(issue(state === "after-fields" ? "unexpected-body" : "duplicate-body", line, current.id));
+		const field = FIELD.exec(raw);
+		if (!field) {
+			issues.push(issue("invalid-field", line, current.id, "行の書き方が違います。「名前: 値」の形で、コロンの後ろに半角の空白を 1 つ置きます。", named(current)));
+			continue;
+		}
+		const [, key, value] = field;
+		const recipe = current.kind !== "profile";
+		if (recipe && key === "line") {
+			if (current.textLine !== null) { issues.push(issue("duplicate-line", line, current.id, "line: は、1 つの項目に 1 行だけ書きます。", named(current))); continue; }
+			// The text is taken as written: its fixed text and holes are judged below.
+			current.text = value;
+			current.textLine = line;
+			continue;
+		}
+		if (!recipe && key === "form") {
+			const words = value.split(" ");
+			if (words.length !== 2 || words[0] === "") {
+				issues.push(issue("invalid-form-line", line, current.id, "form: は「形 出やすさ」と書きます（例: form: verb-basic 1）。", named(current)));
+				continue;
+			}
+			const weight = parsePositiveSafeInteger(words[1]);
+			if (weight === null) { issues.push(issue("invalid-weight", line, current.id, WEIGHT_JA.replace("weight", "form: の出やすさ"), named(current))); continue; }
+			current.forms.push({ form: words[0], weight });
+			continue;
+		}
+		if (!SCALAR_FIELDS[current.kind].includes(key)) {
+			const old = recipe && (key === "part" || key === "requires");
+			issues.push(issue("unknown-field", line, `${current.id}: ${key}`,
+				old ? `${key}: は、古い書式です。型の文は、line: の 1 行に書きます（例: line: {n1}は{n2}を{v1}）。`
+					: `${current.kind} の項目に、${key}: は書けません。`, named(current)));
+			continue;
+		}
+		if (current.textLine !== null || current.forms.length > 0) {
+			issues.push(issue("misplaced-field", line, `${current.id}: ${key}`, `${key}: は、${recipe ? "line:" : "form:"} より前に書きます。`, named(current)));
+			continue;
+		}
+		if (current.fields.has(key)) { issues.push(issue("duplicate-field", line, `${current.id}: ${key}`, `${key}: が 2 回書いてあります。`, named(current))); continue; }
+		current.fields.set(key, value);
+		current.fieldLines.set(key, line);
 	}
-	finish();
 	for (const key of METADATA_KEYS) {
-		if (!metadata.has(key)) issues.push(issue("missing-metadata", 1, key));
+		if (!metadata.has(key)) issues.push(issue("missing-metadata", 1, key, `${key} の行がありません。最初の項目より前に書きます。`));
 	}
-	if (!seenFirstEntry) issues.push(issue("no-entries", lines.length));
-	if (issues.length > 0) return { ok: false, issues: Object.freeze(issues) };
-	const input = { schemaVersion: metadata.get("schema-version"), dataVersion: metadata.get("data-version"), ...parsed };
+	if (entries.length === 0) issues.push(issue("no-entries", lines.length, undefined, "項目が 1 つもありません。"));
+
+	// Profiles first: a hole's tag is looked up in them, wherever in the document they stand.
+	const profiles = [];
+	const profileLines = new Map();
+	const byTag = new Map(SLOT_KINDS.map((kind) => [kind, new Map()]));
+	for (const entry of entries) {
+		if (entry.kind !== "profile") continue;
+		for (const key of REQUIRED_FIELDS.profile) {
+			if (!entry.fields.has(key)) issues.push(issue("missing-field", entry.line, `${entry.id}: ${key}`, `${key}: の行がありません。`, named(entry)));
+		}
+		const kind = entry.fields.get("kind") ?? "";
+		const tag = entry.fields.get("tag");
+		if (tag !== undefined && !TAG.test(tag)) {
+			issues.push(issue("invalid-tag", entry.fieldLines.get("tag"), `${entry.id}: ${tag}`, "tag は、ひらがな、カタカナ、漢字の 1 字から 4 字です。既定の profile にするなら、tag: の行を書きません。", named(entry)));
+		} else if (byTag.has(kind)) {
+			const tags = byTag.get(kind);
+			const key = tag ?? "";
+			if (tags.has(key)) {
+				issues.push(tag === undefined
+					? issue("duplicate-default-profile", entry.line, `${entry.id}: ${kind}`, `tag の無い profile（既定）が、kind: ${kind} に 2 つあります。既定は、種類ごとに 1 つまでです。`, named(entry))
+					: issue("duplicate-tag", entry.fieldLines.get("tag"), `${entry.id}: ${kind} ${tag}`, `tag「${tag}」が、kind: ${kind} の profile に 2 回使われています。`, named(entry)));
+			} else tags.set(key, entry.id);
+		}
+		profiles.push({ id: entry.id, kind, forms: entry.forms });
+		profileLines.set(entry.id, entry.line);
+	}
+
+	const literals = [];
+	const literalIds = new Map();
+	const literalOrigins = new Map();
+	const literalPart = (text, entry) => {
+		if (!literalIds.has(text)) {
+			const id = fakeProverbLiteralId(text);
+			const clash = literalOrigins.get(id);
+			if (clash !== undefined) {
+				issues.push(issue("literal-id-collision", entry.textLine, `${entry.id}: ${id}`,
+					`固定の文字「${text}」と「${clash.text}」が、同じ id（${id}）になりました。めったに起きません。どちらかの文字を、少し変えてください。`, named(entry)));
+			}
+			literalIds.set(text, id);
+			literalOrigins.set(id, { text, line: entry.textLine, entry: named(entry) });
+			literals.push({ id, literal: text });
+			if (compiler.inspectFakeProverbLiteral(text) !== null) {
+				issues.push(issue("invalid-literal", entry.textLine, `${entry.id}: ${text}`,
+					`固定の文字「${text}」に、使えない字があるか、長すぎます。使えるのは、ひらがな、カタカナ、漢字、ー 、 。 だけで、穴と穴のあいだの 1 続きが ${compiler.FAKE_PROVERB_LITERAL_MAX_CODE_POINTS} 字までです。`, named(entry)));
+			}
+		}
+		return { kind: "literal", literalId: literalIds.get(text) };
+	};
+	const profileOf = (kind, tag, entry, hole) => {
+		if (tag !== undefined && !TAG.test(tag)) {
+			issues.push(issue("invalid-tag", entry.textLine, `${entry.id}: {${hole}}`, `穴 {${hole}} の「:」の後ろには、profile の tag（1 字から 4 字）を書きます。`, named(entry)));
+			return "";
+		}
+		const id = byTag.get(kind).get(tag ?? "");
+		if (id === undefined) {
+			issues.push(tag === undefined
+				? issue("no-default-profile", entry.textLine, `${entry.id}: {${hole}}`, `穴 {${hole}} に使う、tag の無い profile（kind: ${kind} の既定）がありません。{${hole}:形} のように、tag を付けます。`, named(entry))
+				: issue("unknown-tag", entry.textLine, `${entry.id}: {${hole}}`, `穴 {${hole}} の tag「${tag}」を持つ profile（kind: ${kind}）がありません。profile の項目の tag: を見てください。`, named(entry)));
+			return "";
+		}
+		return id;
+	};
+
+	const proverbs = [];
+	const glosses = [];
+	/** Per recipe: where its `line:` is, and how each compiled slot id was written. */
+	const recipes = new Map();
+	const authored = {};
+	for (const entry of entries) {
+		if (entry.kind !== "proverb" && entry.kind !== "gloss") continue;
+		for (const key of REQUIRED_FIELDS[entry.kind]) {
+			if (!entry.fields.has(key)) issues.push(issue("missing-field", entry.line, `${entry.id}: ${key}`, `${key}: の行がありません。`, named(entry)));
+		}
+		const weight = entry.fields.has("weight") ? parsePositiveSafeInteger(entry.fields.get("weight")) : 0;
+		if (weight === null) issues.push(issue("invalid-weight", entry.fieldLines.get("weight"), entry.id, WEIGHT_JA, named(entry)));
+		const enabledText = entry.fields.get("enabled");
+		if (enabledText !== undefined && enabledText !== "true" && enabledText !== "false") {
+			issues.push(issue("invalid-boolean", entry.fieldLines.get("enabled"), `${entry.id}: enabled`, "enabled は、true か false と書きます。", named(entry)));
+		}
+		const enabled = enabledText === "true";
+		const holes = new Map();
+		recipes.set(entry.id, { kind: entry.kind, line: entry.textLine ?? entry.line, holes });
+		if (entry.textLine === null) {
+			issues.push(issue("missing-line", entry.line, entry.id, "line: の行がありません。型の文を、line: の後ろに 1 行で書きます。", named(entry)));
+			continue;
+		}
+		authored[entry.id] = entry.text;
+		const pieces = entry.text === "" ? null : splitLine(entry.text);
+		if (pieces === null) {
+			issues.push(issue("invalid-line", entry.textLine, entry.id,
+				entry.text === "" ? "line: の文が空です。" : "line: の文に、閉じていない { があります。穴は {n1} のように、} で閉じます。", named(entry)));
+			continue;
+		}
+		const parts = [];
+		const badHole = (hole) => issues.push(issue("invalid-hole", entry.textLine, `${entry.id}: {${hole}}`, `穴 {${hole}} の書き方が違います。${HOLE_SHAPES_JA}`, named(entry)));
+		if (entry.kind === "proverb") {
+			for (const piece of pieces) {
+				if ("literal" in piece) { parts.push(literalPart(piece.literal, entry)); continue; }
+				const hole = HOLE.exec(piece.hole);
+				if (!hole) { badHole(piece.hole); continue; }
+				if (hole[1] === "+") {
+					issues.push(issue("local-hole-in-proverb", entry.textLine, `${entry.id}: {${piece.hole}}`, `ことわざの中では、+ の付いた穴 {${piece.hole}} は使えません。+ は、解説だけの新しい語に使います。`, named(entry)));
+					continue;
+				}
+				const kind = HOLE_KINDS[hole[2]];
+				const slotId = `${hole[2]}${hole[3]}`;
+				holes.set(slotId, `{${piece.hole}}`);
+				parts.push({ kind, slotId, profileId: profileOf(kind, hole[4], entry, piece.hole), exported: hole[1] !== "-" });
+			}
+			proverbs.push({ id: entry.id, enabled, weight: weight ?? 0, parts });
+			continue;
+		}
+		const requires = [];
+		const required = new Set();
+		const locals = new Map();
+		for (const piece of pieces) {
+			if ("literal" in piece) { parts.push(literalPart(piece.literal, entry)); continue; }
+			const hole = HOLE.exec(piece.hole);
+			if (!hole) { badHole(piece.hole); continue; }
+			if (hole[1] === "-") {
+				issues.push(issue("private-hole-in-gloss", entry.textLine, `${entry.id}: {${piece.hole}}`, `解説の中では、- の付いた穴 {${piece.hole}} は使えません。- は、ことわざの穴を解説に渡さないときに使います。`, named(entry)));
+				continue;
+			}
+			const kind = HOLE_KINDS[hole[2]];
+			const name = `${hole[2]}${hole[3]}`;
+			const referenceTag = () => issues.push(issue("tag-on-reference", entry.textLine, `${entry.id}: {${piece.hole}}`,
+				`穴 {${piece.hole}} には、「:」と tag を付けられません。ことわざの語を使う穴と、2 回目から後の + の穴の形は、最初に書いたところで決まっています。`, named(entry)));
+			if (hole[1] === "+") {
+				if (locals.has(name)) {
+					// The same new word again: a reference to the gloss-local slot.
+					if (hole[4] !== undefined) { referenceTag(); continue; }
+					parts.push({ kind: "reference", slotKind: kind, slotId: locals.get(name) });
+					continue;
+				}
+				const slotId = `g${locals.size + 1}`;
+				locals.set(name, slotId);
+				holes.set(slotId, `{+${name}}`);
+				parts.push({ kind, slotId, profileId: profileOf(kind, hole[4], entry, piece.hole), exported: false });
+				continue;
+			}
+			if (hole[4] !== undefined) { referenceTag(); continue; }
+			if (!required.has(name)) {
+				required.add(name);
+				requires.push({ kind, slotId: name });
+			}
+			holes.set(name, `{${name}}`);
+			parts.push({ kind: "reference", slotKind: kind, slotId: name });
+		}
+		glosses.push({ id: entry.id, enabled, weight: weight ?? 0, requires, parts });
+	}
+
+	if (issues.length > 0) return { ok: false, issues: Object.freeze([...issues].sort((a, b) => a.line - b.line)) };
+	const input = { schemaVersion: metadata.get("schema-version"), dataVersion: metadata.get("data-version"), proverbs, glosses, literals, profiles };
 	const result = compiler.compileFakeProverbRecipeSet(input);
 	if (!result.ok) {
-		return { ok: false, issues: Object.freeze(result.issues.map((entry) =>
-			issue(entry.code, entryLines.get(entry.id) ?? 1, entry.detail === undefined ? entry.id : `${entry.id}: ${entry.detail}`))
-			.sort((a, b) => a.line - b.line)) };
+		const context = { recipes, profileLines, literalOrigins, metadataLines, limits: schema.FAKE_PROVERB_LIMITS, forms: schema.FAKE_PROVERB_CANDIDATE_FORMS, schemaVersion: compiler.FAKE_PROVERB_RECIPE_SCHEMA_VERSION };
+		return { ok: false, issues: Object.freeze(result.issues.map((entry) => compiledIssue(entry, context)).sort((a, b) => a.line - b.line)) };
 	}
-	return { ok: true, ...input };
+	return { ok: true, ...input, authored: Object.freeze(authored) };
+}
+
+/** The slot id a compiler detail names: its first word, or the word after a kind (`noun n4`), without a trailing colon. */
+function slotIdOf(detail) {
+	if (typeof detail !== "string") return null;
+	const words = detail.replace(/:.*$/su, "").split(" ");
+	return words.at(-1) ?? null;
+}
+
+/** The Japanese sentence for a problem the compiler found in what the document says. Undefined when none is written. */
+function explainCompiled(entry, recipe, context) {
+	const { limits } = context;
+	const role = recipe?.kind;
+	const roleJa = role === "gloss" ? "解説" : "ことわざ";
+	const slotId = slotIdOf(entry.detail);
+	const hole = recipe?.holes.get(slotId ?? "") ?? (slotId === null ? "穴" : `{${slotId}}`);
+	switch (entry.code) {
+		case "na-follower":
+			return `${hole} の直後に置けません。${hole} には「静かな」の形が入ることがあるので、直後は、名詞の穴か、名詞で始まる文字（漢字かカタカナで始まる語、または こと もの ところ ため はず わけ ほう）にします。こと もの などの次の字は、文字の終わりか、が を に は も で の と か だ 、 。 のどれかだけです（「ものなり」の「な」は使えません）。行の最後にも置けません。動詞や形容詞だけにするなら、tag で形を絞ります（例: {m1:活}）。`;
+		case "adverbial-follower":
+			return `${hole} の直後に置けません。連用の修飾（「静かに」の形）の直後は、述語の穴か、「静かな」の入らない修飾の穴にします。行の最後にも置けません。`;
+		case "kind-limit": {
+			const kind = entry.detail;
+			const limit = limits.slots[role]?.[kind];
+			return `${KIND_JA[kind] ?? kind}の穴が多すぎます。${role === "gloss" ? "解説だけの新しい語" : "ことわざ"}では、${limit} 個までです。`;
+		}
+		case "part-limit":
+			return `穴と固定の文字を合わせた数が、多すぎます（${roleJa}は ${limits.parts[role]} 個まで）。`;
+		case "export-limit":
+			return `解説に渡す穴が多すぎます（${limits.exports} 個まで）。渡さなくてよい穴の前に、- を付けます（例: {-n3}）。`;
+		case "require-limit":
+			return `解説が使うことわざの穴が多すぎます（${limits.requires} 種類まで）。`;
+		case "reference-limit":
+			return `ことわざの語と、2 回目から後の + の穴を合わせた数が、多すぎます（${limits.references} 個まで）。`;
+		case "duplicate-slot-id":
+		case "duplicate-export":
+			return `同じ穴 ${hole} を 2 回書いています。ことわざの中では、1 つの穴は 1 回だけ書けます。`;
+		case "missing-export":
+			return "解説に渡す穴が 1 つもありません。- を付けない穴が、1 つ以上要ります。";
+		case "missing-require":
+			return "ことわざの語を 1 つも使っていません。解説は、ことわざの穴（{n1} や {v1}）を 1 つ以上使います。";
+		case "unknown-reference":
+			return `${hole} を持つことわざが、1 つもありません。解説は、ことわざにある穴だけを使えます。`;
+		case "unexported-reference":
+			return `${hole} は、どのことわざも解説に渡していません（ことわざの側で、- が付いています）。`;
+		case "unpaired-proverb":
+			return "このことわざに付けられる解説が、1 つもありません。解説は、自分が使う穴を全部持っていることわざにだけ付きます。";
+		case "unpaired-gloss":
+			return "この解説が付くことわざが、1 つもありません。使っている穴を全部渡すことわざが要ります。";
+		case "unused-profile":
+			return "この profile を使う穴が、1 つもありません。使わない profile は、消します。";
+		case "invalid-profile-kind":
+			return "kind は、noun、modifier、predicate、adverbial のどれかです。";
+		case "invalid-form": {
+			const kind = String(entry.detail).split(" ")[0];
+			const allowed = context.forms[kind];
+			return `この種類の profile には書けない形です。${allowed === undefined ? "" : `kind: ${kind} に書ける形は、${allowed.join("、")} です。`}`;
+		}
+		case "duplicate-form":
+			return `同じ形（${entry.detail}）を 2 回書いています。`;
+		case "missing-form":
+			return "form: の行が 1 つもありません。";
+		case "invalid-id":
+			return `id「${entry.id}」の書き方が違います。半角の英小文字で始め、英小文字と数字を、ハイフンでつなぎます（48 字まで）。`;
+		case "duplicate-id":
+			return `id「${entry.id}」が、2 回使われています。proverb、gloss、profile を通して、同じ id は 1 回だけです。`;
+		default:
+			return undefined;
+	}
+}
+
+/** A compiler issue as a document issue: the line it comes from, the same detail as before, and a Japanese sentence. */
+function compiledIssue(entry, context) {
+	const detail = entry.detail === undefined ? entry.id : `${entry.id}: ${entry.detail}`;
+	const recipe = context.recipes.get(entry.id);
+	if (recipe !== undefined) return issue(entry.code, recipe.line, detail, explainCompiled(entry, recipe, context), `${recipe.kind} ${entry.id}`);
+	if (context.profileLines.has(entry.id)) return issue(entry.code, context.profileLines.get(entry.id), detail, explainCompiled(entry, undefined, context), `profile ${entry.id}`);
+	const literal = context.literalOrigins.get(entry.id);
+	if (literal !== undefined) {
+		return issue(entry.code, literal.line, detail,
+			entry.code === "duplicate-id" ? `固定の文字「${literal.text}」の id（${entry.id}）が、項目の id と重なっています。項目の id を、別の名前にしてください。` : undefined, literal.entry);
+	}
+	if (context.metadataLines.has(entry.id)) {
+		return issue(entry.code, context.metadataLines.get(entry.id), detail,
+			entry.code === "unsupported-schema-version" ? `schema-version は、${context.schemaVersion} と書きます。` : `${entry.id} は、1 以上の整数で書きます。`);
+	}
+	const count = { proverbs: "ことわざ", glosses: "解説", literals: "固定の文字の種類", profiles: "profile" }[entry.id];
+	if (entry.code === "entry-limit" && count !== undefined) {
+		return issue(entry.code, 1, detail, `${count}の数（${entry.detail}）が、上限（${context.limits[entry.id]}）を超えています。`);
+	}
+	if (entry.code === "missing-proverb" || entry.code === "missing-gloss") {
+		return issue(entry.code, 1, detail, `使う（enabled: true の）${entry.code === "missing-gloss" ? "解説" : "ことわざ"}が、1 つもありません。`);
+	}
+	return issue(entry.code, 1, detail);
 }
 
 /**
@@ -297,8 +564,17 @@ function parseWithCompiler(markdown, compiler) {
  * cannot become circular.
  */
 async function loadRecipeCompiler(rootDir) {
+	return await loadSourceModule(rootDir, FAKE_PROVERB_RECIPE_VALIDATORS[0]);
+}
+
+/** The hand-written schema, loaded the same way. Its limits and form lists are quoted in explanations, never used to judge. */
+async function loadRecipeSchema(rootDir) {
+	return await loadSourceModule(rootDir, FAKE_PROVERB_RECIPE_VALIDATORS[1]);
+}
+
+async function loadSourceModule(rootDir, file) {
 	const built = await esbuild.build({
-		entryPoints: [path.join(rootDir, FAKE_PROVERB_RECIPE_VALIDATORS[0])],
+		entryPoints: [path.join(rootDir, file)],
 		bundle: true,
 		write: false,
 		format: "esm",
@@ -480,10 +756,13 @@ export async function generateStandardFakeProverbRecipes(options = {}) {
 		(filePath) => readFile(filePath, "utf8"),
 	));
 	const compiler = await loadRecipeCompiler(rootDir);
-	const parsed = parseWithCompiler(markdown, compiler);
+	const parsed = parseWithCompiler(markdown, compiler, await loadRecipeSchema(rootDir));
 	if (!parsed.ok) {
+		// The first line is what tests and records read; the Japanese lines after it are for the person editing the document.
 		throw new Error(
-			`${STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN} is not a valid recipe document: ${describeFakeProverbSourceIssues(parsed.issues)}`,
+			`${STANDARD_FAKE_PROVERB_RECIPES_MARKDOWN} is not a valid recipe document: ${describeFakeProverbSourceIssues(parsed.issues)}
+
+${explainFakeProverbSourceIssues(parsed.issues)}`,
 		);
 	}
 	const data = canonicalFakeProverbRecipeData(parsed);
@@ -663,7 +942,8 @@ function isCanonicalPayload(value) {
 	if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
 	const keys = Object.keys(value);
 	if (keys.length !== PAYLOAD_KEYS.length || !PAYLOAD_KEYS.every((key, index) => keys[index] === key)) return false;
-	if (value.schemaVersion !== 1) return false;
+	// A previous module may predate the current schema (Schema 1 before FAKE-PROVERB-NA1), never follow it.
+	if (!Number.isSafeInteger(value.schemaVersion) || value.schemaVersion < 1 || value.schemaVersion > FAKE_PROVERB_RECIPE_SCHEMA_VERSION) return false;
 	if (typeof value.dataVersion !== "number" || parsePositiveSafeInteger(String(value.dataVersion)) === null) return false;
 	return ["proverbs", "glosses", "literals", "profiles"].every((key) => Array.isArray(value[key]));
 }

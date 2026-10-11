@@ -49,7 +49,10 @@ export const TOOLBAR_CONTROLS = {
 	vocabulary: { ...CONTROL_TEXT.vocabulary, icon: "library" },
 	collision: { ...CONTROL_TEXT.collision, icon: "blend" },
 	fakeProverb: { ...CONTROL_TEXT.fakeProverb, icon: "graduation-cap" },
-	recompose: { ...CONTROL_TEXT.recompose, icon: "wand-sparkles" },
+	// WORKBENCH-UI5: where Recompose was (it is a tab now); a host with tabs only.
+	fakeDictionary: { ...CONTROL_TEXT.fakeDictionary, icon: "book-open" },
+	// FAKE-ALERT-VIEW1: not `triangle-alert`, which the dialog itself uses for a warning.
+	fakeAlert: { ...CONTROL_TEXT.fakeAlert, icon: "message-square-warning" },
 	display: { ...CONTROL_TEXT.display, icon: "sliders-horizontal" },
 	more: { ...CONTROL_TEXT.more, icon: "ellipsis" },
 } as const satisfies Record<keyof typeof CONTROL_TEXT, { name: string; icon: IconName; description: string }>;
@@ -60,11 +63,14 @@ export type ToolbarControlKey = keyof typeof TOOLBAR_CONTROLS;
  * the highest rank goes first. The primary actions go last.
  */
 const OVERFLOW_RANK: Readonly<Record<Exclude<ToolbarControlKey, "more">, number>> = {
-	recompose: 11, fakeProverb: 10, collision: 9, display: 8, automatic: 7, vocabulary: 6, level: 5,
+	fakeDictionary: 12, fakeAlert: 11, fakeProverb: 10, collision: 9, display: 8, automatic: 7, vocabulary: 6, level: 5,
 	collect: 4, copy: 3, refresh: 2, reshuffle: 1,
 };
 
 let TOOLBAR_SEQUENCE = 0;
+
+/** WORKBENCH-UI3: the control whose name or description follows the body area (Generate text while nothing is generated). */
+const WORKBENCH_KEYS: ReadonlySet<ToolbarControlKey> = new Set<ToolbarControlKey>(["reshuffle"]);
 
 export type ToolbarCallbacks = {
 	reshuffle: () => void;
@@ -73,8 +79,10 @@ export type ToolbarCallbacks = {
 	collect: () => void;
 	collision?: () => void;
 	fakeProverb?: () => void;
-	/** 0.1.0 S5. */
-	recompose?: () => void;
+	/** WORKBENCH-UI5: opens the Fake Dictionary dialog (how to look a word up, the key, what the Vocabulary offers). */
+	fakeDictionary?: () => void;
+	/** FAKE-ALERT-VIEW1: opens a Fake Alert made from the active Vocabulary. */
+	fakeAlert?: () => void;
 	cancelVocabulary: () => void;
 	setBodySemantropy: (value: BodySemantropy) => void;
 	/** Persist first, then apply. The toolbar never mutates settings itself. */
@@ -84,6 +92,24 @@ export type ToolbarCallbacks = {
 	restoreSelected: () => void;
 	useAutomaticSelected: () => void;
 	clearManual: () => void;
+};
+
+/**
+ * WORKBENCH-UI3: what the body area shows, on a host that opens a note without
+ * a Shuffle or splits the body area into tabs. Every other host passes none,
+ * and its Toolbar is exactly what it was.
+ */
+export type ToolbarWorkbench = {
+	/** The body shows no Chunk yet: Reshuffle text acts as Generate, and is named so. */
+	generate: boolean;
+	/**
+	 * The host splits the body area into tabs. The Shuffle tab then has its own area
+	 * (WORKBENCH-UI5) with Reshuffle text, Refresh target, Copy and Collect, so the
+	 * Toolbar builds none of them; Display settings carries the note about the tabs.
+	 */
+	tabbed: boolean;
+	/** The Recompose tab is shown: Display settings says which of its settings the tab does not show. */
+	recomposeShown: boolean;
 };
 
 export type ToolbarInput = ToolbarCallbacks & {
@@ -111,12 +137,23 @@ export type ToolbarInput = ToolbarCallbacks & {
 		selectedOverridden: boolean;
 		count: number;
 		diagnostic: ManualSlotDiagnostic | null;
+		/** WORKBENCH-UI2 review 1: false while the body the changes belong to is hidden. Absent is true. */
+		clearable?: boolean;
 	};
+	/** WORKBENCH-UI5: with tabs, the id of the Shuffle area's sentence about the selected word, which the Shuffle word control is described by. */
+	manualDiagnosticId?: () => string | null;
 	/**
 	 * Where the Vocabulary entry (a Toolbar item) and its one-line summary (in
 	 * the status line) mount; the toolbar does not own either.
 	 */
-	vocabularyHost: (entry: HTMLElement, summary: HTMLElement) => void;
+	/**
+	 * Builds the Vocabulary entry and its summary line. `adoptPopup` registers a popup that opens from the status line
+	 * (WORKBENCH-UI5: the list of the Vocabulary's notes) as one of the Toolbar's own: aria-expanded, Escape and a click
+	 * outside close it, opening another closes it, and a Modal about to open closes it.
+	 */
+	vocabularyHost: (entry: HTMLElement, summary: HTMLElement, adoptPopup: (button: HTMLButtonElement, panel: HTMLElement, container: HTMLElement) => void) => void;
+	/** WORKBENCH-UI3: read on every sync; absent on a host with neither flag. */
+	workbench?: () => ToolbarWorkbench;
 };
 
 type ToolbarItem = { key: Exclude<ToolbarControlKey, "more">; el: HTMLElement; home: HTMLElement; rank: number; width: number };
@@ -171,7 +208,14 @@ export class SemantropyToolbar {
 	private readonly labels = new UiLabels();
 	/** The adopted Automatic toggle's texts; replaced with the presenter. */
 	private automaticLabels = new UiLabels();
-	private readonly primary: HTMLElement;
+	/**
+	 * WORKBENCH-UI3: the names and descriptions that follow the body area. They
+	 * are re-applied on every sync, and each write happens only when its text
+	 * really changed.
+	 */
+	private readonly workbenchLabels = new UiLabels();
+	/** WORKBENCH-UI3: in Display settings, only on a host with tabs. */
+	private shuffleOnlyEl: HTMLElement | null = null;
 	private readonly textGroup: HTMLElement;
 	private readonly settingsGroup: HTMLElement;
 	private readonly descriptions: HTMLElement;
@@ -182,6 +226,8 @@ export class SemantropyToolbar {
 	private readonly morePanel: HTMLElement;
 	private morePopup: ToolbarPopup | null = null;
 	private automaticPopup: ToolbarPopup | null = null;
+	/** WORKBENCH-UI5: the list of the Vocabulary's notes, which hangs from the status line instead of the row. */
+	private summaryPopup: ToolbarPopup | null = null;
 	/**
 	 * Listeners on the current Automatic presenter's toggle and menu. They are
 	 * released when a remounted presenter replaces it, so a View that remounts
@@ -224,8 +270,9 @@ export class SemantropyToolbar {
 	private sourceEl: HTMLElement;
 	private levelStatusEl: HTMLElement;
 	private replacementsEl: HTMLElement;
-	private manualEl: HTMLElement;
-	private diagnosticEl: HTMLElement;
+	/** Not built on a host with tabs: the Shuffle area says both (review 2, P3 5). */
+	private manualEl: HTMLElement | null = null;
+	private diagnosticEl: HTMLElement | null = null;
 	private staleEl: HTMLElement;
 	private messageEl: HTMLElement;
 	private detailEl: HTMLElement;
@@ -245,12 +292,17 @@ export class SemantropyToolbar {
 	constructor(parent: HTMLElement, private readonly input: ToolbarInput) {
 		this.doc = parent.ownerDocument;
 		this.root = this.el("div", "semantropy-toolbar");
+		// WORKBENCH-UI4: a host with the workbench on has the stylesheet rules that let Display settings fit a narrow pane.
+		if (input.workbench) this.root.classList.add("is-workbench");
 		this.root.setAttribute("role", "toolbar");
 		parent.appendChild(this.root);
 
-		this.primary = this.group("is-primary", () => ui().toolbar.groups.primary);
+		// WORKBENCH-UI5: with tabs, the actions on the Shuffle body live in the Shuffle tab's own area.
+		const tabbed = this.input.workbench?.().tabbed === true;
+		const primary = tabbed ? null : this.group("is-primary", () => ui().toolbar.groups.primary);
 		const vocabulary = this.group("is-vocabulary", () => ui().toolbar.groups.vocabulary);
-		const generation = this.input.collision || this.input.fakeProverb || this.input.recompose ? this.group("is-generation", () => ui().toolbar.groups.generation) : null;
+		const generation = this.input.collision || this.input.fakeProverb || this.input.fakeAlert
+			? this.group("is-generation", () => ui().toolbar.groups.generation) : null;
 		// Generation settings sits with Settings at the row's end. More sections follow this same order.
 		this.textGroup = this.group("is-text", () => ui().toolbar.groups.text);
 		this.settingsGroup = this.group("is-settings", () => ui().toolbar.groups.settings);
@@ -273,17 +325,21 @@ export class SemantropyToolbar {
 			"div",
 			"semantropy-meta semantropy-replacements",
 		);
-		this.manualEl = this.child(this.statusEl, "div", "semantropy-meta semantropy-manual-count");
-		// The Manual diagnostic for the selected word. It lives in the status
-		// line rather than inside the overflow menu, so the reason a word cannot
-		// be shuffled stays readable once the menu is closed. It is a separate
-		// element from the manual-change count: one describes the selected word,
-		// the other counts the whole loaded Target.
-		this.diagnosticEl = this.child(this.statusEl, "div", "semantropy-manual-diagnostic");
-		this.diagnosticEl.id = `${this.menuId}-manual-diagnostic`;
-		this.diagnosticEl.setAttribute("role", "status");
-		this.diagnosticEl.setAttribute("aria-live", "polite");
-		this.diagnosticEl.hidden = true;
+		// WORKBENCH-UI5 (review 2, P3 5): with tabs both the count and the sentence about the selected word are the Shuffle body's,
+		// so they stand in its area; above the tab row they would appear and go with the selection and move the tab row.
+		if (!tabbed) {
+			this.manualEl = this.child(this.statusEl, "div", "semantropy-meta semantropy-manual-count");
+			// The Manual diagnostic for the selected word. It lives in the status
+			// line rather than inside the overflow menu, so the reason a word cannot
+			// be shuffled stays readable once the menu is closed. It is a separate
+			// element from the manual-change count: one describes the selected word,
+			// the other counts the whole loaded Target.
+			this.diagnosticEl = this.child(this.statusEl, "div", "semantropy-manual-diagnostic");
+			this.diagnosticEl.id = `${this.menuId}-manual-diagnostic`;
+			this.diagnosticEl.setAttribute("role", "status");
+			this.diagnosticEl.setAttribute("aria-live", "polite");
+			this.diagnosticEl.hidden = true;
+		}
 		this.staleEl = this.child(this.statusEl, "div", "semantropy-stale");
 		this.messageEl = this.child(this.statusEl, "div", "semantropy-message");
 		this.messageEl.setAttribute("role", "status");
@@ -308,11 +364,16 @@ export class SemantropyToolbar {
 		this.alertEl.setAttribute("aria-live", "polite");
 		this.alertEl.hidden = true;
 
-		this.buildPrimary();
+		if (primary) this.buildPrimary(primary);
 		this.buildLevel();
 		this.automaticHost = this.item("automatic", this.textGroup);
 		const vocabularyEntry = this.item("vocabulary", vocabulary);
-		this.input.vocabularyHost(vocabularyEntry, vocabularySummary);
+		this.input.vocabularyHost(vocabularyEntry, vocabularySummary, (button, panel, container) => {
+			const popup: ToolbarPopup = { button, panel, container };
+			this.summaryPopup = popup;
+			this.addPopup(popup);
+			this.listen(button, "click", () => this.togglePopup(popup));
+		});
 		const vocabularyButton = vocabularyEntry.querySelector<HTMLButtonElement>("button");
 		if (vocabularyButton) this.describe(vocabularyButton, "vocabulary");
 		if (generation && this.input.collision) {
@@ -325,10 +386,16 @@ export class SemantropyToolbar {
 				this.closePopups(); this.input.fakeProverb?.();
 			}, "semantropy-fake-proverb-open");
 		}
-		if (generation && this.input.recompose) {
-			this.iconButton(this.item("recompose", generation), "recompose", () => {
-				this.closePopups(); this.input.recompose?.();
-			}, "semantropy-recompose-open");
+		if (generation && this.input.fakeAlert) {
+			this.iconButton(this.item("fakeAlert", generation), "fakeAlert", () => {
+				this.closePopups(); this.input.fakeAlert?.();
+			}, "semantropy-fake-alert-open");
+		}
+		// WORKBENCH-UI5 (owner, 2026-10-08): the Fake Dictionary button stands in the Settings category, before Display settings.
+		if (this.input.fakeDictionary) {
+			this.iconButton(this.item("fakeDictionary", this.settingsGroup), "fakeDictionary", () => {
+				this.closePopups(); this.input.fakeDictionary?.();
+			}, "semantropy-fake-dictionary-open");
 		}
 		this.buildOverflow();
 
@@ -360,7 +427,7 @@ export class SemantropyToolbar {
 			const target = event.target;
 			for (const popup of this.popups) {
 				if (popup.panel.hidden) continue;
-				if (target instanceof Node && popup.container.contains(target)) continue;
+				if (target instanceof Node && (popup.container.contains(target) || popup.panel.contains(target))) continue;
 				this.closePopup(popup);
 			}
 		};
@@ -397,6 +464,7 @@ export class SemantropyToolbar {
 	relabel(): void {
 		this.labels.apply();
 		this.automaticLabels.apply();
+		// The workbench names are re-applied by the sync below, in the new language.
 		if (this.feedbackMessage !== null) this.feedbackEl.textContent = localize(this.feedbackMessage);
 		this.sync();
 		this.refreshLayout(true);
@@ -489,6 +557,7 @@ export class SemantropyToolbar {
 		this.handlers.length = 0;
 		this.labels.clear();
 		this.automaticLabels.clear();
+		this.workbenchLabels.clear();
 	}
 
 	sync(): void {
@@ -496,34 +565,42 @@ export class SemantropyToolbar {
 		const status = this.input.status();
 		const display = this.input.display();
 		const manual = this.input.manual();
+		// WORKBENCH-UI3: names that follow the body area (Generate text) are re-applied here. On a host with tabs the four
+		// buttons below do not exist (they are in the Shuffle area, WORKBENCH-UI5) and `setVisible` leaves them alone.
+		const workbench = this.input.workbench?.();
+		if (workbench) this.workbenchLabels.apply();
 
 		this.setVisible(this.reshuffleButton, model.showReshuffle, !model.reshuffleEnabled);
 		this.setVisible(this.refreshButton, model.showRefresh, !model.refreshEnabled);
 		this.setVisible(this.copyButton, model.showCopy, !model.copyEnabled);
 		this.setVisible(this.collectButton, model.showCollect, !model.collectEnabled);
+		if (this.shuffleOnlyEl) this.shuffleOnlyEl.hidden = workbench?.recomposeShown !== true;
 		// Shuffle needs an alternative, not merely an eligible word: a slot whose
 		// Vocabulary offers nothing else keeps the control disabled and says why.
 		const diagnostic = toManualDiagnosticView(manual.diagnostic);
+		// On the Recompose tab the View reports no selected word and `clearable: false`, so these are off there too.
 		if (this.manualShuffleButton) this.manualShuffleButton.disabled = !manual.selectedShuffleable;
 		if (this.manualRestoreButton) this.manualRestoreButton.disabled = !manual.selected;
 		if (this.manualAutomaticButton) this.manualAutomaticButton.disabled = !manual.selectedOverridden;
-		if (this.manualClearButton) this.manualClearButton.disabled = manual.count === 0;
+		if (this.manualClearButton) this.manualClearButton.disabled = manual.count === 0 || manual.clearable === false;
 		// This row is an aria-live region and `sync()` runs on every
 		// selectionchange, pointerup, keyup and status change. Writing the same
 		// sentence again replaces the Text node, which a screen reader may announce
 		// a second time, so the DOM is touched only when something really changed.
-		const message = diagnostic === null ? "" : localize(diagnostic.message);
-		const state = diagnostic === null ? null : diagnostic.available ? "available" : "unavailable";
-		if (this.diagnosticEl.textContent !== message) this.diagnosticEl.textContent = message;
-		if (this.diagnosticEl.hidden !== (diagnostic === null)) this.diagnosticEl.hidden = diagnostic === null;
-		// State is carried by the words; the attribute only lets a theme reinforce it.
-		if ((this.diagnosticEl.dataset["manual"] ?? null) !== state) {
-			if (state === null) delete this.diagnosticEl.dataset["manual"];
-			else this.diagnosticEl.dataset["manual"] = state;
+		if (this.diagnosticEl) {
+			const message = diagnostic === null ? "" : localize(diagnostic.message);
+			const state = diagnostic === null ? null : diagnostic.available ? "available" : "unavailable";
+			if (this.diagnosticEl.textContent !== message) this.diagnosticEl.textContent = message;
+			if (this.diagnosticEl.hidden !== (diagnostic === null)) this.diagnosticEl.hidden = diagnostic === null;
+			// State is carried by the words; the attribute only lets a theme reinforce it.
+			if ((this.diagnosticEl.dataset["manual"] ?? null) !== state) {
+				if (state === null) delete this.diagnosticEl.dataset["manual"];
+				else this.diagnosticEl.dataset["manual"] = state;
+			}
 		}
-		// Never describe a control from a hidden subtree: the status line is the
+		// Never describe a control from a hidden subtree: the status line (with tabs, the Shuffle area) is the
 		// visible owner of this sentence, and the reference goes with it.
-		const describedBy = diagnostic === null ? null : this.diagnosticEl.id;
+		const describedBy = diagnostic === null ? null : this.diagnosticEl?.id ?? this.input.manualDiagnosticId?.() ?? null;
 		if (this.manualShuffleButton && this.manualShuffleButton.getAttribute("aria-describedby") !== describedBy) {
 			if (describedBy === null) this.manualShuffleButton.removeAttribute("aria-describedby");
 			else this.manualShuffleButton.setAttribute("aria-describedby", describedBy);
@@ -593,8 +670,10 @@ export class SemantropyToolbar {
 		this.sourceEl.hidden = status.sourceLabel === null;
 		this.replacementsEl.textContent = status.replacementLabel ?? "";
 		this.replacementsEl.hidden = status.replacementLabel === null;
-		this.manualEl.textContent = manual.count > 0 ? ui().toolbar.manualChanges(manual.count) : "";
-		this.manualEl.hidden = manual.count === 0;
+		if (this.manualEl) {
+			this.manualEl.textContent = manual.count > 0 ? ui().toolbar.manualChanges(manual.count) : "";
+			this.manualEl.hidden = manual.count === 0;
+		}
 		const stale =
 			status.kind === "target-stale" || status.kind === "vocabulary-stale";
 		// Status sentences are English message identities; they are shown in the current language.
@@ -602,7 +681,7 @@ export class SemantropyToolbar {
 		const statusDetail = localize(status.detail ?? "");
 		this.staleEl.textContent = stale ? statusMessage : "";
 		this.staleEl.classList.toggle("is-stale", stale);
-		this.staleEl.hidden = !stale;
+		this.staleEl.hidden = !stale || statusMessage === "";
 		this.messageEl.textContent = stale ? statusDetail : statusMessage;
 		this.detailEl.textContent = stale ? "" : statusDetail;
 		this.detailEl.hidden = this.detailEl.textContent === "";
@@ -615,7 +694,7 @@ export class SemantropyToolbar {
 	 * Re-plans which items fit the row. It reads layout, so it runs on a resize
 	 * and when an item appears or disappears, never on every selection sync.
 	 */
-	refreshLayout(force = true): void {
+	refreshLayout(force = true, again = true): void {
 		for (const item of this.items) {
 			const control = item.el.querySelector<HTMLElement>("button");
 			if (item.key !== "level" && item.key !== "display") item.el.hidden = !control || control.hidden;
@@ -626,7 +705,7 @@ export class SemantropyToolbar {
 		const view = this.doc.defaultView;
 		const px = (value: string | undefined) => { const n = Number.parseFloat(value ?? ""); return Number.isFinite(n) ? n : 0; };
 		const rootStyle = view?.getComputedStyle(this.root);
-		const groupStyle = view?.getComputedStyle(this.primary);
+		const groupStyle = view?.getComputedStyle(this.groups[0]!.items);
 		// A group is as wide as its label when the label is wider than its items;
 		// a label the narrow-pane rule hides takes no room.
 		for (const group of this.groups) {
@@ -668,6 +747,10 @@ export class SemantropyToolbar {
 			for (const item of this.items) if (item.el.parentElement !== item.home) moved.add(item);
 		}
 		this.place(moved);
+		// Placing can change the widths the plan was made from: a category label the narrow-pane rule hides only goes once the
+		// row is as narrow as it is, and a row first laid out while hidden was planned from widths of 0. When the row
+		// still overflows it is planned once more, from the widths it has now (review 2, P3 10).
+		if (again && this.root.scrollWidth > this.root.clientWidth) this.refreshLayout(true, false);
 	}
 
 	private place(moved: ReadonlySet<ToolbarItem>): void {
@@ -689,7 +772,11 @@ export class SemantropyToolbar {
 			arrange(group.items, home);
 			if (group.list) arrange(group.list, away);
 			// A category with nothing left in the row takes no room; one with nothing in More shows no heading.
-			if (group.el.hidden !== (home.length === 0)) group.el.hidden = home.length === 0;
+			// WORKBENCH-UI4: with the workbench on, a category whose controls are all hidden takes none either, as
+			// the plan above already counts it. (With no note open the primary category showed its label over
+			// nothing, 157px that no item could give back, and pushed the rest out of the row.)
+			const bare = home.length === 0 || (this.input.workbench !== undefined && home.every(el => el.hidden));
+			if (group.el.hidden !== bare) group.el.hidden = bare;
 			if (group.section && group.section.hidden !== (away.length === 0)) group.section.hidden = away.length === 0;
 		}
 		this.moreItem.hidden = moved.size === 0;
@@ -714,11 +801,11 @@ export class SemantropyToolbar {
 		else if (focusedControl?.isConnected && this.doc.activeElement !== focusedControl) focusedControl.focus({ preventScroll: true });
 	}
 
-	private buildPrimary(): void {
-		this.reshuffleButton = this.iconButton(this.item("reshuffle", this.primary), "reshuffle", () => this.input.reshuffle(), "semantropy-reshuffle");
-		this.refreshButton = this.iconButton(this.item("refresh", this.primary), "refresh", () => this.input.refreshTarget(), "semantropy-refresh");
-		this.copyButton = this.iconButton(this.item("copy", this.primary), "copy", () => this.input.copy(), "semantropy-copy");
-		this.collectButton = this.iconButton(this.item("collect", this.primary), "collect", () => this.input.collect(), "semantropy-collect");
+	private buildPrimary(primary: HTMLElement): void {
+		this.reshuffleButton = this.iconButton(this.item("reshuffle", primary), "reshuffle", () => this.input.reshuffle(), "semantropy-reshuffle");
+		this.refreshButton = this.iconButton(this.item("refresh", primary), "refresh", () => this.input.refreshTarget(), "semantropy-refresh");
+		this.copyButton = this.iconButton(this.item("copy", primary), "copy", () => this.input.copy(), "semantropy-copy");
+		this.collectButton = this.iconButton(this.item("collect", primary), "collect", () => this.input.collect(), "semantropy-collect");
 	}
 
 	private buildLevel(): void {
@@ -820,6 +907,12 @@ export class SemantropyToolbar {
 		this.contrastEl.setAttribute("role", "status");
 
 		const d = () => ui().display;
+		// WORKBENCH-UI3: on a host with tabs, a note says which settings the Recompose tab does not show.
+		if (this.input.workbench?.().tabbed === true) {
+			this.shuffleOnlyEl = this.child(menu, "div", "semantropy-display-note");
+			this.labels.text(this.shuffleOnlyEl, () => ui().toolbar.workbench.shuffleOnly);
+			this.shuffleOnlyEl.hidden = true;
+		}
 		// 0.1.0 (owner report): the four switches sit two per row.
 		const toggles = this.child(menu, "div", "semantropy-display-toggles");
 		this.toggle(toggles, "showRuby", () => d().ruby, () => d().rubyDescription);
@@ -968,6 +1061,14 @@ export class SemantropyToolbar {
 			}
 			return;
 		}
+		if (panel === this.summaryPopup?.panel) {
+			// It hangs from the status line: its own containing block is the summary, and it stays inside the Toolbar's width.
+			const parent = (panel.offsetParent ?? this.root).getBoundingClientRect(), rootBox = this.root.getBoundingClientRect();
+			const room = Math.max(0, rootBox.right - parent.left - panel.offsetWidth);
+			panel.style.left = `${Math.round(Math.min(Math.max(0, anchor.getBoundingClientRect().left - parent.left), room))}px`;
+			this.fitPopupHeight(panel);
+			return;
+		}
 		const root = this.root.getBoundingClientRect();
 		const left = anchor.getBoundingClientRect().left - root.left;
 		const room = Math.max(0, this.root.clientWidth - panel.offsetWidth);
@@ -990,7 +1091,9 @@ export class SemantropyToolbar {
 		const bottom = Math.min(bounds.bottom, windowBottom);
 		const room = Math.max(96, Math.floor(bottom - panel.getBoundingClientRect().top - 8));
 		// 0.1.0 (owner report): no fixed cap, so a tall phone screen shows the whole Display settings.
-		panel.style.setProperty("max-height", `${room}px`);
+		// The Vocabulary's list of notes is the exception (owner, review 3): about half of the View, scrolling inside, however many notes.
+		const cap = panel === this.summaryPopup?.panel ? Math.max(96, Math.floor(bounds.height / 2)) : Number.POSITIVE_INFINITY;
+		panel.style.setProperty("max-height", `${Math.min(room, cap)}px`);
 	}
 
 	/**
@@ -1048,7 +1151,9 @@ export class SemantropyToolbar {
 
 	/** A control's icon, its label (shown in More) and its accessible name, in the current language. */
 	private controlText(button: HTMLElement, key: ToolbarControlKey, labels: UiLabels): void {
-		const name = () => ui().toolbar.controls[key].name;
+		const name = () => this.controlName(key);
+		// WORKBENCH-UI3: a name that follows the body area is re-applied on every sync.
+		if (this.input.workbench && WORKBENCH_KEYS.has(key)) labels = this.workbenchLabels;
 		iconLabel(button, TOOLBAR_CONTROLS[key].icon, name());
 		const label = button.querySelector<HTMLElement>(".semantropy-action-label");
 		if (label) labels.text(label, name);
@@ -1061,9 +1166,26 @@ export class SemantropyToolbar {
 			this.described.add(key);
 			const description = this.child(this.descriptions, "div", "semantropy-control-description");
 			description.id = id;
-			this.labels.text(description, () => ui().toolbar.controls[key].description);
+			const labels = this.input.workbench && WORKBENCH_KEYS.has(key) ? this.workbenchLabels : this.labels;
+			labels.text(description, () => this.controlDescription(key));
 		}
 		button.setAttribute("aria-describedby", id);
+	}
+
+	/**
+	 * WORKBENCH-UI3: a control's short name. Reshuffle text is Generate text while
+	 * the body is not generated (a host that opens a note without a Shuffle and has
+	 * no tabs). Without a workbench it is the catalog name.
+	 */
+	private controlName(key: ToolbarControlKey): string {
+		const controls = ui().toolbar.controls;
+		return key === "reshuffle" && this.input.workbench?.().generate ? ui().toolbar.workbench.generate.name : controls[key].name;
+	}
+
+	/** WORKBENCH-UI3: the longer description, following the same state as `controlName()`. */
+	private controlDescription(key: ToolbarControlKey): string {
+		const controls = ui().toolbar.controls;
+		return key === "reshuffle" && this.input.workbench?.().generate ? ui().toolbar.workbench.generate.description : controls[key].description;
 	}
 
 	private select(

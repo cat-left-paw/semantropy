@@ -265,8 +265,8 @@ describe("unchanged contracts", () => {
 
 	it("leaves Target mode identical where the old recovery did not over-protect", () => {
 		for (const md of [...safeTargetFixtures.map((f) => f.md), denseRubyNovel(3_000)]) {
-			// Only the Target policy id moved (target-presentation-1 -> -2).
-			expect(target(md).policyVersion).toBe("target-presentation-2");
+			// Only the Target policy id moved (target-presentation-1 -> -2 -> -3). None of these has a blank at the end of a line.
+			expect(target(md).policyVersion).toBe("target-presentation-3");
 			expect(JSON.stringify({ ...target(md), policyVersion: null })).toBe(JSON.stringify({ ...referenceProjectMarkdownSource(md, "target-prototype"), policyVersion: null }));
 		}
 		// Inputs that were (and stay) wholly protected: same blocks, ranges and no runs.

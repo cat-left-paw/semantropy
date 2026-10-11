@@ -36,7 +36,8 @@ export const probes = [
 	[AUTH, PURE, "frequency-counted-per-observation", "group.frequency = count(group.frequency + candidate.record.frequency);",
 		"group.frequency = count(group.frequency + candidate.record.frequency * handle.observations.lookup(candidate.record.candidateId)!.profiles.length);",
 		"counts a record once despite multiple observed profiles and duplicate Source handles"],
-	[AUTH, PURE, "frequency-draw-made-uniform", 'handle.provenance.drawMode === "frequency" ? group.frequency : 1', "1",
+	// 0.1.0 S3 moved the weight into drawWeight(); the rewrite is the same one: the draw mode is ignored.
+	[AUTH, PURE, "frequency-draw-made-uniform", "drawWeight(handle.provenance.drawMode, weights, group.frequency,", 'drawWeight("uniform", weights, group.frequency,',
 		"draws with Vocabulary frequency mode without exposing the nonce"],
 	[AUTH, PURE, "released-owner-remintable", 'if (REVOKED.has(vocabulary)) refuse("released");', "",
 		"revokes the owner and delayed evaluations on refresh"],

@@ -393,7 +393,8 @@ describe("UX-10 / UX-12 stylesheet contract", () => {
 	};
 	it("softens marker backgrounds and lines only, never the text", () => {
 		for (const selector of [".semantropy-body .semantropy-replaced", ".semantropy-body .semantropy-manual-available", ".semantropy-body .semantropy-dictionary-available"]) {
-			const body = rule(selector);
+			// FAKE-DICT-RECOMPOSE1: the replacement marker's colour is the highlight chain (`stylesheetVariables.test.ts` pins it); here it counts as the one variable it starts with.
+			const body = rule(selector)?.split("var(--text-highlight-bg, var(--highlight-background, rgba(255, 208, 0, 0.4)))").join("var(--text-highlight-bg)") ?? null;
 			expect(body, selector).not.toBeNull();
 			expect(body).toMatch(/color-mix\(in srgb, var\(--[a-z-]+\) \d+%, transparent\)/);
 			expect(body).not.toMatch(/(?:^|[;\s])(?:opacity|color|filter)\s*:/);

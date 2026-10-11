@@ -176,8 +176,9 @@ describe("distribution benchmark", () => {
 		async () => {
 			const main = await stat(path.join(rootDir, artifactDir, "main.js"));
 			const inspection = await inspectArtifact(path.join(rootDir, artifactDir), rootDir);
-			// Provisional UI-scope cap, raised to 600,000 at EXPERIENCE-LOCALE1 (see artifact.test.ts).
-			expect(inspection.maskedCodeBytes).toBeLessThan(650_000);
+			// Fake Alert Policy 1 §12: 650,000 is a monitoring target; since LEXEME-SHARE1 passed it, 750,000 is the
+			// point to stop and ask the owner, not a new upper limit (see artifact.test.ts).
+			expect(inspection.maskedCodeBytes).toBeLessThan(750_000);
 			const fullDictionary = await measureDictionaryDir(
 				linderaFullDictionaryDir(rootDir),
 			);
@@ -206,7 +207,7 @@ describe("distribution benchmark", () => {
 				},
 				size: {
 					maskedCodeBytes: inspection.maskedCodeBytes,
-					maskedProvisionalLimitBytes: 650_000,
+					maskedProvisionalLimitBytes: 750_000,
 					maskedBaselineDelta: inspection.maskedCodeBytes - 290_908,
 					mainJsBytes: main.size,
 					retiredReferenceBytes: RETIRED_MAIN_JS_REFERENCE_BYTES,
